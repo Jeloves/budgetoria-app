@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/styles/*": ["styles/*"]
+      "@/styles/*": ["styles/*"],
+      "@/firebase/*": [".firebase/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
