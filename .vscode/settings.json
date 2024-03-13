@@ -3,6 +3,7 @@
         "appspot",
         "budgetoria",
         "firebaseapp",
+        "firestore",
         "sidenav",
         "unspaced"
     ]
