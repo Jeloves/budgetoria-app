@@ -1,16 +1,20 @@
 import classNames from "classnames";
 import styles from "./icon-button.module.scss";
+import { ButtonHTMLAttributes } from "react";
 
 export type IconButtonPropsType = {
+	button: ButtonHTMLAttributes<HTMLButtonElement> & {
+		onClick: () => void;
+	};
 	src: string;
 	altText: string;
 };
 
 export function IconButton(props: IconButtonPropsType) {
-	const { src, altText } = props;
+	const { button, src, altText } = props;
 
 	return (
-		<button className={styles.iconButton}>
+		<button {...button} className={styles.iconButton}>
 			{/*eslint-disable-next-line @next/next/no-img-element*/}
 			<img src={src} alt={altText} />
 		</button>
