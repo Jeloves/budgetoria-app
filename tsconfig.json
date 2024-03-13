@@ -20,7 +20,10 @@
     ],
     "paths": {
       "@/styles/*": ["styles/*"],
-      "@/firebase/*": [".firebase/*"]
+      "@/firebase/*": [".firebase/*"],
+      "@/features/*": ["app/features/*"],
+      "@/icons/*": ["public/icons/*"],
+      "@/ui/*": ["app/features/ui/*"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

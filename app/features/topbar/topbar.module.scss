@@ -1,0 +1,25 @@
+@use "@styles/color";
+@use "@styles/space";
+
+
+.topbarContainer {
+	padding: space.$s3-1 space.$s2-1;
+	display: flex;
+	background-color: color.$primary-dark;
+	align-items: center;
+	gap: space.$s4;
+}
+
+.dateDisplay {
+	//margin-left = widthOfIcon + gapSize
+	margin-left: calc(space.$s6 + space.$s4);
+	display: flex;
+	justify-content: center;
+	flex: 1 0 0;
+	gap: space.$s2;
+
+	& span {
+		align-self: center;
+		color: white;
+	}
+}

@@ -1,0 +1,11 @@
+@use "@styles/space";
+@use "@styles/reset";
+
+.iconButton {
+    display: flex;
+
+    & img {
+        width: space.$s6;
+		height: space.$s6;
+    }
+}
