@@ -3,9 +3,13 @@ import "@/styles/global.scss";
 import { useEffect, useState } from "react";
 import { auth, getUser } from "@/firebase/auth";
 import { User } from "firebase/auth/cordova";
+import { getSelectedBudget } from "@/firebase/budgets";
+import { Budget } from "@/firebase/models";
+import { Topbar } from "@/features/topbar/topbar";
 
 export default function BudgetPage() {
 	const [user, setUser] = useState<User | null>(null);
+	const [budget, setBudget] = useState<Budget | null>(null);
 
 	// Sets user
 	useEffect(() => {
@@ -16,13 +20,18 @@ export default function BudgetPage() {
 
 	// Sets budgets
 	useEffect(() => {
-		const fetchBudgetData = async () => {};
+		const fetchBudgetData = async () => {
+			if (user) {
+				const data = await getSelectedBudget(user.uid);
+				setBudget(data);
+			}
+		};
 		fetchBudgetData();
 	}, [user]);
 
 	return (
 		<>
-			<header></header>
+			<Topbar/>
 			<main></main>
 		</>
 	);

@@ -1,0 +1,10 @@
+@use "@styles/space";
+
+.iconButton {
+    display: flex;
+
+    & img {
+        width: space.$s6;
+		height: space.$s6;
+    }
+}
