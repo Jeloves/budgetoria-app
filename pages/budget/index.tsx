@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { auth, getUser } from "@/firebase/auth";
 import { User } from "firebase/auth/cordova";
 import { getSelectedBudget } from "@/firebase/budgets";
+import { getAllocations } from "@/firebase/allocations";
 import { Budget } from "@/firebase/models";
 import { Topbar } from "@/features/topbar/topbar";
 
@@ -30,7 +31,7 @@ export default function BudgetPage() {
 
 	return (
 		<>
-			<Topbar/>
+			<Topbar />
 			<main></main>
 		</>
 	);
