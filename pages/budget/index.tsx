@@ -6,6 +6,8 @@ import { getSelectedBudget } from "@/firebase/budgets";
 import { getAllocations } from "@/firebase/allocations";
 import { Budget } from "@/firebase/models";
 import { Topbar } from "@/features/topbar/topbar";
+import { Unassigned } from "@/features/unassigned";
+import styles from "./index.module.scss"
 
 export default function BudgetPage() {
 	const [user, setUser] = useState<User | null>(null);
@@ -31,8 +33,11 @@ export default function BudgetPage() {
 
 	return (
 		<>
-			<Topbar />
-			<main></main>
+			<header className={styles.header}>
+				<Topbar />
+				<Unassigned currency={budget ? budget.currency : "USD"} unassignedBalance={budget ? budget.unassignedBalance : 0} />
+			</header>
+			<main className={styles.main}>Hello</main>
 		</>
 	);
 }

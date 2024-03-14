@@ -22,7 +22,7 @@ export function Unassigned(props: UnassignedPropsType) {
 			<section className={styles.unassigned}>
 				<div>
 					<data>
-						{currencySymbols.get(currency)} {unassignedBalance / 1000000}
+						{currencySymbols.get(currency)} {unassignedBalance! / 1000000}
 					</data>
 					<label>Ready to Assign</label>
 				</div>
