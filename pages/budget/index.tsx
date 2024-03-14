@@ -1,5 +1,4 @@
 "use client";
-import "@/styles/global.scss";
 import { useEffect, useState } from "react";
 import { auth, getUser } from "@/firebase/auth";
 import { User } from "firebase/auth/cordova";
