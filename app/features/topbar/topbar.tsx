@@ -2,6 +2,7 @@ import { useState } from "react";
 import Image from "next/image";
 import styles from "./topbar.module.scss";
 import { IconButton } from "@/features/ui/icon-button/icon-button";
+import { DatePicker } from "../date-picker";
 
 const monthAcronyms = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -26,9 +27,13 @@ export function Topbar() {
 		alert("Create new transaction");
 	};
 
-	const handlePreviousYearOnClick = () => {};
+	const handlePreviousYearOnClick = () => {
+		alert("prev year")
+	};
 
-	const handleNextYearOnClick = () => {};
+	const handleNextYearOnClick = () => {
+		alert("next year")
+	};
 
 	const handleMonthOnClick = (index: number) => {
 		setMonth(index);
@@ -86,7 +91,11 @@ export function Topbar() {
 				<IconButton button={{ onClick: handleEditOnClick }} src="/icons/edit.svg" altText="Button to edit categories" />
 				<IconButton button={{ onClick: handleCreateTransactionOnClick }} src="/icons/circled-dollar.svg" altText="Button to create new transaction" />
 			</section>
-			{isDatePickerShowing && datePicker}
+			{isDatePickerShowing && <DatePicker monthAcronyms={monthAcronyms}
+			handlePreviousYearOnClick={handlePreviousYearOnClick}
+			handleNextYearOnClick={handleNextYearOnClick}
+			handleMonthOnClick={handleMonthOnClick}
+			/>}
 		</>
 	);
 }

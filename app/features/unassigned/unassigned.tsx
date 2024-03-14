@@ -14,7 +14,7 @@ const currencySymbols = new Map([
 	["CAD", "$"],
 ]);
 
-function Unassigned(props: UnassignedPropsType) {
+export function Unassigned(props: UnassignedPropsType) {
 	const { currency, unassignedBalance } = props;
 
 	return (
