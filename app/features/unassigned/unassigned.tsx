@@ -3,7 +3,7 @@ import styles from "./unassigned.module.scss";
 
 type UnassignedPropsType = {
 	currency: string;
-	unassignedBalance: number;
+	unassignedBalance: number | null;
 };
 
 const currencySymbols = new Map([
