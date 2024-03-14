@@ -3,7 +3,7 @@ import styles from "./unassigned.module.scss";
 
 type UnassignedPropsType = {
 	currency: string;
-	unassignedBalance: number | null;
+	unassignedBalance: number;
 };
 
 const currencySymbols = new Map([
@@ -22,7 +22,7 @@ export function Unassigned(props: UnassignedPropsType) {
 			<section className={styles.unassigned}>
 				<div>
 					<data>
-						{currencySymbols.get(currency)} {unassignedBalance / 1000000}
+						{currencySymbols.get(currency)} {unassignedBalance! / 1000000}
 					</data>
 					<label>Ready to Assign</label>
 				</div>
