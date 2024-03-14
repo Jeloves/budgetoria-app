@@ -14,17 +14,6 @@ const Template: StoryFn<DatePickerPropsType> = (args) => <DatePicker {...args}/>
 
 export const Default = Template.bind({});
 
-const monthAcronyms = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-
 Default.args = {
     monthAcronyms: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-    handlePreviousYearOnClick: () => {
-        console.log("prev year")
-    },
-    handleNextYearOnClick: () => {
-        console.log("next year")
-    },
-    handleMonthOnClick: (index) => {
-        console.log(monthAcronyms[index])
-    }
 }
