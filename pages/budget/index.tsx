@@ -6,6 +6,7 @@ import { User } from "firebase/auth/cordova";
 import { getSelectedBudget } from "@/firebase/budgets";
 import { getAllocations } from "@/firebase/allocations";
 import { Allocation, Budget } from "@/firebase/models";
+import { Topbar } from "@/features/topbar/topbar";
 
 export default function BudgetPage() {
 	const [user, setUser] = useState<User | null>(null);
@@ -31,7 +32,7 @@ export default function BudgetPage() {
 
 	return (
 		<>
-			<header></header>
+			<Topbar/>
 			<main></main>
 		</>
 	);

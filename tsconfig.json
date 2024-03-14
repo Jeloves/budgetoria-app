@@ -19,7 +19,7 @@
       }
     ],
     "paths": {
-      "@/styles/*": ["styles/*"],
+      "@styles/*": ["styles/*"],
       "@/firebase/*": [".firebase/*"],
       "@/features/*": ["app/features/*"],
       "@/icons/*": ["public/icons/*"],

@@ -1,6 +1,6 @@
-import classNames from "classnames";
 import styles from "./icon-button.module.scss";
 import { ButtonHTMLAttributes } from "react";
+import "../../../reset.css"
 
 export type IconButtonPropsType = {
 	button: ButtonHTMLAttributes<HTMLButtonElement> & {

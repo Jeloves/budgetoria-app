@@ -36,10 +36,12 @@
 
 	& header {
 		width: 100%;
+		height: fit-content;
 		display: flex;
 		align-items: center;
 		padding: space.$s2 space.$s2 0 space.$s2;
 		box-sizing: border-box;
+		position: relative;
 
 		& h1 {
 			text-align: center;
