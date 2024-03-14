@@ -1,24 +1,42 @@
 import styles from "./date-picker.module.scss";
 import { IconButton } from "../ui";
+import classNames from "classnames";
+import { useState } from "react";
 
 export type DatePickerPropsType = {
-    monthAcronyms: string[];
-	handlePreviousYearOnClick: () => void;
-	handleNextYearOnClick: () => void;
-	handleMonthOnClick: (index: number) => void;
+	selectedMonth: number;
+	selectedYear: number;
+	monthAcronyms: string[];
+	handleMonthOnClick: (monthIndex: number, newYear: number) => void;
 };
 
 export function DatePicker(props: DatePickerPropsType) {
-	const { monthAcronyms, handlePreviousYearOnClick, handleNextYearOnClick, handleMonthOnClick } = props;
+	const { selectedMonth, selectedYear, monthAcronyms, handleMonthOnClick } = props;
+
+    const [yearDisplayed, setYearDisplayed] = useState<number>(selectedYear)
+
+    const handlePreviousYearOnClick = () => {
+		setYearDisplayed(yearDisplayed - 1);
+	};
+
+	const handleNextYearOnClick = () => {
+        setYearDisplayed(yearDisplayed + 1);
+	};
 
 	let trArray: JSX.Element[] = [];
 	let tdArray: JSX.Element[] = [];
 	monthAcronyms.map((acronym, index) => {
+
+		const classes = {
+			[styles.selected]: ((selectedMonth === index) && selectedYear === yearDisplayed) ? true : false,
+		};
+
 		tdArray.push(
 			<td
 				key={index}
+				className={classNames(classes)}
 				onClick={() => {
-					handleMonthOnClick(index);
+					handleMonthOnClick(index, yearDisplayed);
 				}}
 			>
 				{acronym}
@@ -34,7 +52,7 @@ export function DatePicker(props: DatePickerPropsType) {
 		<section className={styles.datePicker}>
 			<header>
 				<IconButton button={{ onClick: handlePreviousYearOnClick }} src="/icons/arrow-left.svg" altText="Button to select previous year" />
-				<h1>2024</h1>
+				<h1>{yearDisplayed}</h1>
 				<IconButton button={{ onClick: handleNextYearOnClick }} src="/icons/arrow-right.svg" altText="Button to select next year" />
 			</header>
 			<table>

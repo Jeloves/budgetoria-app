@@ -27,16 +27,11 @@ export function Topbar() {
 		alert("Create new transaction");
 	};
 
-	const handlePreviousYearOnClick = () => {
-		alert("prev year")
-	};
-
-	const handleNextYearOnClick = () => {
-		alert("next year")
-	};
-
-	const handleMonthOnClick = (index: number) => {
-		setMonth(index);
+	const handleMonthOnClick = (monthIndex: number, newYear: number) => {
+		setMonth(monthIndex);
+		if (year !== newYear) {
+			setYear(newYear)
+		}
 		setIsDatePickerShowing(false);
 	};
 
@@ -49,40 +44,6 @@ export function Topbar() {
 		</div>
 	);
 
-	let trArray: JSX.Element[] = [];
-	let tdArray: JSX.Element[] = [];
-	monthAcronyms.map((acronym, index) => {
-		tdArray.push(
-			<td
-				key={index}
-				onClick={() => {
-					handleMonthOnClick(index);
-				}}
-			>
-				{acronym}
-			</td>
-		);
-		if (index === 3 || index === 7 || index === 11) {
-			trArray.push(<tr>{tdArray}</tr>);
-			tdArray = [];
-		}
-	});
-
-	const datePicker = (
-		<section className={styles.datePicker}>
-			<header>
-				<IconButton button={{ onClick: handlePreviousYearOnClick }} src="/icons/arrow-left.svg" altText="Button to select previous year" />
-				<h1>2024</h1>
-				<IconButton button={{ onClick: handleNextYearOnClick }} src="/icons/arrow-right.svg" altText="Button to select next year" />
-			</header>
-			<table>
-				<tbody>
-					{trArray}
-				</tbody>
-			</table>
-		</section>
-	);
-
 	return (
 		<>
 			<section className={styles.topbarContainer}>
@@ -91,11 +52,7 @@ export function Topbar() {
 				<IconButton button={{ onClick: handleEditOnClick }} src="/icons/edit.svg" altText="Button to edit categories" />
 				<IconButton button={{ onClick: handleCreateTransactionOnClick }} src="/icons/circled-dollar.svg" altText="Button to create new transaction" />
 			</section>
-			{isDatePickerShowing && <DatePicker monthAcronyms={monthAcronyms}
-			handlePreviousYearOnClick={handlePreviousYearOnClick}
-			handleNextYearOnClick={handleNextYearOnClick}
-			handleMonthOnClick={handleMonthOnClick}
-			/>}
+			{isDatePickerShowing && <DatePicker selectedMonth={month} selectedYear={year} monthAcronyms={monthAcronyms} handleMonthOnClick={handleMonthOnClick} />}
 		</>
 	);
 }

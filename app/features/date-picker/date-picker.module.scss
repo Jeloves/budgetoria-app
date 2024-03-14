@@ -37,5 +37,9 @@
 		border-radius: 8px;
 		text-align: center;
 		font: font.$text-sm-medium;
+
+		&.selected {
+			background-color: lightblue;
+		}
 	}
 }
