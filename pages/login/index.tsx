@@ -1,3 +1,5 @@
+import "../reset.css";
+import styles from "./index.module.scss";
 import { useState, ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { signInUser } from "@/firebase/auth";
