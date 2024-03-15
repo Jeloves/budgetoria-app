@@ -28,6 +28,8 @@ export class Category {
     name: string;
     position: number;
 	subcategories: Subcategory[] = [];
+	assigned: number = 0;
+	available: number = 0;
     constructor(id: string, name: string, position: number) {
         this.id = id;
         this.name = name;
@@ -40,6 +42,8 @@ export class Subcategory {
     name: string;
     position: number;
     categoryID: string;
+	assigned: number = 0;
+	available: number = 0;
     constructor(id: string, name: string, position: number, categoryID: string) {
         this.id = id;
         this.name = name;

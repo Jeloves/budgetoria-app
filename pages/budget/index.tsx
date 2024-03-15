@@ -10,12 +10,22 @@ import { Allocation, Budget, Category, Subcategory } from "@/firebase/models";
 import { Topbar } from "@/features/topbar/topbar";
 import { Unassigned } from "@/features/unassigned";
 import { CategoryItem } from "@/features/category-item";
+import { todo } from "node:test";
+import { assignAllocations } from "./scripts";
 
 export default function BudgetPage() {
 	const [user, setUser] = useState<User | null>(null);
 	const [budget, setBudget] = useState<Budget | null>(null);
 	const [allocations, setAllocations] = useState<Allocation[]>([]);
 	const [categories, setCategories] = useState<Category[]>([]);
+
+	const [month, setMonth] = useState<number>(new Date().getMonth());
+	const [year, setYear] = useState(new Date().getFullYear());
+
+	const handleDateChangeOnClick = (monthIndex: number, newYear: number) => {
+		setMonth(monthIndex)
+		setYear(newYear)
+	}
 
 	// Sets user
 	useEffect(() => {
@@ -45,7 +55,6 @@ export default function BudgetPage() {
 				setAllocations(allocationData);
 
 				for (const category of categoryData) {
-					console.log("Category:", category);
 					if (category.id === "00000000-0000-0000-0000-000000000000") {
 						continue;
 					}
@@ -63,20 +72,23 @@ export default function BudgetPage() {
 		fetchBudgetSubcollections();
 	}, [user, budget]);
 
+
+	assignAllocations(categories, allocations, month, year)
 	const categoryItems: JSX.Element[] = [];
 	if (categories.length > 0) {
 		for (const category of categories) {
 			if (category.id === "00000000-0000-0000-0000-000000000000") {
 				continue;
 			}
-			categoryItems.push(<CategoryItem name={category.name} currencyString={"$"} assigned={0} available={0} subcategories={category.subcategories}/>)
+			categoryItems.push(<CategoryItem name={category.name} currencyString={"$"} assigned={category.assigned} available={0} subcategories={category.subcategories}/>)
 		}
 	}
+
 
 	return (
 		<>
 			<header className={styles.header}>
-				<Topbar />
+				<Topbar month={month} year={year} handleDateChangeOnClick={handleDateChangeOnClick}/>
 				<Unassigned currency={budget ? budget.currency : "USD"} unassignedBalance={budget ? budget.unassignedBalance : 0} />
 			</header>
 			<main className={styles.main}>{categoryItems}</main>

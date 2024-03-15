@@ -25,7 +25,7 @@ export async function getSubcategories(userID: string, budgetID: string): Promis
 
 		const subcategories: Subcategory[] = subcategoriesSnapshot.docs.map((doc) => {
 			const data = doc.data();
-			return { ...data, id: doc.id } as Subcategory;
+			return new Subcategory(doc.id, data.name, data.position, data.categoryID);
 		});
 
 		return subcategories;

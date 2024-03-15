@@ -6,9 +6,14 @@ import { DatePicker } from "../date-picker";
 
 const monthAcronyms = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-export function Topbar() {
-	const [month, setMonth] = useState<number>(new Date().getMonth());
-	const [year, setYear] = useState(new Date().getFullYear());
+type TopbarPropsType = {
+	month: number;
+	year: number;
+	handleDateChangeOnClick: (monthIndex: number, newYear: number) => void;
+};
+
+export function Topbar(props: TopbarPropsType) {
+	const { month, year, handleDateChangeOnClick } = props;
 	const [isDatePickerShowing, setIsDatePickerShowing] = useState(false);
 
 	const handleDateDisplayOnClick = () => {
@@ -28,9 +33,8 @@ export function Topbar() {
 	};
 
 	const handleMonthOnClick = (monthIndex: number, newYear: number) => {
-		setMonth(monthIndex);
-		if (year !== newYear) {
-			setYear(newYear)
+		if (newYear !== year || monthIndex !== month) {
+			handleDateChangeOnClick(monthIndex, newYear);
 		}
 		setIsDatePickerShowing(false);
 	};
