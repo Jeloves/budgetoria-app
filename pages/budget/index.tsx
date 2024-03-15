@@ -1,4 +1,5 @@
 "use client";
+import "../reset.css";
 import styles from "./index.module.scss";
 import { useEffect, useState } from "react";
 import { auth, getUser } from "@/firebase/auth";
