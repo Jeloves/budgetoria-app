@@ -6,7 +6,7 @@ import { DatePicker } from "../date-picker";
 
 const monthAcronyms = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-type TopbarPropsType = {
+export type TopbarPropsType = {
 	month: number;
 	year: number;
 	handleDateChangeOnClick: (monthIndex: number, newYear: number) => void;

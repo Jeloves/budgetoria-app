@@ -1,6 +1,6 @@
 import React from "react";
 import { Meta, StoryFn } from "@storybook/react";
-import { Topbar } from "./topbar"
+import { Topbar, TopbarPropsType } from "./topbar"
 
 export default {
   title: "Header/Topbar",
@@ -10,6 +10,6 @@ export default {
   },
 } as Meta<typeof Topbar>;
 
-const Template: StoryFn = () => <Topbar/>;
+const Template: StoryFn<TopbarPropsType> = (args) => <Topbar {...args}/>;
 
 export const Default = Template.bind({});
