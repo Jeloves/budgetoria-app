@@ -24,5 +24,6 @@
         background-color: color.$green;
         padding: 0 space.$s1;
         border-radius: space.$s2;
+        margin-right: calc(-1 * space.$s1);
     }
 }

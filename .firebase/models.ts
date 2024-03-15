@@ -27,6 +27,7 @@ export class Category {
 	id: string;
     name: string;
     position: number;
+	subcategories: Subcategory[] = [];
     constructor(id: string, name: string, position: number) {
         this.id = id;
         this.name = name;

@@ -9,7 +9,7 @@ export async function getCategories(userID: string, budgetID: string): Promise<C
 
 		const categories: Category[] = categoriesSnapshot.docs.map((doc) => {
 			const data = doc.data();
-			return { ...data, id: doc.id } as Category;
+			return new Category(doc.id, data.name, data.position);
 		});
 
 		return categories;

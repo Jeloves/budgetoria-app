@@ -16,7 +16,6 @@ export default function BudgetPage() {
 	const [budget, setBudget] = useState<Budget | null>(null);
 	const [allocations, setAllocations] = useState<Allocation[]>([]);
 	const [categories, setCategories] = useState<Category[]>([]);
-	const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
 
 	// Sets user
 	useEffect(() => {
@@ -36,7 +35,6 @@ export default function BudgetPage() {
 		fetchBudgetData();
 	}, [user]);
 
-
 	// Fetches budget subcollections
 	useEffect(() => {
 		const fetchBudgetSubcollections = async () => {
@@ -45,14 +43,35 @@ export default function BudgetPage() {
 				const categoryData = await getCategories(user.uid, budget.id);
 				const subcategoryData = await getSubcategories(user.uid, budget.id);
 				setAllocations(allocationData);
+
+				for (const category of categoryData) {
+					console.log("Category:", category);
+					if (category.id === "00000000-0000-0000-0000-000000000000") {
+						continue;
+					}
+					for (const subcategory of subcategoryData) {
+						if (category.id === subcategory.categoryID) {
+							category.subcategories.push(subcategory);
+						}
+					}
+					category.subcategories.sort((a, b) => a.position - b.position);
+				}
+				categoryData.sort((a, b) => a.position - b.position);
 				setCategories(categoryData);
-				setSubcategories(subcategoryData);
 			}
 		};
 		fetchBudgetSubcollections();
 	}, [user, budget]);
 
-	console.log(subcategories)
+	const categoryItems: JSX.Element[] = [];
+	if (categories.length > 0) {
+		for (const category of categories) {
+			if (category.id === "00000000-0000-0000-0000-000000000000") {
+				continue;
+			}
+			categoryItems.push(<CategoryItem name={category.name} currencyString={"$"} assigned={0} available={0} subcategories={category.subcategories}/>)
+		}
+	}
 
 	return (
 		<>
@@ -60,7 +79,7 @@ export default function BudgetPage() {
 				<Topbar />
 				<Unassigned currency={budget ? budget.currency : "USD"} unassignedBalance={budget ? budget.unassignedBalance : 0} />
 			</header>
-			<main className={styles.main}>Hello</main>
+			<main className={styles.main}>{categoryItems}</main>
 		</>
 	);
 }
