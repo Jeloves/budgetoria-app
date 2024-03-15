@@ -15,7 +15,11 @@ export function assignAllocations(categories: Category[], allocations: Allocatio
 		if (category.id === "00000000-0000-0000-0000-000000000000") {
 			continue;
 		}
+		category.assigned = 0;
+		category.available = 0;
 		for (const subcategory of category.subcategories) {
+			subcategory.assigned = 0;
+			subcategory.available = 0;
 			for (const allocation of allocations) {
 				if (allocation.month !== month || allocation.year !== year) {
 					continue;
