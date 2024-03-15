@@ -1,4 +1,5 @@
 "use client";
+import "../reset.css";
 import styles from "./index.module.scss";
 import { useEffect, useState } from "react";
 import { auth, getUser } from "@/firebase/auth";
@@ -69,7 +70,7 @@ export default function BudgetPage() {
 			if (category.id === "00000000-0000-0000-0000-000000000000") {
 				continue;
 			}
-			categoryItems.push(<CategoryItem name={category.name} currencyString={"$"} assigned={0} available={0} subcategories={category.subcategories}/>)
+			categoryItems.push(<CategoryItem name={category.name} currencyString={"$"} assigned={0} available={0} subcategories={category.subcategories} />);
 		}
 	}
 
