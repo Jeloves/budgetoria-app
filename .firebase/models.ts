@@ -34,6 +34,19 @@ export class Category {
     }
 }
 
+export class Subcategory {
+    id: string;
+    name: string;
+    position: number;
+    categoryID: string;
+    constructor(id: string, name: string, position: number, categoryID: string) {
+        this.id = id;
+        this.name = name;
+        this.position = position;
+        this.categoryID = categoryID;
+    }
+}
+
 export class Allocation {
 	id: string;
 	year: number;

@@ -5,8 +5,8 @@ import { auth, getUser } from "@/firebase/auth";
 import { User } from "firebase/auth/cordova";
 import { getSelectedBudget } from "@/firebase/budgets";
 import { getAllocations } from "@/firebase/allocations";
-import { getCategories } from "@/firebase/categories";
-import { Allocation, Budget, Category } from "@/firebase/models";
+import { getCategories, getSubcategories } from "@/firebase/categories";
+import { Allocation, Budget, Category, Subcategory } from "@/firebase/models";
 import { Topbar } from "@/features/topbar/topbar";
 import { Unassigned } from "@/features/unassigned";
 import { CategoryItem } from "@/features/category-item";
@@ -16,6 +16,7 @@ export default function BudgetPage() {
 	const [budget, setBudget] = useState<Budget | null>(null);
 	const [allocations, setAllocations] = useState<Allocation[]>([]);
 	const [categories, setCategories] = useState<Category[]>([]);
+	const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
 
 	// Sets user
 	useEffect(() => {
@@ -42,14 +43,16 @@ export default function BudgetPage() {
 			if (budget && user) {
 				const allocationData = await getAllocations(user.uid, budget.id);
 				const categoryData = await getCategories(user.uid, budget.id);
-
+				const subcategoryData = await getSubcategories(user.uid, budget.id);
 				setAllocations(allocationData);
 				setCategories(categoryData);
+				setSubcategories(subcategoryData);
 			}
 		};
 		fetchBudgetSubcollections();
 	}, [user, budget]);
 
+	console.log(subcategories)
 
 	return (
 		<>

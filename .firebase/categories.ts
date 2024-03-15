@@ -1,7 +1,7 @@
 import { getDocs, collection } from "firebase/firestore";
 import { collectionLabel } from "./firebase.config";
 import { firestore } from "./firebase.config";
-import { Category } from "./models"
+import { Category, Subcategory } from "./models"
 
 export async function getCategories(userID: string, budgetID: string): Promise<Category[]> {
 	try {
@@ -15,6 +15,22 @@ export async function getCategories(userID: string, budgetID: string): Promise<C
 		return categories;
 	} catch (error) {
 		console.error("Failed to read categories: ", error);
+		throw error;
+	}
+}
+
+export async function getSubcategories(userID: string, budgetID: string): Promise<Subcategory[]> {
+	try {
+		const subcategoriesSnapshot = await getDocs(collection(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.subcategories));
+
+		const subcategories: Subcategory[] = subcategoriesSnapshot.docs.map((doc) => {
+			const data = doc.data();
+			return { ...data, id: doc.id } as Subcategory;
+		});
+
+		return subcategories;
+	} catch (error) {
+		console.error("Failed to read subcategories: ", error);
 		throw error;
 	}
 }
