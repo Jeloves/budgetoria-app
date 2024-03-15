@@ -66,3 +66,26 @@ export class Allocation {
 		this.subcategoryID = subcategoryID;
 	}
 }
+
+export class Transaction {
+    id: string;
+    date: Timestamp;
+    payee: string;
+    memo: string;
+    balance: number;
+    approval: boolean;
+    accountID: string;
+    categoryID: string;
+    subcategoryID: string;
+    constructor(id: string, date: Timestamp, payee: string, memo: string, balance: number, approval: boolean, accountID: string, categoryID: string, subcategoryID: string) {
+        this.id = id;
+        this.date = date;
+        this.payee = payee;
+        this.memo = memo;
+        this.balance = balance;
+        this.approval = approval;
+        this.accountID = accountID;
+        this.categoryID = categoryID;
+        this.subcategoryID = subcategoryID;
+    }
+}
