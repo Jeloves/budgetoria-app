@@ -28,6 +28,8 @@ export class Category {
     name: string;
     position: number;
 	subcategories: Subcategory[] = [];
+	assigned: number = 0;
+	available: number = 0;
     constructor(id: string, name: string, position: number) {
         this.id = id;
         this.name = name;
@@ -40,6 +42,8 @@ export class Subcategory {
     name: string;
     position: number;
     categoryID: string;
+	assigned: number = 0;
+	available: number = 0;
     constructor(id: string, name: string, position: number, categoryID: string) {
         this.id = id;
         this.name = name;
@@ -61,4 +65,27 @@ export class Allocation {
 		this.balance = balance;
 		this.subcategoryID = subcategoryID;
 	}
+}
+
+export class Transaction {
+    id: string;
+    date: Timestamp;
+    payee: string;
+    memo: string;
+    balance: number;
+    approval: boolean;
+    accountID: string;
+    categoryID: string;
+    subcategoryID: string;
+    constructor(id: string, date: Timestamp, payee: string, memo: string, balance: number, approval: boolean, accountID: string, categoryID: string, subcategoryID: string) {
+        this.id = id;
+        this.date = date;
+        this.payee = payee;
+        this.memo = memo;
+        this.balance = balance;
+        this.approval = approval;
+        this.accountID = accountID;
+        this.categoryID = categoryID;
+        this.subcategoryID = subcategoryID;
+    }
 }
