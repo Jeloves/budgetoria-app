@@ -12,7 +12,7 @@ import { Allocation, Budget, Category, Subcategory, Transaction } from "@/fireba
 import { Topbar } from "@/features/topbar/topbar";
 import { Unassigned } from "@/features/unassigned";
 import { CategoryItem } from "@/features/category-item";
-import { calculateAllocations } from "./scripts/calculateAllocations";
+import { calculateAllocations } from "../../utils/calculateAllocations";
 
 export default function BudgetPage() {
 	const [user, setUser] = useState<User | null>(null);
