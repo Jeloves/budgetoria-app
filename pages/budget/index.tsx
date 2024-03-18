@@ -12,7 +12,7 @@ import { Allocation, Budget, Category, Subcategory, Transaction } from "@/fireba
 import { Topbar } from "@/features/topbar/topbar";
 import { Unassigned } from "@/features/unassigned";
 import { CategoryItem } from "@/features/category-item";
-import { assignAllocations } from "./scripts";
+import { calculateAllocations } from "./scripts/calculateAllocations";
 
 export default function BudgetPage() {
 	const [user, setUser] = useState<User | null>(null);
@@ -78,7 +78,7 @@ export default function BudgetPage() {
 
 	console.log(transactions);
 
-	assignAllocations(categories, allocations, transactions, month, year);
+	calculateAllocations(categories, allocations, transactions, month, year);
 	const categoryItems: JSX.Element[] = [];
 	if (categories.length > 0) {
 		for (const category of categories) {

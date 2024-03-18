@@ -2,7 +2,7 @@ import { NIL as NIL_UUID } from "uuid";
 import { Allocation, Category, Transaction } from "@/firebase/models";
 
 // Calculates allocation data at start, or when dateDisplayed is changed.
-export function assignAllocations(categories: Category[], allocations: Allocation[], transactions: Transaction[], month: number, year: number) {
+export function calculateAllocations(categories: Category[], allocations: Allocation[], transactions: Transaction[], month: number, year: number) {
 	// Filters transactions for that month
 	const filteredTransactionsByMonthYear: Transaction[] = transactions.filter((transaction) => {
 		const timestamp = transaction.date;
