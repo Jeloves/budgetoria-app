@@ -1,5 +1,4 @@
 import classNames from "classnames";
-import { IconButton } from "../ui";
 import styles from "./subcategory-item.module.scss";
 
 export type SubcategoryItemPropsType = {
@@ -17,7 +16,7 @@ export function SubcategoryItem(props: SubcategoryItemPropsType) {
 			<span className={styles.subcategoryName}>{name}</span>
 			<div className={classNames(styles.allocation)}>
 				{currencyString}
-				{(assigned / 1000000).toFixed(2)}
+				<input type="text" value={(assigned / 1000000).toFixed(2)}/>
 			</div>
 			<div className={classNames(styles.allocation)}>
 				<span>
