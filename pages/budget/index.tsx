@@ -78,6 +78,7 @@ export default function BudgetPage() {
 		fetchBudgetSubcollections();
 	}, [user, budget]);
 
+
 	const updateSubcategoryAllocation = async (subcategoryID: string, newBalance: number, changeInBalance: number) => {
 		await updateAssignedAllocation(user!.uid, budget!.id, subcategoryID, month, year, newBalance);
 		budget!.unassignedBalance -= changeInBalance;
@@ -92,8 +93,11 @@ export default function BudgetPage() {
 				continue;
 			}
 			categoryItems.push(<CategoryItem name={category.name} currencyString={"$"} assigned={category.assigned} available={category.available} subcategories={category.subcategories} updateSubcategoryAllocation={updateSubcategoryAllocation} />);
+
 		}
 	}
+
+	
 
 	return (
 		<>

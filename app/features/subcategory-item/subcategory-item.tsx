@@ -44,8 +44,8 @@ export function SubcategoryItem(props: SubcategoryItemPropsType) {
 			setAvailableAllocation(availableAllocation + changeInAssignedValue);
 			updateCategoryAllocations(changeInAssignedValue);
 			// Updating firebase
+
 			updateSubcategoryAllocation(subcategoryID, newAssigned, changeInAssignedValue);
-		}
 
 		// Used to re-render this component
 		setKey((key === 0) ? 1 : 0);
