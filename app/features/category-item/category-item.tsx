@@ -3,6 +3,7 @@ import { IconButton } from "../ui";
 import styles from "./category-item.module.scss";
 import { Subcategory } from "@/firebase/models";
 import { SubcategoryItem } from "../subcategory-item";
+import { useState } from "react";
 
 export type CategoryItemPropsType = {
 	name: string;
@@ -14,12 +15,23 @@ export type CategoryItemPropsType = {
 
 export function CategoryItem(props: CategoryItemPropsType) {
 	const { name, currencyString, assigned, available, subcategories } = props;
+	const [assignedAllocation, setAssignedAllocation] = useState<number>(assigned);
+	const [availableAllocation, setAvailableAllocation] = useState<number>(available);
 
 	const handleShowSubcategoriesOnClick = () => {};
 
+	const updateCategoryAllocations = (changeInAssignedValue: number) => {
+		if (changeInAssignedValue !== 0) {
+			const newAssigned = assignedAllocation + changeInAssignedValue;
+			const newAvailable = availableAllocation + changeInAssignedValue;
+			setAssignedAllocation(newAssigned);
+			setAvailableAllocation(newAvailable);
+		}
+	};
+
 	const subcategoryItems: JSX.Element[] = [];
 	for (const subcategory of subcategories) {
-		subcategoryItems.push(<SubcategoryItem name={subcategory.name} currencyString={currencyString} assigned={subcategory.assigned} available={subcategory.available}></SubcategoryItem>);
+		subcategoryItems.push(<SubcategoryItem name={subcategory.name} currencyString={currencyString} assigned={subcategory.assigned} available={subcategory.available} updateCategoryAllocations={updateCategoryAllocations}></SubcategoryItem>);
 	}
 
 	return (
@@ -32,12 +44,12 @@ export function CategoryItem(props: CategoryItemPropsType) {
 				<div className={classNames(styles.allocation)}>
 					<span>Assigned</span>
 					{currencyString}
-					{(assigned / 1000000).toFixed(2)}
+					{(assignedAllocation / 1000000).toFixed(2)}
 				</div>
 				<div className={classNames(styles.allocation)}>
 					<span>Available</span>
 					{currencyString}
-					{(available / 1000000).toFixed(2)}
+					{(availableAllocation / 1000000).toFixed(2)}
 				</div>
 			</section>
 			<div>{subcategoryItems}</div>
