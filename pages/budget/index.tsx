@@ -24,6 +24,8 @@ export default function BudgetPage() {
 	const [month, setMonth] = useState<number>(new Date().getMonth());
 	const [year, setYear] = useState(new Date().getFullYear());
 
+	const [unassignedKey, setUnassignedKey] = useState<0 | 1>(0);
+
 	const handleDateChangeOnClick = (monthIndex: number, newYear: number) => {
 		setMonth(monthIndex);
 		setYear(newYear);
@@ -76,9 +78,11 @@ export default function BudgetPage() {
 		fetchBudgetSubcollections();
 	}, [user, budget]);
 
-	const updateSubcategoryAllocation = async (subcategoryID: string, newBalance: number) => {
+	const updateSubcategoryAllocation = async (subcategoryID: string, newBalance: number, changeInBalance: number) => {
 		await updateAssignedAllocation(user!.uid, budget!.id, subcategoryID, month, year, newBalance);
-	}
+		budget!.unassignedBalance -= changeInBalance;
+		setUnassignedKey((unassignedKey === 0) ? 1 : 0);
+	};
 
 	calculateAllocations(categories, allocations, transactions, month, year);
 	const categoryItems: JSX.Element[] = [];
@@ -87,17 +91,15 @@ export default function BudgetPage() {
 			if (category.id === "00000000-0000-0000-0000-000000000000") {
 				continue;
 			}
-			categoryItems.push(<CategoryItem name={category.name} currencyString={"$"} assigned={category.assigned} available={category.available} subcategories={category.subcategories} updateSubcategoryAllocation={updateSubcategoryAllocation}/>);
+			categoryItems.push(<CategoryItem name={category.name} currencyString={"$"} assigned={category.assigned} available={category.available} subcategories={category.subcategories} updateSubcategoryAllocation={updateSubcategoryAllocation} />);
 		}
 	}
-
-	
 
 	return (
 		<>
 			<header className={styles.header}>
 				<Topbar month={month} year={year} handleDateChangeOnClick={handleDateChangeOnClick} />
-				<Unassigned currency={budget ? budget.currency : "USD"} unassignedBalance={budget ? budget.unassignedBalance : 0} />
+				<Unassigned currency={budget ? budget.currency : "USD"} unassignedBalance={budget ? budget.unassignedBalance : 0} key={unassignedKey}/>
 			</header>
 			<main className={styles.main}>{categoryItems}</main>
 		</>

@@ -9,7 +9,7 @@ export type SubcategoryItemPropsType = {
 	assigned: number;
 	available: number;
 	updateCategoryAllocations: (changeInAssignedValue: number) => void;
-	updateSubcategoryAllocation: (subcategoryID: string, newBalance: number) => void;
+	updateSubcategoryAllocation: (subcategoryID: string, newBalance: number, changeInBalance: number) => void;
 };
 
 export function SubcategoryItem(props: SubcategoryItemPropsType) {
@@ -44,11 +44,11 @@ export function SubcategoryItem(props: SubcategoryItemPropsType) {
 			setAvailableAllocation(availableAllocation + changeInAssignedValue);
 			updateCategoryAllocations(changeInAssignedValue);
 			// Updating firebase
-			updateSubcategoryAllocation(subcategoryID, newAssigned);
+			updateSubcategoryAllocation(subcategoryID, newAssigned, changeInAssignedValue);
 		}
 
 		// Used to re-render this component
-		setKey(key + 1);
+		setKey((key === 0) ? 1 : 0);
 	};
 
 	return (
