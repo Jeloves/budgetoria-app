@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { auth, getUser } from "@/firebase/auth";
 import { User } from "firebase/auth/cordova";
 import { getSelectedBudget } from "@/firebase/budgets";
-import { getAllocations } from "@/firebase/allocations";
+import { getAllocations, updateAssignedAllocation } from "@/firebase/allocations";
 import { getCategories, getSubcategories } from "@/firebase/categories";
 import { getTransactions } from "@/firebase/transactions";
 import { Allocation, Budget, Category, Subcategory, Transaction } from "@/firebase/models";
@@ -76,7 +76,9 @@ export default function BudgetPage() {
 		fetchBudgetSubcollections();
 	}, [user, budget]);
 
-	console.log(transactions);
+	const updateSubcategoryAllocation = async (subcategoryID: string, newBalance: number) => {
+		await updateAssignedAllocation(user!.uid, budget!.id, subcategoryID, month, year, newBalance);
+	}
 
 	calculateAllocations(categories, allocations, transactions, month, year);
 	const categoryItems: JSX.Element[] = [];
@@ -85,9 +87,11 @@ export default function BudgetPage() {
 			if (category.id === "00000000-0000-0000-0000-000000000000") {
 				continue;
 			}
-			categoryItems.push(<CategoryItem name={category.name} currencyString={"$"} assigned={category.assigned} available={category.available} subcategories={category.subcategories} />);
+			categoryItems.push(<CategoryItem name={category.name} currencyString={"$"} assigned={category.assigned} available={category.available} subcategories={category.subcategories} updateSubcategoryAllocation={updateSubcategoryAllocation}/>);
 		}
 	}
+
+	
 
 	return (
 		<>

@@ -3,15 +3,17 @@ import styles from "./subcategory-item.module.scss";
 import { useState } from "react";
 
 export type SubcategoryItemPropsType = {
+	subcategoryID: string;
 	name: string;
 	currencyString: string;
 	assigned: number;
 	available: number;
 	updateCategoryAllocations: (changeInAssignedValue: number) => void;
+	updateSubcategoryAllocation: (subcategoryID: string, newBalance: number) => void;
 };
 
 export function SubcategoryItem(props: SubcategoryItemPropsType) {
-	const { name, currencyString, assigned, available, updateCategoryAllocations } = props;
+	const { subcategoryID, name, currencyString, assigned, available, updateCategoryAllocations, updateSubcategoryAllocation } = props;
 	const [assignedAllocation, setAssignedAllocation] = useState<number>(assigned);
 	const [availableAllocation, setAvailableAllocation] = useState<number>(available);
 	const [key, setKey] = useState<number>(0);
@@ -39,10 +41,12 @@ export function SubcategoryItem(props: SubcategoryItemPropsType) {
 
 		if (changeInAssignedValue !== 0) {
 			setAssignedAllocation(newAssigned);
-			setAvailableAllocation(availableAllocation + changeInAssignedValue)
+			setAvailableAllocation(availableAllocation + changeInAssignedValue);
 			updateCategoryAllocations(changeInAssignedValue);
+			// Updating firebase
+			updateSubcategoryAllocation(subcategoryID, newAssigned);
 		}
-		
+
 		// Used to re-render this component
 		setKey(key + 1);
 	};
