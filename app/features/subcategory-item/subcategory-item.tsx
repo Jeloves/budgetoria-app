@@ -1,5 +1,6 @@
+import classNames from "classnames";
 import styles from "./subcategory-item.module.scss";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export type SubcategoryItemPropsType = {
 	subcategoryID: string;
@@ -11,11 +12,16 @@ export type SubcategoryItemPropsType = {
 	updateSubcategoryAllocation: (subcategoryID: string, newBalance: number, changeInBalance: number) => void;
 };
 
+type AvailableAllocationClassesType = {
+	[key: string]: boolean;
+};
+
 export function SubcategoryItem(props: SubcategoryItemPropsType) {
 	const { subcategoryID, name, currencyString, assigned, available, updateCategoryAllocations, updateSubcategoryAllocation } = props;
 	const [assignedAllocation, setAssignedAllocation] = useState<number>(assigned);
 	const [availableAllocation, setAvailableAllocation] = useState<number>(available);
 	const [key, setKey] = useState<number>(0);
+	const [availableAllocationClasses, setAvailableAllocationClasses] = useState<AvailableAllocationClassesType>({ [styles.allocation]: true });
 
 	const handleEnterKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
 		if (event.key === "Enter") {
@@ -46,14 +52,22 @@ export function SubcategoryItem(props: SubcategoryItemPropsType) {
 			updateSubcategoryAllocation(subcategoryID, newAssigned, changeInAssignedValue);
 		}
 		// Used to re-render this component
-		setKey((key === 0) ? 1 : 0);
+		setKey(key === 0 ? 1 : 0);
 	};
+
+	useEffect(() => {
+		setAvailableAllocationClasses({
+			[styles.allocation]: true,
+			[styles.empty]: availableAllocation === 0,
+			[styles.negative]: availableAllocation < 0,
+		});
+	}, [availableAllocation]);
 
 	return (
 		<section className={styles.subcategory}>
 			<span className={styles.subcategoryName}>{name}</span>
 			<input className={styles.input} type="text" defaultValue={currencyString + (assignedAllocation / 1000000).toFixed(2)} onBlur={handleInputBlur} onKeyDown={handleEnterKeyDown} key={key} />
-			<div className={styles.allocation}>
+			<div className={classNames(availableAllocationClasses)}>
 				<span>
 					{currencyString}
 					{(availableAllocation / 1000000).toFixed(2)}
