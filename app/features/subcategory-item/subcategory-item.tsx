@@ -1,4 +1,3 @@
-import classNames from "classnames";
 import styles from "./subcategory-item.module.scss";
 import { useState } from "react";
 
@@ -9,7 +8,7 @@ export type SubcategoryItemPropsType = {
 	assigned: number;
 	available: number;
 	updateCategoryAllocations: (changeInAssignedValue: number) => void;
-	updateSubcategoryAllocation: (subcategoryID: string, newBalance: number) => void;
+	updateSubcategoryAllocation: (subcategoryID: string, newBalance: number, changeInBalance: number) => void;
 };
 
 export function SubcategoryItem(props: SubcategoryItemPropsType) {
@@ -44,18 +43,17 @@ export function SubcategoryItem(props: SubcategoryItemPropsType) {
 			setAvailableAllocation(availableAllocation + changeInAssignedValue);
 			updateCategoryAllocations(changeInAssignedValue);
 			// Updating firebase
-			updateSubcategoryAllocation(subcategoryID, newAssigned);
+			updateSubcategoryAllocation(subcategoryID, newAssigned, changeInAssignedValue);
 		}
-
 		// Used to re-render this component
-		setKey(key + 1);
+		setKey((key === 0) ? 1 : 0);
 	};
 
 	return (
 		<section className={styles.subcategory}>
 			<span className={styles.subcategoryName}>{name}</span>
 			<input className={styles.input} type="text" defaultValue={currencyString + (assignedAllocation / 1000000).toFixed(2)} onBlur={handleInputBlur} onKeyDown={handleEnterKeyDown} key={key} />
-			<div className={classNames(styles.allocation)}>
+			<div className={styles.allocation}>
 				<span>
 					{currencyString}
 					{(availableAllocation / 1000000).toFixed(2)}

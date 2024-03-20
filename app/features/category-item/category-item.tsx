@@ -11,7 +11,7 @@ export type CategoryItemPropsType = {
 	assigned: number;
 	available: number;
 	subcategories: Subcategory[];
-	updateSubcategoryAllocation: (subcategoryID: string, newBalance: number) => void;
+	updateSubcategoryAllocation: (subcategoryID: string, newBalance: number, changeInBalance: number) => void;
 };
 
 export function CategoryItem(props: CategoryItemPropsType) {
@@ -31,9 +31,11 @@ export function CategoryItem(props: CategoryItemPropsType) {
 	};
 
 	const subcategoryItems: JSX.Element[] = [];
-	for (const subcategory of subcategories) {
+	for (let i=0; i<subcategories.length; i++) {
+		const subcategory = subcategories[i]
 		subcategoryItems.push(
 			<SubcategoryItem
+				key={i}
 				subcategoryID={subcategory.id}
 				name={subcategory.name}
 				currencyString={currencyString}
@@ -43,7 +45,7 @@ export function CategoryItem(props: CategoryItemPropsType) {
 				updateSubcategoryAllocation={updateSubcategoryAllocation}
 			/>
 		);
-	}
+	};
 
 	return (
 		<>
