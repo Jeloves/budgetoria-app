@@ -31,9 +31,10 @@ export function CategoryItem(props: CategoryItemPropsType) {
 	};
 
 	const subcategoryItems: JSX.Element[] = [];
-	for (const subcategory of subcategories) {
+	for (const [index, subcategory] of subcategories.entries()) {
 		subcategoryItems.push(
 			<SubcategoryItem
+				key={index}
 				subcategoryID={subcategory.id}
 				name={subcategory.name}
 				currencyString={currencyString}
@@ -43,7 +44,7 @@ export function CategoryItem(props: CategoryItemPropsType) {
 				updateSubcategoryAllocation={updateSubcategoryAllocation}
 			/>
 		);
-	}
+	};
 
 	return (
 		<>
