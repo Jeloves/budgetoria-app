@@ -12,6 +12,7 @@ export type CategoryItemPropsType = {
 	available: number;
 	subcategories: Subcategory[];
 	updateSubcategoryAllocation: (subcategoryID: string, newBalance: number, changeInBalance: number) => void;
+};
 
 export function CategoryItem(props: CategoryItemPropsType) {
 	const { name, currencyString, assigned, available, subcategories, updateSubcategoryAllocation } = props;
