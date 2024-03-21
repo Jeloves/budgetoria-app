@@ -2,19 +2,17 @@
 @use "@styles/space";
 
 .unassigned {
-    height: auto;
-    width: auto;
-    background-color: color.$green;
-    border-radius: space.$s2;
+    height: space.$s20;
     box-sizing: border-box;
-    margin: 1rem;
-    margin-bottom: 0rem;
-    padding: 1rem;
     display: flex;
+    align-items: center;
+    padding: 0 space.$s2;
 
     div {
-        height: 100%;
-        width: auto;
+        height: fit-content;
+        border-radius: space.$s2;
+        background-color: color.$green;
+        padding: space.$s4;
         display: flex;
         flex-direction: column;
         align-items: flex-start;

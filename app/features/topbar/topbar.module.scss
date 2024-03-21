@@ -4,12 +4,14 @@
 
 
 .topbarContainer {
+	height: space.$s15;
 	padding: space.$s3-1 space.$s2-1;
 	display: flex;
 	background-color: color.$secondary-dark;
 	align-items: center;
 	gap: space.$s4;
 	border-bottom: space.$s0-1 solid color.$gray-500;
+	box-sizing: border-box;
 }
 
 .dateDisplay {
