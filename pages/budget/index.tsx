@@ -4,7 +4,7 @@ import styles from "./index.module.scss";
 import { useEffect, useState } from "react";
 import { auth, getUser } from "@/firebase/auth";
 import { User } from "firebase/auth/cordova";
-import { getSelectedBudget } from "@/firebase/budgets";
+import { getSelectedBudget, updateUnassignedBalance } from "@/firebase/budgets";
 import { getAllocations, updateAssignedAllocation } from "@/firebase/allocations";
 import { getCategories, getSubcategories } from "@/firebase/categories";
 import { getTransactions } from "@/firebase/transactions";
@@ -38,7 +38,7 @@ export default function BudgetPage() {
 		});
 	});
 
-	// Sets budgets
+	// Fetches selected budget when user logs in
 	useEffect(() => {
 		const fetchBudgetData = async () => {
 			if (user) {
@@ -49,14 +49,14 @@ export default function BudgetPage() {
 		fetchBudgetData();
 	}, [user]);
 
-	// Fetches budget subcollections
+	// Fetches subcollections when budget changes
 	useEffect(() => {
 		const fetchBudgetSubcollections = async () => {
-			if (budget && user) {
-				const allocationData = await getAllocations(user.uid, budget.id);
-				const categoryData = await getCategories(user.uid, budget.id);
-				const subcategoryData = await getSubcategories(user.uid, budget.id);
-				const transactionData = await getTransactions(user.uid, budget.id);
+			if (budget) {
+				const allocationData = await getAllocations(user!.uid, budget.id);
+				const categoryData = await getCategories(user!.uid, budget.id);
+				const subcategoryData = await getSubcategories(user!.uid, budget.id);
+				const transactionData = await getTransactions(user!.uid, budget.id);
 				setAllocations(allocationData);
 				setTransactions(transactionData);
 
@@ -76,13 +76,14 @@ export default function BudgetPage() {
 			}
 		};
 		fetchBudgetSubcollections();
-	}, [user, budget]);
-
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [budget]);
 
 	const updateSubcategoryAllocation = async (subcategoryID: string, newBalance: number, changeInBalance: number) => {
 		await updateAssignedAllocation(user!.uid, budget!.id, subcategoryID, month, year, newBalance);
+		await updateUnassignedBalance(user!.uid, changeInBalance);
 		budget!.unassignedBalance -= changeInBalance;
-		setUnassignedKey((unassignedKey === 0) ? 1 : 0);
+		setUnassignedKey(unassignedKey === 0 ? 1 : 0);
 	};
 
 	calculateAllocations(categories, allocations, transactions, month, year);
@@ -93,17 +94,14 @@ export default function BudgetPage() {
 				continue;
 			}
 			categoryItems.push(<CategoryItem name={category.name} currencyString={"$"} assigned={category.assigned} available={category.available} subcategories={category.subcategories} updateSubcategoryAllocation={updateSubcategoryAllocation} />);
-
 		}
 	}
-
-	
 
 	return (
 		<>
 			<header className={styles.header}>
 				<Topbar month={month} year={year} handleDateChangeOnClick={handleDateChangeOnClick} />
-				<Unassigned currency={budget ? budget.currency : "USD"} unassignedBalance={budget ? budget.unassignedBalance : 0} key={unassignedKey}/>
+				<Unassigned currency={budget ? budget.currency : "USD"} unassignedBalance={budget ? budget.unassignedBalance : 0} key={unassignedKey} />
 			</header>
 			<main className={styles.main}>{categoryItems}</main>
 		</>

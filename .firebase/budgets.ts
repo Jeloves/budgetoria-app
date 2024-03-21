@@ -1,4 +1,4 @@
-import { getDocs, collection } from "firebase/firestore";
+import { getDocs, collection, doc, setDoc } from "firebase/firestore";
 import { collectionLabel } from "./firebase.config";
 import { firestore } from "./firebase.config";
 import { Budget } from "./models"
@@ -35,6 +35,27 @@ export async function getSelectedBudget(userID: string): Promise<Budget> {
 		}
 	} catch (error) {
 		console.error("Failed to read selected budget: ", error);
+		throw error;
+	}
+}
+
+export async function updateUnassignedBalance(userID: string, changeInBalance: number) {
+	try {
+		const budgetsSnapshot = await getDocs(collection(firestore, collectionLabel.users, userID, collectionLabel.budgets));
+		const budgetDoc = budgetsSnapshot.docs.find((doc) => {
+			const data = doc.data();
+			return data.selectedBool;
+		});
+		
+		if (budgetDoc) {
+			const unassignedBalance = budgetDoc.data().unassignedBalance;
+			const budgetRef = doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetDoc.id)
+			setDoc(budgetRef, {unassignedBalance: unassignedBalance - changeInBalance})
+		} else {
+			throw new Error("Cannot find a selected budget.");
+		}
+	} catch (error) {
+		console.error("Failed to update unassigned balance: ", error);
 		throw error;
 	}
 }
