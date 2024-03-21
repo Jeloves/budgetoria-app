@@ -1,4 +1,4 @@
-import { getDocs, collection, doc, setDoc } from "firebase/firestore";
+import { getDocs, collection, doc, updateDoc } from "firebase/firestore";
 import { collectionLabel } from "./firebase.config";
 import { firestore } from "./firebase.config";
 import { Budget } from "./models"
@@ -50,7 +50,7 @@ export async function updateUnassignedBalance(userID: string, changeInBalance: n
 		if (budgetDoc) {
 			const unassignedBalance = budgetDoc.data().unassignedBalance;
 			const budgetRef = doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetDoc.id)
-			setDoc(budgetRef, {unassignedBalance: unassignedBalance - changeInBalance})
+			updateDoc(budgetRef, {unassignedBalance: unassignedBalance - changeInBalance})
 		} else {
 			throw new Error("Cannot find a selected budget.");
 		}
