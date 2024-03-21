@@ -1,10 +1,14 @@
+@use "@styles/space";
+
 .header {
-    height: 16vh;
+    height: calc(space.$s20 + space.$s15);   // = unassigned.height + topbar.height
     width: 100vw;
     position: fixed;
+    display: flex;
+    flex-direction: column;
 }
 
 .main {
-    padding-top: 18vh;
+    padding-top: calc(space.$s20 + space.$s15);
     box-sizing: border-box;
 }

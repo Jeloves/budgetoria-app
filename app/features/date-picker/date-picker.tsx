@@ -13,22 +13,21 @@ export type DatePickerPropsType = {
 export function DatePicker(props: DatePickerPropsType) {
 	const { selectedMonth, selectedYear, monthAcronyms, handleMonthOnClick } = props;
 
-    const [yearDisplayed, setYearDisplayed] = useState<number>(selectedYear)
+	const [yearDisplayed, setYearDisplayed] = useState<number>(selectedYear);
 
-    const handlePreviousYearOnClick = () => {
+	const handlePreviousYearOnClick = () => {
 		setYearDisplayed(yearDisplayed - 1);
 	};
 
 	const handleNextYearOnClick = () => {
-        setYearDisplayed(yearDisplayed + 1);
+		setYearDisplayed(yearDisplayed + 1);
 	};
 
 	let trArray: JSX.Element[] = [];
 	let tdArray: JSX.Element[] = [];
 	monthAcronyms.map((acronym, index) => {
-
 		const classes = {
-			[styles.selected]: ((selectedMonth === index) && selectedYear === yearDisplayed) ? true : false,
+			[styles.selected]: selectedMonth === index && selectedYear === yearDisplayed ? true : false,
 		};
 
 		tdArray.push(
@@ -50,14 +49,16 @@ export function DatePicker(props: DatePickerPropsType) {
 
 	return (
 		<section className={styles.datePicker}>
-			<header>
-				<IconButton button={{ onClick: handlePreviousYearOnClick }} src="/icons/arrow-left.svg" altText="Button to select previous year" />
-				<h1>{yearDisplayed}</h1>
-				<IconButton button={{ onClick: handleNextYearOnClick }} src="/icons/arrow-right.svg" altText="Button to select next year" />
-			</header>
-			<table>
-				<tbody>{trArray}</tbody>
-			</table>
+			<div className={styles.datePickerContent}>
+				<header>
+					<IconButton button={{ onClick: handlePreviousYearOnClick }} src="/icons/arrow-left.svg" altText="Button to select previous year" />
+					<h1>{yearDisplayed}</h1>
+					<IconButton button={{ onClick: handleNextYearOnClick }} src="/icons/arrow-right.svg" altText="Button to select next year" />
+				</header>
+				<table>
+					<tbody>{trArray}</tbody>
+				</table>
+			</div>
 		</section>
 	);
 }
