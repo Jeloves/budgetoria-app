@@ -2,6 +2,8 @@
 
 .iconButton {
     display: flex;
+    background: none;
+    border: none;
 
     & img {
         width: space.$s6;
