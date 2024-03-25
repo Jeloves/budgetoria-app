@@ -5,7 +5,7 @@
     color: white;
 	display: flex;
     border-bottom: space.$s0-1 solid color.$gray-500;
-    gap: space.$s2;
+    gap: space.$s4;
     align-items: center;
 
     input[type="text"] {
@@ -28,7 +28,7 @@
 
 .editSubcategory {
     background-color: color.$primary-dark;
-    padding: space.$s4 space.$s4;
+    padding: space.$s4 space.$s2;
 }
 
 

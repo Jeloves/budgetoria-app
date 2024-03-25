@@ -13,6 +13,7 @@ import { Topbar } from "@/features/topbar/topbar";
 import { Unassigned } from "@/features/unassigned";
 import { CategoryItem } from "@/features/category-item";
 import { calculateAllocations } from "../../utils/calculateAllocations";
+import { EditPage } from "@/features/edit-categories";
 
 export default function BudgetPage() {
 	const [user, setUser] = useState<User | null>(null);
@@ -26,10 +27,16 @@ export default function BudgetPage() {
 
 	const [unassignedKey, setUnassignedKey] = useState<0 | 1>(0);
 
+	// Passed to DatePicker
 	const handleDateChangeOnClick = (monthIndex: number, newYear: number) => {
 		setMonth(monthIndex);
 		setYear(newYear);
 	};
+
+	// Passed to Topbar
+	const handleEditCategoriesOnClick = () => {
+
+	}
 
 	// Sets user
 	useEffect(() => {
@@ -98,6 +105,7 @@ export default function BudgetPage() {
 	}
 
 	return (
+		/*
 		<>
 			<header className={styles.header}>
 				<Topbar month={month} year={year} handleDateChangeOnClick={handleDateChangeOnClick} />
@@ -105,5 +113,7 @@ export default function BudgetPage() {
 			</header>
 			<main className={styles.main}>{categoryItems}</main>
 		</>
+		*/
+		<EditPage categories={categories}/>
 	);
 }
