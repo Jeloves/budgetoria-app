@@ -17,5 +17,5 @@ export const Default = Template.bind({});
 
 Default.args = {
     category: null,
-    subcategory: new Subcategory("id", "Crunchyroll", 0, "catID"),
+    subcategory: new Subcategory("id", "Crunchyroll", "catID"),
 }
