@@ -34,9 +34,7 @@ export default function BudgetPage() {
 	};
 
 	// Passed to Topbar
-	const handleEditCategoriesOnClick = () => {
-
-	}
+	const handleEditCategoriesOnClick = () => {};
 
 	// Sets user
 	useEffect(() => {
@@ -76,14 +74,30 @@ export default function BudgetPage() {
 							category.subcategories.push(subcategory);
 						}
 					}
-					category.subcategories.sort((a, b) => a.position - b.position);
+					category.subcategories.sort((a, b) => {
+						if (a.name < b.name) {
+							return -1;
+						} else if (a.name > b.name) {
+							return 1;
+						} else {
+							return 0;
+						}
+					});
 				}
-				categoryData.sort((a, b) => a.position - b.position);
+				categoryData.sort((a, b) => {
+					if (a.name < b.name) {
+						return -1;
+					} else if (a.name > b.name) {
+						return 1;
+					} else {
+						return 0;
+					}
+				});
 				setCategories(categoryData);
 			}
 		};
 		fetchBudgetSubcollections();
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [budget]);
 
 	const updateSubcategoryAllocation = async (subcategoryID: string, newBalance: number, changeInBalance: number) => {
@@ -114,6 +128,6 @@ export default function BudgetPage() {
 			<main className={styles.main}>{categoryItems}</main>
 		</>
 		*/
-		<EditPage categories={categories}/>
+		<EditPage categories={categories} />
 	);
 }

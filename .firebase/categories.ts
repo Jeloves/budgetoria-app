@@ -9,7 +9,7 @@ export async function getCategories(userID: string, budgetID: string): Promise<C
 
 		const categories: Category[] = categoriesSnapshot.docs.map((doc) => {
 			const data = doc.data();
-			return new Category(doc.id, data.name, data.position);
+			return new Category(doc.id, data.name);
 		});
 
 		return categories;
@@ -25,7 +25,7 @@ export async function getSubcategories(userID: string, budgetID: string): Promis
 
 		const subcategories: Subcategory[] = subcategoriesSnapshot.docs.map((doc) => {
 			const data = doc.data();
-			return new Subcategory(doc.id, data.name, data.position, data.categoryID);
+			return new Subcategory(doc.id, data.name, data.categoryID);
 		});
 
 		return subcategories;

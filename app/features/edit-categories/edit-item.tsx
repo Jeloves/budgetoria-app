@@ -28,7 +28,6 @@ export function EditItem(props: EditItemPropsType) {
 		alert("SUBcategory will be moved.");
 	};
 
-	let editItemElement: JSX.Element;
 
 	if (category && subcategory === null) {
 		return (
