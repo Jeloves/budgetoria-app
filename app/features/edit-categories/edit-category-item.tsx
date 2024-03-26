@@ -8,12 +8,13 @@ import { v4 as uuidv4 } from "uuid";
 
 export type EditCategoryItemPropsType = {
 	category: Category;
+	handleDeleteCategoryClick: (categoryID: string) => void;
 	handleDeleteSubcategoryClick: (subcategoryID: string, categoryID: string) => void;
 	handleAddSubcategoryClick: (subcategory: Subcategory) => void;
 };
 
 export function EditCategoryItem(props: EditCategoryItemPropsType) {
-	const { category, handleDeleteSubcategoryClick, handleAddSubcategoryClick } = props;
+	const { category, handleDeleteCategoryClick, handleDeleteSubcategoryClick, handleAddSubcategoryClick } = props;
 	const [isShowingEmptySubcategory, setIsShowingEmptySubcategory] = useState<boolean>(false);
 
 	const handleDeleteCategory = () => {
@@ -28,7 +29,7 @@ export function EditCategoryItem(props: EditCategoryItemPropsType) {
 		if (event.key === "Enter") {
 			const inputValue = event.currentTarget.value;
 			if (inputValue) {
-				handleAddSubcategoryClick(new Subcategory(uuidv4(), inputValue, category.id))
+				handleAddSubcategoryClick(new Subcategory(uuidv4(), inputValue, category.id));
 				setIsShowingEmptySubcategory(false);
 			} else {
 				setIsShowingEmptySubcategory(false);
@@ -46,8 +47,18 @@ export function EditCategoryItem(props: EditCategoryItemPropsType) {
 		<section>
 			<div className={styles.editCategoryContent}>
 				<input type="text" defaultValue={category.name} />
-				<IconButton button={{ onClick: handleDeleteCategory }} src={"/icons/circled-minus.svg"} altText={"Button to delete category"} />
-				<IconButton button={{ onClick: handleDisplayNewSubcategory }} src={"/icons/circled-plus.svg"} altText={"Button to add subcategory"} />
+				<IconButton
+					button={{
+						onClick: () => {
+							handleDeleteCategoryClick(category.id);
+						},
+					}}
+					src={"/icons/circled-minus.svg"}
+					altText={"Button to delete category"}
+				/>
+				<div className={isShowingEmptySubcategory ? styles.showingEmptySubcategory : ""}>
+					<IconButton button={{ onClick: handleDisplayNewSubcategory }} src={"/icons/circled-plus.svg"} altText={"Button to add subcategory"} />
+				</div>
 			</div>
 			{isShowingEmptySubcategory ? (
 				<div className={styles.emptySubcategory}>

@@ -63,3 +63,23 @@
 		border-bottom: space.$s0-1 solid color.$gray-500;
 	}
 }
+
+.emptyCategory {
+	box-sizing: border-box;
+	background-color: color.$secondary-dark;
+	padding: space.$s4 calc(space.$s2 + space.$s4 + space.$s6) space.$s4 space.$s2;
+	border-bottom: space.$s0-1 solid color.$gray-500;
+	display: flex;
+
+    & input[type="text"] {
+		// Reset
+		margin-right: space.$s8;
+		padding: 0;
+		border: space.$s0-1 solid color.$gray-500;
+		outline: none;
+		background: none;
+		font: inherit;
+		color: white;
+        flex: 1;
+	}
+}

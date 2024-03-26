@@ -24,6 +24,15 @@
 	}
 }
 
+.showingEmptySubcategory {
+	width: space.$s6;
+	height: space.$s5;
+
+	& img {
+		display: none;
+	}
+}
+
 .emptySubcategory {
 	box-sizing: border-box;
 	background-color: color.$primary-dark;
