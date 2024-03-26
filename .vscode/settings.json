@@ -7,7 +7,9 @@
         "firebaseapp",
         "firestore",
         "sidenav",
+        "subcat",
         "unspaced",
+        "uuidv",
         "vercel"
     ]
 }

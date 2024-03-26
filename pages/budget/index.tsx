@@ -128,6 +128,6 @@ export default function BudgetPage() {
 			<main className={styles.main}>{categoryItems}</main>
 		</>
 		*/
-		<EditPage categories={categories} />
+		(categories.length > 0) ? <EditPage categoryData={[...categories]} /> : <></>
 	);
 }

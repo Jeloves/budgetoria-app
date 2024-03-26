@@ -1,0 +1,65 @@
+@use "@styles/color";
+@use "@styles/font";
+@use "@styles/space";
+
+.header {
+	width: 100vw;
+	height: space.$s15;
+	padding: space.$s3-1 space.$s2-1;
+	background-color: color.$secondary-dark;
+	display: flex;
+	align-items: center;
+	border-bottom: space.$s0-1 solid color.$gray-500;
+	box-sizing: border-box;
+	color: white;
+	position: fixed;
+
+	& span {
+		display: flex;
+		flex-direction: column;
+	}
+
+	& div {
+		display: flex;
+		flex: 1;
+	}
+
+	& div:nth-child(2) {
+		justify-content: flex-end;
+	}
+}
+
+.textButton {
+	font: font.$text-sm-medium;
+}
+
+.cancel {
+	color: red;
+}
+
+.finish {
+	margin-left: space.$s4;
+	color: color.$green;
+}
+
+.empty {
+	color: color.$secondary-dark;
+}
+
+.content {
+	padding-top: space.$s15;
+}
+
+.categorySelectionContent {
+
+	.categoryOption {
+		color: white;
+		width: 100%;
+		padding: space.$s2 space.$s2;
+		display: flex;
+		flex-direction: column;
+		font-size: space.$s6;
+		align-items: center;
+		border-bottom: space.$s0-1 solid color.$gray-500;
+	}
+}

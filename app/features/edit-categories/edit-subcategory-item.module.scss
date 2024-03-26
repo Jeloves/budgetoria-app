@@ -2,13 +2,13 @@
 @use "@styles/space";
 
 .editItem {
-    color: white;
+	color: white;
 	display: flex;
-    border-bottom: space.$s0-1 solid color.$gray-500;
-    gap: space.$s4;
-    align-items: center;
+	border-bottom: space.$s0-1 solid color.$gray-500;
+	gap: space.$s4;
+	align-items: center;
 
-    input[type="text"] {
+	input[type="text"] {
 		// Reset
 		margin: 0;
 		padding: 0;
@@ -17,7 +17,11 @@
 		background: none;
 		font: inherit;
 		color: inherit;
-        flex: 1;
+		flex: 1;
+	}
+
+	input[type="checkbox"] {
+		display: none;
 	}
 }
 
@@ -27,9 +31,7 @@
 }
 
 .editSubcategory {
-    background-color: color.$primary-dark;
-    padding: space.$s4 space.$s2;
+	background-color: color.$primary-dark;
+	padding: space.$s4 space.$s2;
 }
-
-
 
