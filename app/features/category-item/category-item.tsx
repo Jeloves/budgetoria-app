@@ -21,6 +21,10 @@ export function CategoryItem(props: CategoryItemPropsType) {
 
 	const handleShowSubcategoriesOnClick = () => {};
 
+	const handleAddSubcategoryOnClick = () => {
+		alert("adding")
+	};
+
 	const updateCategoryAllocations = (changeInAssignedValue: number) => {
 		if (changeInAssignedValue !== 0) {
 			const newAssigned = assignedAllocation + changeInAssignedValue;
@@ -31,8 +35,8 @@ export function CategoryItem(props: CategoryItemPropsType) {
 	};
 
 	const subcategoryItems: JSX.Element[] = [];
-	for (let i=0; i<subcategories.length; i++) {
-		const subcategory = subcategories[i]
+	for (let i = 0; i < subcategories.length; i++) {
+		const subcategory = subcategories[i];
 		subcategoryItems.push(
 			<SubcategoryItem
 				key={i}
@@ -45,7 +49,7 @@ export function CategoryItem(props: CategoryItemPropsType) {
 				updateSubcategoryAllocation={updateSubcategoryAllocation}
 			/>
 		);
-	};
+	}
 
 	return (
 		<>
@@ -53,6 +57,10 @@ export function CategoryItem(props: CategoryItemPropsType) {
 				<span className={styles.categoryName}>
 					<IconButton button={{ onClick: handleShowSubcategoriesOnClick }} src={"/icons/arrow-down.svg"} altText={"Button to show subcategories"} />
 					{name}
+					<button className={styles.addSubcategory} onClick={handleAddSubcategoryOnClick}>
+						{/* eslint-disable-next-line @next/next/no-img-element */}
+						<img src="/icons/circled-plus.svg" alt="Button for adding a subcategory"></img>
+					</button>
 				</span>
 				<div className={classNames(styles.allocation)}>
 					<span>Assigned</span>
