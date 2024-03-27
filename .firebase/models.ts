@@ -23,7 +23,6 @@ export class Budget {
 export class Category {
 	id: string;
     name: string;
-	subcategories: Subcategory[] = [];
 	assigned: number = 0;
 	available: number = 0;
     constructor(id: string, name: string) {
