@@ -31,12 +31,20 @@ export function EditPage(props: EditPagePropsType) {
 	const [movedSubcategories, setMovedSubcategories] = useState<MovedSubcategoryMap[]>([]);
 	const [selectedSubcategory, setSelectedSubcategory] = useState<Subcategory | null>(null);
 	const [isShowingEmptyCategory, setIsShowingEmptyCategory] = useState<boolean>(false);
+	const [isLoadingChanges, setIsLoadingChanges] = useState<boolean>(false);
 	const [mainKey, setMainKey] = useState<number>(0);
 
 	const handleDeleteCategoryClick = (categoryID: string) => {
 		if (!deletedCategoriesByID.includes(categoryID)) {
 			deletedCategoriesByID.push(categoryID);
 			const targetCategoryIndex = categories.findIndex((category) => category.id === categoryID);
+			const targetCategory = categories[targetCategoryIndex];
+
+			for (const subcategory of targetCategory.subcategories) {
+				if (!deletedSubcategoriesByID.includes(subcategory.id)) {
+					deletedSubcategoriesByID.push(subcategory.id);
+				}
+			}
 			categories.splice(targetCategoryIndex, 1);
 			setMainKey(mainKey === 0 ? 1 : 0);
 		}
@@ -131,6 +139,11 @@ export function EditPage(props: EditPagePropsType) {
 		}
 	};
 
+	const handleDoneClick = () => {
+		setIsLoadingChanges(true);
+		props.handleFinishEditsClick(deletedCategoriesByID, newCategories, deletedSubcategoriesByID, newSubcategories, movedSubcategories);
+	}
+
 	const editHeader = (
 		<header className={styles.header}>
 			<div>
@@ -151,9 +164,7 @@ export function EditPage(props: EditPagePropsType) {
 				/>
 				<button
 					className={classNames(styles.textButton, styles.finish)}
-					onClick={() => {
-						props.handleFinishEditsClick(deletedCategoriesByID, newCategories, deletedSubcategoriesByID, newSubcategories, movedSubcategories);
-					}}
+					onClick={handleDoneClick}
 				>
 					Done
 				</button>
@@ -209,6 +220,7 @@ export function EditPage(props: EditPagePropsType) {
 
 	return (
 		<>
+			{isLoadingChanges ? <div className={styles.loading}>Loading</div> : null}
 			{selectedSubcategory ? categorySelectionHeader : editHeader}
 			<main key={mainKey} className={styles.content}>
 				{isShowingEmptyCategory ? (

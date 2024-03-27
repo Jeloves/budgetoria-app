@@ -1,7 +1,8 @@
-import { getDocs, collection, doc, setDoc } from "firebase/firestore";
+import { getDocs, collection, doc, setDoc, deleteDoc, getDoc } from "firebase/firestore";
 import { collectionLabel } from "./firebase.config";
 import { firestore } from "./firebase.config";
 import { Allocation } from "./models";
+import { updateUnassignedBalance } from "./budgets";
 
 export async function getAllocations(userID: string, budgetID: string): Promise<Allocation[]> {
 	try {
@@ -39,5 +40,13 @@ export async function updateAssignedAllocation(userID: string, budgetID: string,
 		}
 	} catch {
 		console.error("Failed to update allocation.");
+	}
+}
+
+export async function deleteAllocation(userID: string, budgetID: string, allocationID: string) {
+	try {
+		await deleteDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.allocations, allocationID));
+	} catch (error) {
+		console.error("Failed to delete allocation", error);
 	}
 }

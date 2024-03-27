@@ -2,6 +2,21 @@
 @use "@styles/font";
 @use "@styles/space";
 
+.loading {
+	width: 100%;
+	height: 100%;
+	background-color: color.$secondary-dark;
+	position: fixed;
+	z-index: 2;
+	color: white;
+	font-size: 24px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	box-sizing: border-box;
+	padding-bottom: space.$s15;
+}
+
 .header {
 	width: 100vw;
 	height: space.$s15;
@@ -13,6 +28,7 @@
 	box-sizing: border-box;
 	color: white;
 	position: fixed;
+	z-index: 1;
 
 	& span {
 		display: flex;

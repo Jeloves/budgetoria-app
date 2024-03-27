@@ -1,7 +1,7 @@
-import { getDocs, collection, setDoc, doc } from "firebase/firestore";
+import { getDocs, collection, doc, setDoc, deleteDoc } from "firebase/firestore";
 import { collectionLabel } from "./firebase.config";
 import { firestore } from "./firebase.config";
-import { Category, Subcategory } from "./models"
+import { Category, Subcategory } from "./models";
 
 export async function getCategories(userID: string, budgetID: string): Promise<Category[]> {
 	try {
@@ -23,9 +23,17 @@ export async function createCategory(userID: string, budgetID: string, newCatego
 	try {
 		await setDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.categories, newCategory.id), {
 			name: newCategory.name,
-		})
+		});
 	} catch (error) {
 		console.error("Failed to add new category", error);
+	}
+}
+
+export async function deleteCategory(userID: string, budgetID: string, categoryID: string) {
+	try {
+		await deleteDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.categories, categoryID));
+	} catch (error) {
+		console.error("Failed to delete category", error);
 	}
 }
 
@@ -50,8 +58,16 @@ export async function createSubcategory(userID: string, budgetID: string, newSub
 		await setDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.subcategories, newSubcategory.id), {
 			name: newSubcategory.name,
 			categoryID: newSubcategory.categoryID,
-		})
+		});
 	} catch (error) {
 		console.error("Failed to add new subcategory", error);
+	}
+}
+
+export async function deleteSubcategory(userID: string, budgetID: string, subcategoryID: string) {
+	try {
+		await deleteDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.subcategories, subcategoryID));
+	} catch (error) {
+		console.error("Failed to delete subcategory", error);
 	}
 }

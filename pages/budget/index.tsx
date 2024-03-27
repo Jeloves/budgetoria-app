@@ -48,9 +48,10 @@ export default function BudgetPage() {
 		setIsEditing(false);
 	};
 	const handleFinishEditsClick = (deletedCategoriesByID: string[], newCategories: Category[], deletedSubcategoriesByID: string[], newSubcategories: Subcategory[], movedSubcategories: MovedSubcategoryMap[]) => {
-		handleCategoryChanges(user!.uid, budget!.id, deletedCategoriesByID, newCategories, deletedSubcategoriesByID, newSubcategories, movedSubcategories);
-		setIsEditing(false)
-		setDataListenerKey(!dataListenerKey);
+		handleCategoryChanges(user!.uid, budget!.id, allocations, transactions.concat(incompleteTransactions), deletedCategoriesByID, newCategories, deletedSubcategoriesByID, newSubcategories, movedSubcategories).then(() => {
+			setIsEditing(false)
+			setDataListenerKey(!dataListenerKey);
+		});
 	};
 
 	// Sets user
@@ -69,7 +70,7 @@ export default function BudgetPage() {
 			}
 		};
 		fetchBudgetData();
-	}, [user]);
+	}, [user, dataListenerKey]);
 
 	// Fetches subcollections when budget changes
 	useEffect(() => {
@@ -79,19 +80,17 @@ export default function BudgetPage() {
 				const categoryData = await getCategories(user!.uid, budget.id);
 				const subcategoryData = await getSubcategories(user!.uid, budget.id);
 				const transactionData = await getTransactions(user!.uid, budget.id);
-				setAllocations(allocationData);
 
 				const completeTransactionsData: Transaction[] = [];
 				const incompleteTransactionsData: Transaction[] = [];
 				for (const transaction of transactionData) {
-					if (transaction.categoryID === null || transaction.subcategoryID === null) {
+					if (transaction.categoryID === "" || transaction.subcategoryID === "") {
 						incompleteTransactionsData.push(transaction);
 					} else {
 						completeTransactionsData.push(transaction);
 					}
 				}
-				setTransactions(completeTransactionsData);
-				setIncompleteTransactions(incompleteTransactions);
+				
 
 				for (const category of categoryData) {
 					if (category.id === "00000000-0000-0000-0000-000000000000") {
@@ -121,21 +120,25 @@ export default function BudgetPage() {
 						return 0;
 					}
 				});
+				calculateAllocations(categoryData, allocationData, completeTransactionsData, month, year);
+
 				setCategories(categoryData);
+				setTransactions(completeTransactionsData);
+				setIncompleteTransactions(incompleteTransactions);
+				setAllocations(allocationData);
 			}
 		};
-		fetchBudgetSubcollections();
+		fetchBudgetSubcollections()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [budget, dataListenerKey]);
 
 	const updateSubcategoryAllocation = async (subcategoryID: string, newBalance: number, changeInBalance: number) => {
 		await updateAssignedAllocation(user!.uid, budget!.id, subcategoryID, month, year, newBalance);
-		await updateUnassignedBalance(user!.uid, changeInBalance);
+		await updateUnassignedBalance(user!.uid, -changeInBalance);
 		budget!.unassignedBalance -= changeInBalance;
 		setUnassignedKey(unassignedKey === 0 ? 1 : 0);
 	};
-console.log(budget)
-	calculateAllocations(categories, allocations, transactions, month, year);
+
 	const categoryItems: JSX.Element[] = [];
 	if (categories.length > 0) {
 		for (const category of categories) {
