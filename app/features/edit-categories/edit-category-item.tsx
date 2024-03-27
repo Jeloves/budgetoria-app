@@ -11,15 +11,12 @@ export type EditCategoryItemPropsType = {
 	handleDeleteCategoryClick: (categoryID: string) => void;
 	handleDeleteSubcategoryClick: (subcategoryID: string, categoryID: string) => void;
 	handleAddSubcategoryClick: (subcategory: Subcategory) => void;
+	handleSelectSubcategoryClick: (subcategory: Subcategory) => void;
 };
 
 export function EditCategoryItem(props: EditCategoryItemPropsType) {
-	const { category, handleDeleteCategoryClick, handleDeleteSubcategoryClick, handleAddSubcategoryClick } = props;
+	const { category, handleDeleteCategoryClick, handleDeleteSubcategoryClick, handleAddSubcategoryClick, handleSelectSubcategoryClick } = props;
 	const [isShowingEmptySubcategory, setIsShowingEmptySubcategory] = useState<boolean>(false);
-
-	const handleDeleteCategory = () => {
-		alert("category will be deleted.");
-	};
 
 	const handleDisplayNewSubcategory = () => {
 		setIsShowingEmptySubcategory(true);
@@ -40,7 +37,14 @@ export function EditCategoryItem(props: EditCategoryItemPropsType) {
 	let subcategoryEditItems: JSX.Element[] = [];
 	for (let i = 0; i < category.subcategories.length; i++) {
 		const subcategory = category.subcategories[i];
-		subcategoryEditItems.push(<EditSubcategoryItem key={i} subcategory={subcategory} categoryID={category.id} handleSelectSubcategoryClick={(id: string, name: string) => {}} handleDeleteSubcategoryClick={handleDeleteSubcategoryClick} />);
+		subcategoryEditItems.push(
+			<EditSubcategoryItem
+				key={i}
+				subcategory={subcategory}
+				handleDeleteSubcategoryClick={handleDeleteSubcategoryClick}
+				handleSelectSubcategoryClick={handleSelectSubcategoryClick}
+			/>
+		);
 	}
 
 	return (

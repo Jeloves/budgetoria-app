@@ -29,12 +29,20 @@
 	}
 }
 
-.textButton {
-	font: font.$text-sm-medium;
+.selectionHeader {
+	justify-content: space-between;
+
+	.empty {
+		color: color.$secondary-dark;
+	}
 }
 
 .cancel {
 	color: red;
+}
+
+.textButton {
+	font: font.$text-sm-medium;
 }
 
 .finish {
@@ -42,26 +50,28 @@
 	color: color.$green;
 }
 
-.empty {
-	color: color.$secondary-dark;
-}
+
 
 .content {
 	padding-top: space.$s15;
+	display: flex;
+	flex-direction: column;
 }
 
-.categorySelectionContent {
+.categoryOption {
+	color: white;
+	width: 100%;
+	padding: space.$s2 space.$s2;
+	display: flex;
+	flex-direction: column;
+	font-size: space.$s6;
+	align-items: center;
+	border-bottom: space.$s0-1 solid color.$gray-500;
+}
 
-	.categoryOption {
-		color: white;
-		width: 100%;
-		padding: space.$s2 space.$s2;
-		display: flex;
-		flex-direction: column;
-		font-size: space.$s6;
-		align-items: center;
-		border-bottom: space.$s0-1 solid color.$gray-500;
-	}
+.categoryOptionHeading {
+	background-color: color.$primary-dark;
+	font-size: space.$s4;
 }
 
 .emptyCategory {

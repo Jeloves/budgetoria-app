@@ -11,14 +11,23 @@ export type EditPagePropsType = {
 	categoryData: Category[];
 };
 
+export interface MovedSubcategoryMap {
+	oldCategoryID: string;
+	newCategoryID: string;
+	subcategoryID: string;
+}
+
 export function EditPage(props: EditPagePropsType) {
 	const [categories, setCategories] = useState<Category[]>(props.categoryData);
-	const [selectedSubcategory, setSelectedSubcategory] = useState<Subcategory[]>([]);
+	const [deletedCategoriesByID, setDeletedCategoriesByID] = useState<string[]>([]);
+	const [newCategories, setNewCategories] = useState<Category[]>([]);
+	const [deletedSubcategoriesByID, setDeletedSubcategoriesByID] = useState<string[]>([]);
+	const [newSubcategories, setNewSubcategories] = useState<Subcategory[]>([]);
+	const [movedSubcategories, setMovedSubcategories] = useState<MovedSubcategoryMap[]>([]);
+	const [selectedSubcategory, setSelectedSubcategory] = useState<Subcategory | null>(null);
 	const [isShowingEmptyCategory, setIsShowingEmptyCategory] = useState<boolean>(false);
 	const [mainKey, setMainKey] = useState<number>(0);
 
-	const deletedCategoriesByID: string[] = [];
-	const newCategories: Category[] = [];
 	const handleDeleteCategoryClick = (categoryID: string) => {
 		if (!deletedCategoriesByID.includes(categoryID)) {
 			deletedCategoriesByID.push(categoryID);
@@ -55,8 +64,6 @@ export function EditPage(props: EditPagePropsType) {
 		}
 	};
 
-	const deletedSubcategoriesByID: string[] = [];
-	const newSubcategories: Subcategory[] = [];
 	const handleDeleteSubcategoryClick = (subcategoryID: string, categoryID: string) => {
 		if (!deletedSubcategoriesByID.includes(subcategoryID)) {
 			deletedSubcategoriesByID.push(subcategoryID);
@@ -85,54 +92,110 @@ export function EditPage(props: EditPagePropsType) {
 			setMainKey(mainKey === 0 ? 1 : 0);
 		}
 	};
-
-	const handleSelectSubcategoryClick = (subcategory: Subcategory) => {};
+	const handleSelectSubcategoryClick = (subcategory: Subcategory) => {
+		console.log("Selected:", subcategory);
+		setSelectedSubcategory(subcategory);
+		setMainKey(mainKey === 0 ? 1 : 0);
+	};
 
 	const handleSelectCategoryClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-		const selectedCategoryID = event.currentTarget.id;
+		const oldCategoryID = selectedSubcategory!.categoryID;
+		const newCategoryID = event.currentTarget.id;
+		if (oldCategoryID !== newCategoryID) {
+			movedSubcategories.push({ oldCategoryID: oldCategoryID, newCategoryID: newCategoryID, subcategoryID: selectedSubcategory!.id });
+
+			const targetOldCategoryIndex = categories.findIndex((category) => category.id === oldCategoryID);
+			const targetNewCategoryIndex = categories.findIndex((category) => category.id === newCategoryID);
+			const targetOldSubcategoryIndex = categories[targetOldCategoryIndex].subcategories.findIndex((subcategory) => subcategory.id === selectedSubcategory!.id);
+
+			categories[targetOldCategoryIndex].subcategories.splice(targetOldSubcategoryIndex, 1);
+			categories[targetNewCategoryIndex].subcategories.push(selectedSubcategory!);
+			categories[targetNewCategoryIndex].subcategories.sort((a, b) => {
+				if (a.name < b.name) {
+					return -1;
+				} else if (a.name > b.name) {
+					return 1;
+				} else {
+					return 0;
+				}
+			});
+
+			setSelectedSubcategory(null);
+			setMainKey(mainKey === 0 ? 1 : 0);
+			console.log(movedSubcategories);
+		}
 	};
 
 	const editHeader = (
-		<>
+		<header className={styles.header}>
 			<div>
 				<button className={classNames(styles.textButton, styles.cancel)}>Cancel</button>
 			</div>
 			Edit Categories
 			<div>
-				<IconButton button={{ onClick: () => {setIsShowingEmptyCategory(!isShowingEmptyCategory)} }} src={isShowingEmptyCategory ? "/icons/delete-folder.svg" : "/icons/add-folder.svg"} altText="Button to add new category" />
+				<IconButton
+					button={{
+						onClick: () => {
+							setIsShowingEmptyCategory(!isShowingEmptyCategory);
+						},
+					}}
+					src={isShowingEmptyCategory ? "/icons/delete-folder.svg" : "/icons/add-folder.svg"}
+					altText="Button to add new category"
+				/>
 				<button className={classNames(styles.textButton, styles.finish)}>Done</button>
 			</div>
-		</>
+		</header>
 	);
 
 	const categorySelectionHeader = (
-		<>
-			<button className={classNames(styles.textButton, styles.cancel)}>Cancel</button>
-			<span>Subcategory</span>
-			<button className={classNames(styles.textButton, styles.empty)}>Done</button>
-		</>
+		<header className={classNames(styles.header, styles.selectionHeader)}>
+			<button
+				className={classNames(styles.textButton, styles.cancel)}
+				onClick={() => {
+					setSelectedSubcategory(null);
+				}}
+			>
+				Cancel
+			</button>
+			Moving Subcategory: {selectedSubcategory ? selectedSubcategory.name : ""}
+			<button className={classNames(styles.textButton, styles.empty)}>Cancel</button>
+		</header>
 	);
 
 	let editContent: JSX.Element[] = [];
-	let categorySelectionContent: JSX.Element[] = [];
+	let categorySelectionContent: JSX.Element[] = [
+		<h1 key={-1} className={classNames(styles.categoryOption, styles.categoryOptionHeading)}>
+			Select New Category
+		</h1>,
+	];
 
-	editContent.length = 0;
-	categorySelectionContent.length = 0;
 	for (let i = 0; i < categories.length; i++) {
 		const category = categories[i];
 		if (category.id === NIL_UUID) {
 			continue;
 		}
-		editContent.push(<EditCategoryItem key={i} category={category} handleDeleteCategoryClick={handleDeleteCategoryClick} handleDeleteSubcategoryClick={handleDeleteSubcategoryClick} handleAddSubcategoryClick={handleAddSubcategoryClick} />);
+		editContent.push(
+			<EditCategoryItem
+				key={i}
+				category={category}
+				handleDeleteCategoryClick={handleDeleteCategoryClick}
+				handleDeleteSubcategoryClick={handleDeleteSubcategoryClick}
+				handleAddSubcategoryClick={handleAddSubcategoryClick}
+				handleSelectSubcategoryClick={handleSelectSubcategoryClick}
+			/>
+		);
 		categorySelectionContent.push(
 			<button key={i} id={category.id} onClick={handleSelectCategoryClick} className={styles.categoryOption}>
 				{category.name}
 			</button>
 		);
 	}
+
+	console.log(categories)
+
 	return (
 		<>
-			<header className={styles.header}>{selectedSubcategory.length > 0 ? categorySelectionHeader : editHeader}</header>
+			{selectedSubcategory ? categorySelectionHeader : editHeader}
 			<main key={mainKey} className={styles.content}>
 				{isShowingEmptyCategory ? (
 					<div className={styles.emptyCategory}>
@@ -148,7 +211,7 @@ export function EditPage(props: EditPagePropsType) {
 						/>
 					</div>
 				) : null}
-				{selectedSubcategory.length > 0 ? categorySelectionContent : editContent}
+				{selectedSubcategory ? categorySelectionContent : editContent}
 			</main>
 		</>
 	);
