@@ -8,11 +8,6 @@ export class Budget {
 	currency: string;
 	selected: boolean = false;
 	unassignedBalance: number = 0;
-	accounts = [];
-	categories = [];
-	subcategories = [];
-	allocations = [];
-	transactions = [];
 
 	constructor(id: string, name: string, dateCreated: Timestamp, locale: string, currency: string) {
 		this.id = id;
@@ -71,8 +66,8 @@ export class Transaction {
     balance: number;
     approval: boolean;
     accountID: string;
-    categoryID: string;
-    subcategoryID: string;
+    categoryID: string | null;
+    subcategoryID: string | null;
     constructor(id: string, date: Timestamp, payee: string, memo: string, balance: number, approval: boolean, accountID: string, categoryID: string, subcategoryID: string) {
         this.id = id;
         this.date = date;

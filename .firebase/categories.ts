@@ -1,4 +1,4 @@
-import { getDocs, collection } from "firebase/firestore";
+import { getDocs, collection, setDoc, doc } from "firebase/firestore";
 import { collectionLabel } from "./firebase.config";
 import { firestore } from "./firebase.config";
 import { Category, Subcategory } from "./models"
@@ -16,6 +16,18 @@ export async function getCategories(userID: string, budgetID: string): Promise<C
 	} catch (error) {
 		console.error("Failed to read categories: ", error);
 		throw error;
+	}
+}
+
+export async function createCategory(userID: string, budgetID: string, newCategory: Category) {
+	try {
+		await setDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.categories, newCategory.id), {
+			name: newCategory.name,
+		})
+		return Promise.resolve();
+	} catch (error) {
+		console.error("Failed to add new category", error);
+		return Promise.reject();
 	}
 }
 

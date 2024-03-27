@@ -6,10 +6,14 @@ import styles from "./edit-page.module.scss";
 import { useState } from "react";
 import classNames from "classnames";
 import { v4 as uuidv4 } from "uuid";
+import { handleCategoryChanges } from "@/utils/handleCategoryChanges";
 
 export type EditPagePropsType = {
+	userID: string;
+	budgetID: string;
 	categoryData: Category[];
 	handleCancelEditCategoriesClick: () => void;
+	handleFinishEditsClick: (deletedCategoriesByID: string[], newCategories: Category[], deletedSubcategoriesByID: string[], newSubcategories: Subcategory[], movedSubcategories: MovedSubcategoryMap[]) => void;
 };
 
 export interface MovedSubcategoryMap {
@@ -130,7 +134,9 @@ export function EditPage(props: EditPagePropsType) {
 	const editHeader = (
 		<header className={styles.header}>
 			<div>
-				<button className={classNames(styles.textButton, styles.cancel)} onClick={props.handleCancelEditCategoriesClick}>Cancel</button>
+				<button className={classNames(styles.textButton, styles.cancel)} onClick={props.handleCancelEditCategoriesClick}>
+					Cancel
+				</button>
 			</div>
 			Edit Categories
 			<div>
@@ -143,7 +149,14 @@ export function EditPage(props: EditPagePropsType) {
 					src={isShowingEmptyCategory ? "/icons/delete-folder.svg" : "/icons/add-folder.svg"}
 					altText="Button to add new category"
 				/>
-				<button className={classNames(styles.textButton, styles.finish)}>Done</button>
+				<button
+					className={classNames(styles.textButton, styles.finish)}
+					onClick={() => {
+						props.handleFinishEditsClick(deletedCategoriesByID, newCategories, deletedSubcategoriesByID, newSubcategories, movedSubcategories);
+					}}
+				>
+					Done
+				</button>
 			</div>
 		</header>
 	);
@@ -192,7 +205,7 @@ export function EditPage(props: EditPagePropsType) {
 		);
 	}
 
-	console.log(categories)
+	console.log(categories);
 
 	return (
 		<>
