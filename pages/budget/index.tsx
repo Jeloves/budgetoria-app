@@ -4,7 +4,7 @@ import styles from "./index.module.scss";
 import { useEffect, useState } from "react";
 import { auth, getUser } from "@/firebase/auth";
 import { User } from "firebase/auth/cordova";
-import { getSelectedBudget, updateUnassignedBalance } from "@/firebase/budgets";
+import { getSelectedBudget, getUnassignedBalance, updateUnassignedBalance } from "@/firebase/budgets";
 import { getAllocations, updateAssignedAllocation } from "@/firebase/allocations";
 import { getCategories, getSubcategories } from "@/firebase/categories";
 import { getTransactions } from "@/firebase/transactions";
@@ -12,7 +12,6 @@ import { Allocation, Budget, Category, Subcategory, Transaction } from "@/fireba
 import { Topbar } from "@/features/topbar/topbar";
 import { Unassigned } from "@/features/unassigned";
 import { CategoryItem } from "@/features/category-item";
-import { calculateAllocations } from "../../utils/calculateAllocations";
 import { EditPage } from "@/features/edit-categories";
 import { MovedSubcategoryMap } from "@/features/edit-categories/edit-page";
 import { handleCategoryChanges } from "@/utils/handleCategoryChanges";
@@ -22,8 +21,9 @@ export default function BudgetPage() {
 	const [budget, setBudget] = useState<Budget | null>(null);
 	const [allocations, setAllocations] = useState<Allocation[]>([]);
 	const [categories, setCategories] = useState<Category[]>([]);
-	const [transactions, setTransactions] = useState<Transaction[]>([]);
-	const [incompleteTransactions, setIncompleteTransactions] = useState<Transaction[]>([]);
+	const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
+	const [clearedTransactions, setClearedTransactions] = useState<Transaction[]>([]);
+	const [unclearedTransactions, setUnclearedTransactions] = useState<Transaction[]>([]);
 	const [isEditing, setIsEditing] = useState<boolean>(false);
 	const [dataListenerKey, setDataListenerKey] = useState<boolean>(false);
 
@@ -48,7 +48,7 @@ export default function BudgetPage() {
 		setIsEditing(false);
 	};
 	const handleFinishEditsClick = (deletedCategoriesByID: string[], newCategories: Category[], deletedSubcategoriesByID: string[], newSubcategories: Subcategory[], movedSubcategories: MovedSubcategoryMap[]) => {
-		handleCategoryChanges(user!.uid, budget!.id, allocations, transactions.concat(incompleteTransactions), deletedCategoriesByID, newCategories, deletedSubcategoriesByID, newSubcategories, movedSubcategories).then(() => {
+		handleCategoryChanges(user!.uid, budget!.id, allocations, clearedTransactions.concat(unclearedTransactions), deletedCategoriesByID, newCategories, deletedSubcategoriesByID, newSubcategories, movedSubcategories).then(() => {
 			setIsEditing(false)
 			setDataListenerKey(!dataListenerKey);
 		});
@@ -76,41 +76,14 @@ export default function BudgetPage() {
 	useEffect(() => {
 		const fetchBudgetSubcollections = async () => {
 			if (budget) {
-				const allocationData = await getAllocations(user!.uid, budget.id);
 				const categoryData = await getCategories(user!.uid, budget.id);
 				const subcategoryData = await getSubcategories(user!.uid, budget.id);
-				const transactionData = await getTransactions(user!.uid, budget.id);
 
-				const completeTransactionsData: Transaction[] = [];
-				const incompleteTransactionsData: Transaction[] = [];
-				for (const transaction of transactionData) {
-					if (transaction.categoryID === "" || transaction.subcategoryID === "") {
-						incompleteTransactionsData.push(transaction);
-					} else {
-						completeTransactionsData.push(transaction);
-					}
-				}
-				
+				// Allocation and transaction data are filtered by month & year.
+				const allocationData = await getAllocations(user!.uid, budget.id, month, year);
+				const transactionData = await getTransactions(user!.uid, budget.id, month, year);
 
-				for (const category of categoryData) {
-					if (category.id === "00000000-0000-0000-0000-000000000000") {
-						continue;
-					}
-					for (const subcategory of subcategoryData) {
-						if (category.id === subcategory.categoryID) {
-							category.subcategories.push(subcategory);
-						}
-					}
-					category.subcategories.sort((a, b) => {
-						if (a.name < b.name) {
-							return -1;
-						} else if (a.name > b.name) {
-							return 1;
-						} else {
-							return 0;
-						}
-					});
-				}
+				// Sorting categories and subcategories alphabetically.
 				categoryData.sort((a, b) => {
 					if (a.name < b.name) {
 						return -1;
@@ -120,12 +93,32 @@ export default function BudgetPage() {
 						return 0;
 					}
 				});
-				calculateAllocations(categoryData, allocationData, completeTransactionsData, month, year);
+				subcategoryData.sort((a, b) => {
+					if (a.name < b.name) {
+						return -1;
+					} else if (a.name > b.name) {
+						return 1;
+					} else {
+						return 0;
+					}
+				});
+
+				// Sorting cleared vs uncleared transactions.
+				const clearedTransactionData: Transaction[] = [];
+				const unclearedTransactionData: Transaction[] = [];
+				for (const transaction of transactionData) {
+					if (transaction.categoryID === "" || transaction.subcategoryID === "" || !transaction.approval) {
+						unclearedTransactionData.push(transaction);
+					} else {
+						clearedTransactionData.push(transaction);
+					}
+				}
 
 				setCategories(categoryData);
-				setTransactions(completeTransactionsData);
-				setIncompleteTransactions(incompleteTransactions);
+				setSubcategories(subcategoryData);
 				setAllocations(allocationData);
+				setClearedTransactions(clearedTransactionData);
+				setUnclearedTransactions(unclearedTransactions);
 			}
 		};
 		fetchBudgetSubcollections()
@@ -135,29 +128,31 @@ export default function BudgetPage() {
 	const updateSubcategoryAllocation = async (subcategoryID: string, newBalance: number, changeInBalance: number) => {
 		await updateAssignedAllocation(user!.uid, budget!.id, subcategoryID, month, year, newBalance);
 		await updateUnassignedBalance(user!.uid, -changeInBalance);
-		budget!.unassignedBalance -= changeInBalance;
+		budget!.unassignedBalance = await getUnassignedBalance(user!.uid, budget!.id);
 		setUnassignedKey(unassignedKey === 0 ? 1 : 0);
 	};
 
 	const categoryItems: JSX.Element[] = [];
 	if (categories.length > 0) {
-		for (const category of categories) {
-			if (category.id === "00000000-0000-0000-0000-000000000000") {
-				continue;
-			}
-			categoryItems.push(<CategoryItem name={category.name} currencyString={"$"} assigned={category.assigned} available={category.available} subcategories={category.subcategories} updateSubcategoryAllocation={updateSubcategoryAllocation} />);
+		for (let i=0; i<categories.length; i++) {
+			const category = categories[i];
+
+			// Filtering necessary props for this CategoryItem.
+			const filteredSubcategories = subcategories.filter((subcategory) => {
+				return subcategory.categoryID === category.id;
+			})
+			const filteredAllocations = allocations.filter((allocation) => {
+				return filteredSubcategories.some((subcategory) => {
+					return subcategory.id === allocation.subcategoryID;
+				})
+			})
+			const filteredTransactions = clearedTransactions.filter((transaction) => {
+				return transaction.categoryID === category.id;
+			})
+
+			categoryItems.push(<CategoryItem key={i} currencyString={"$"} category={category} subcategories={filteredSubcategories} allocations={filteredAllocations} transactions={filteredTransactions} updateSubcategoryAllocation={updateSubcategoryAllocation} />);
 		}
 	}
-
-	const mainPage = (
-		<>
-			<header className={styles.header}>
-				<Topbar month={month} year={year} handleDateChangeOnClick={handleDateChangeOnClick} handleEditCategoriesClick={handleEditCategoriesClick} />
-				<Unassigned currency={budget ? budget.currency : "USD"} unassignedBalance={budget ? budget.unassignedBalance : 0} key={unassignedKey} />
-			</header>
-			<main className={styles.main}>{categoryItems}</main>
-		</>
-	);
 
 	if (isEditing) {
 		return <EditPage userID={user ? user.uid : ""} budgetID={budget ? budget.id : ""} categoryData={[...categories]} handleCancelEditCategoriesClick={handleCancelEditCategoriesClick} handleFinishEditsClick={handleFinishEditsClick}/>;
