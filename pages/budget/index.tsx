@@ -13,6 +13,9 @@ import { Topbar } from "@/features/topbar/topbar";
 import { Unassigned } from "@/features/unassigned";
 import { CategoryItem } from "@/features/category-item";
 import { calculateAllocations } from "../../utils/calculateAllocations";
+import { EditPage } from "@/features/edit-categories";
+import { MovedSubcategoryMap } from "@/features/edit-categories/edit-page";
+import { handleCategoryChanges } from "@/utils/handleCategoryChanges";
 
 export default function BudgetPage() {
 	const [user, setUser] = useState<User | null>(null);
@@ -20,15 +23,35 @@ export default function BudgetPage() {
 	const [allocations, setAllocations] = useState<Allocation[]>([]);
 	const [categories, setCategories] = useState<Category[]>([]);
 	const [transactions, setTransactions] = useState<Transaction[]>([]);
+	const [incompleteTransactions, setIncompleteTransactions] = useState<Transaction[]>([]);
+	const [isEditing, setIsEditing] = useState<boolean>(false);
+	const [dataListenerKey, setDataListenerKey] = useState<boolean>(false);
 
 	const [month, setMonth] = useState<number>(new Date().getMonth());
 	const [year, setYear] = useState(new Date().getFullYear());
 
 	const [unassignedKey, setUnassignedKey] = useState<0 | 1>(0);
 
+	// Passed to DatePicker
 	const handleDateChangeOnClick = (monthIndex: number, newYear: number) => {
 		setMonth(monthIndex);
 		setYear(newYear);
+	};
+
+	// Passed to Topbar
+	const handleEditCategoriesClick = () => {
+		setIsEditing(true);
+	};
+
+	// Passed to EditPage
+	const handleCancelEditCategoriesClick = () => {
+		setIsEditing(false);
+	};
+	const handleFinishEditsClick = (deletedCategoriesByID: string[], newCategories: Category[], deletedSubcategoriesByID: string[], newSubcategories: Subcategory[], movedSubcategories: MovedSubcategoryMap[]) => {
+		handleCategoryChanges(user!.uid, budget!.id, allocations, transactions.concat(incompleteTransactions), deletedCategoriesByID, newCategories, deletedSubcategoriesByID, newSubcategories, movedSubcategories).then(() => {
+			setIsEditing(false)
+			setDataListenerKey(!dataListenerKey);
+		});
 	};
 
 	// Sets user
@@ -47,7 +70,7 @@ export default function BudgetPage() {
 			}
 		};
 		fetchBudgetData();
-	}, [user]);
+	}, [user, dataListenerKey]);
 
 	// Fetches subcollections when budget changes
 	useEffect(() => {
@@ -57,8 +80,17 @@ export default function BudgetPage() {
 				const categoryData = await getCategories(user!.uid, budget.id);
 				const subcategoryData = await getSubcategories(user!.uid, budget.id);
 				const transactionData = await getTransactions(user!.uid, budget.id);
-				setAllocations(allocationData);
-				setTransactions(transactionData);
+
+				const completeTransactionsData: Transaction[] = [];
+				const incompleteTransactionsData: Transaction[] = [];
+				for (const transaction of transactionData) {
+					if (transaction.categoryID === "" || transaction.subcategoryID === "") {
+						incompleteTransactionsData.push(transaction);
+					} else {
+						completeTransactionsData.push(transaction);
+					}
+				}
+				
 
 				for (const category of categoryData) {
 					if (category.id === "00000000-0000-0000-0000-000000000000") {
@@ -69,24 +101,44 @@ export default function BudgetPage() {
 							category.subcategories.push(subcategory);
 						}
 					}
-					category.subcategories.sort((a, b) => a.position - b.position);
+					category.subcategories.sort((a, b) => {
+						if (a.name < b.name) {
+							return -1;
+						} else if (a.name > b.name) {
+							return 1;
+						} else {
+							return 0;
+						}
+					});
 				}
-				categoryData.sort((a, b) => a.position - b.position);
+				categoryData.sort((a, b) => {
+					if (a.name < b.name) {
+						return -1;
+					} else if (a.name > b.name) {
+						return 1;
+					} else {
+						return 0;
+					}
+				});
+				calculateAllocations(categoryData, allocationData, completeTransactionsData, month, year);
+
 				setCategories(categoryData);
+				setTransactions(completeTransactionsData);
+				setIncompleteTransactions(incompleteTransactions);
+				setAllocations(allocationData);
 			}
 		};
-		fetchBudgetSubcollections();
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [budget]);
+		fetchBudgetSubcollections()
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [budget, dataListenerKey]);
 
 	const updateSubcategoryAllocation = async (subcategoryID: string, newBalance: number, changeInBalance: number) => {
 		await updateAssignedAllocation(user!.uid, budget!.id, subcategoryID, month, year, newBalance);
-		await updateUnassignedBalance(user!.uid, changeInBalance);
+		await updateUnassignedBalance(user!.uid, -changeInBalance);
 		budget!.unassignedBalance -= changeInBalance;
 		setUnassignedKey(unassignedKey === 0 ? 1 : 0);
 	};
 
-	calculateAllocations(categories, allocations, transactions, month, year);
 	const categoryItems: JSX.Element[] = [];
 	if (categories.length > 0) {
 		for (const category of categories) {
@@ -97,13 +149,27 @@ export default function BudgetPage() {
 		}
 	}
 
-	return (
+	const mainPage = (
 		<>
 			<header className={styles.header}>
-				<Topbar month={month} year={year} handleDateChangeOnClick={handleDateChangeOnClick} />
+				<Topbar month={month} year={year} handleDateChangeOnClick={handleDateChangeOnClick} handleEditCategoriesClick={handleEditCategoriesClick} />
 				<Unassigned currency={budget ? budget.currency : "USD"} unassignedBalance={budget ? budget.unassignedBalance : 0} key={unassignedKey} />
 			</header>
 			<main className={styles.main}>{categoryItems}</main>
 		</>
 	);
+
+	if (isEditing) {
+		return <EditPage userID={user ? user.uid : ""} budgetID={budget ? budget.id : ""} categoryData={[...categories]} handleCancelEditCategoriesClick={handleCancelEditCategoriesClick} handleFinishEditsClick={handleFinishEditsClick}/>;
+	} else {
+		return (
+			<>
+				<header className={styles.header}>
+					<Topbar month={month} year={year} handleDateChangeOnClick={handleDateChangeOnClick} handleEditCategoriesClick={handleEditCategoriesClick} />
+					<Unassigned currency={budget ? budget.currency : "USD"} unassignedBalance={budget ? budget.unassignedBalance : 0} key={unassignedKey} />
+				</header>
+				<main className={styles.main}>{categoryItems}</main>
+			</>
+		);
+	}
 }

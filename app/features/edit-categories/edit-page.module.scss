@@ -1,0 +1,111 @@
+@use "@styles/color";
+@use "@styles/font";
+@use "@styles/space";
+
+.loading {
+	width: 100%;
+	height: 100%;
+	background-color: color.$secondary-dark;
+	position: fixed;
+	z-index: 2;
+	color: white;
+	font-size: 24px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	box-sizing: border-box;
+	padding-bottom: space.$s15;
+}
+
+.header {
+	width: 100vw;
+	height: space.$s15;
+	padding: space.$s3-1 space.$s2-1;
+	background-color: color.$secondary-dark;
+	display: flex;
+	align-items: center;
+	border-bottom: space.$s0-1 solid color.$gray-500;
+	box-sizing: border-box;
+	color: white;
+	position: fixed;
+	z-index: 1;
+
+	& span {
+		display: flex;
+		flex-direction: column;
+	}
+
+	& div {
+		display: flex;
+		flex: 1;
+	}
+
+	& div:nth-child(2) {
+		justify-content: flex-end;
+	}
+}
+
+.selectionHeader {
+	justify-content: space-between;
+
+	.empty {
+		color: color.$secondary-dark;
+	}
+}
+
+.cancel {
+	color: red;
+}
+
+.textButton {
+	font: font.$text-sm-medium;
+}
+
+.finish {
+	margin-left: space.$s4;
+	color: color.$green;
+}
+
+
+
+.content {
+	padding-top: space.$s15;
+	display: flex;
+	flex-direction: column;
+}
+
+.categoryOption {
+	color: white;
+	width: 100%;
+	padding: space.$s2 space.$s2;
+	display: flex;
+	flex-direction: column;
+	font-size: space.$s6;
+	align-items: center;
+	border-bottom: space.$s0-1 solid color.$gray-500;
+}
+
+.categoryOptionHeading {
+	background-color: color.$primary-dark;
+	font-size: space.$s4;
+}
+
+.emptyCategory {
+	box-sizing: border-box;
+	background-color: color.$secondary-dark;
+	padding: space.$s4 calc(space.$s2 + space.$s4 + space.$s6) space.$s4 space.$s2;
+	border-bottom: space.$s0-1 solid color.$gray-500;
+	display: flex;
+
+    & input[type="text"] {
+		// Reset
+		margin-right: space.$s8;
+		padding: 0;
+		border: space.$s0-1 solid color.$gray-500;
+		outline: none;
+		background: none;
+		font: inherit;
+		color: white;
+        flex: 1;
+	}
+}

@@ -10,10 +10,11 @@ export type TopbarPropsType = {
 	month: number;
 	year: number;
 	handleDateChangeOnClick: (monthIndex: number, newYear: number) => void;
+	handleEditCategoriesClick: () => void;
 };
 
 export function Topbar(props: TopbarPropsType) {
-	const { month, year, handleDateChangeOnClick } = props;
+	const { month, year, handleDateChangeOnClick, handleEditCategoriesClick } = props;
 	const [isDatePickerShowing, setIsDatePickerShowing] = useState(false);
 
 	const handleDateDisplayOnClick = () => {
@@ -22,10 +23,6 @@ export function Topbar(props: TopbarPropsType) {
 
 	const handleSideNavigationOnClick = () => {
 		alert("Show sidenav");
-	};
-
-	const handleEditOnClick = () => {
-		alert("Edit categories");
 	};
 
 	const handleCreateTransactionOnClick = () => {
@@ -53,7 +50,7 @@ export function Topbar(props: TopbarPropsType) {
 			<section className={styles.topbarContainer}>
 				<IconButton button={{ onClick: handleSideNavigationOnClick }} src="/icons/ellipsis.svg" altText="Button to open Side Navigation" />
 				{dateDisplay}
-				<IconButton button={{ onClick: handleEditOnClick }} src="/icons/edit.svg" altText="Button to edit categories" />
+				<IconButton button={{ onClick: handleEditCategoriesClick }} src="/icons/edit.svg" altText="Button to edit categories" />
 				<IconButton button={{ onClick: handleCreateTransactionOnClick }} src="/icons/circled-dollar.svg" altText="Button to create new transaction" />
 			</section>
 			{isDatePickerShowing && <DatePicker selectedMonth={month} selectedYear={year} monthAcronyms={monthAcronyms} handleMonthOnClick={handleMonthOnClick} />}
