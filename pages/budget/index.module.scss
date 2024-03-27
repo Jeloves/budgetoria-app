@@ -1,4 +1,5 @@
 @use "@styles/space";
+@use "@styles/color";
 
 .header {
     height: calc(space.$s20 + space.$s15);   // = unassigned.height + topbar.height
@@ -6,6 +7,7 @@
     position: fixed;
     display: flex;
     flex-direction: column;
+    background-color: color.$secondary-dark;
 }
 
 .main {

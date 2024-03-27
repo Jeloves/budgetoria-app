@@ -24,10 +24,8 @@ export async function createCategory(userID: string, budgetID: string, newCatego
 		await setDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.categories, newCategory.id), {
 			name: newCategory.name,
 		})
-		return Promise.resolve();
 	} catch (error) {
 		console.error("Failed to add new category", error);
-		return Promise.reject();
 	}
 }
 
@@ -44,5 +42,16 @@ export async function getSubcategories(userID: string, budgetID: string): Promis
 	} catch (error) {
 		console.error("Failed to read subcategories: ", error);
 		throw error;
+	}
+}
+
+export async function createSubcategory(userID: string, budgetID: string, newSubcategory: Subcategory) {
+	try {
+		await setDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.subcategories, newSubcategory.id), {
+			name: newSubcategory.name,
+			categoryID: newSubcategory.categoryID,
+		})
+	} catch (error) {
+		console.error("Failed to add new subcategory", error);
 	}
 }
