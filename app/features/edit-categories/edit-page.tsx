@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 
 export type EditPagePropsType = {
 	categoryData: Category[];
+	handleCancelEditCategoriesClick: () => void;
 };
 
 export interface MovedSubcategoryMap {
@@ -129,7 +130,7 @@ export function EditPage(props: EditPagePropsType) {
 	const editHeader = (
 		<header className={styles.header}>
 			<div>
-				<button className={classNames(styles.textButton, styles.cancel)}>Cancel</button>
+				<button className={classNames(styles.textButton, styles.cancel)} onClick={props.handleCancelEditCategoriesClick}>Cancel</button>
 			</div>
 			Edit Categories
 			<div>

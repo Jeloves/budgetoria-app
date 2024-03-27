@@ -21,6 +21,7 @@ export default function BudgetPage() {
 	const [allocations, setAllocations] = useState<Allocation[]>([]);
 	const [categories, setCategories] = useState<Category[]>([]);
 	const [transactions, setTransactions] = useState<Transaction[]>([]);
+	const [isEditing, setIsEditing] = useState<boolean>(false);
 
 	const [month, setMonth] = useState<number>(new Date().getMonth());
 	const [year, setYear] = useState(new Date().getFullYear());
@@ -34,7 +35,12 @@ export default function BudgetPage() {
 	};
 
 	// Passed to Topbar
-	const handleEditCategoriesOnClick = () => {};
+	const handleEditCategoriesClick = () => {
+		setIsEditing(true);
+	};
+	const handleCancelEditCategoriesClick = () => {
+		setIsEditing(false);
+	}
 
 	// Sets user
 	useEffect(() => {
@@ -118,16 +124,27 @@ export default function BudgetPage() {
 		}
 	}
 
-	return (
-		/*
+	const mainPage = (
 		<>
 			<header className={styles.header}>
-				<Topbar month={month} year={year} handleDateChangeOnClick={handleDateChangeOnClick} />
+				<Topbar month={month} year={year} handleDateChangeOnClick={handleDateChangeOnClick} handleEditCategoriesClick={handleEditCategoriesClick}/>
 				<Unassigned currency={budget ? budget.currency : "USD"} unassignedBalance={budget ? budget.unassignedBalance : 0} key={unassignedKey} />
 			</header>
 			<main className={styles.main}>{categoryItems}</main>
 		</>
-		*/
-		(categories.length > 0) ? <EditPage categoryData={[...categories]} /> : <></>
 	);
+
+	if (isEditing) {
+		return <EditPage categoryData={[...categories]} handleCancelEditCategoriesClick={handleCancelEditCategoriesClick}/>;
+	} else {
+		return (
+			<>
+				<header className={styles.header}>
+					<Topbar month={month} year={year} handleDateChangeOnClick={handleDateChangeOnClick} handleEditCategoriesClick={handleEditCategoriesClick}/>
+					<Unassigned currency={budget ? budget.currency : "USD"} unassignedBalance={budget ? budget.unassignedBalance : 0} key={unassignedKey} />
+				</header>
+				<main className={styles.main}>{categoryItems}</main>
+			</>
+		);
+	}
 }
