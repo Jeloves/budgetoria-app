@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from "uuid";
 
 export type EditCategoryItemPropsType = {
 	category: Category;
+	subcategories: Subcategory[];
 	handleDeleteCategoryClick: (categoryID: string) => void;
 	handleDeleteSubcategoryClick: (subcategoryID: string, categoryID: string) => void;
 	handleAddSubcategoryClick: (subcategory: Subcategory) => void;
@@ -15,7 +16,7 @@ export type EditCategoryItemPropsType = {
 };
 
 export function EditCategoryItem(props: EditCategoryItemPropsType) {
-	const { category, handleDeleteCategoryClick, handleDeleteSubcategoryClick, handleAddSubcategoryClick, handleSelectSubcategoryClick } = props;
+	const { category, subcategories, handleDeleteCategoryClick, handleDeleteSubcategoryClick, handleAddSubcategoryClick, handleSelectSubcategoryClick } = props;
 	const [isShowingEmptySubcategory, setIsShowingEmptySubcategory] = useState<boolean>(false);
 
 	const handleDisplayNewSubcategory = () => {
@@ -35,8 +36,8 @@ export function EditCategoryItem(props: EditCategoryItemPropsType) {
 	};
 
 	let subcategoryEditItems: JSX.Element[] = [];
-	for (let i = 0; i < category.subcategories.length; i++) {
-		const subcategory = category.subcategories[i];
+	for (let i = 0; i < subcategories.length; i++) {
+		const subcategory = subcategories[i];
 		subcategoryEditItems.push(
 			<EditSubcategoryItem
 				key={i}

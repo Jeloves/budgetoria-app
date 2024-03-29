@@ -1,7 +1,7 @@
 import React from "react";
 import { Meta, StoryFn } from "@storybook/react";
 import { CategoryItem, CategoryItemPropsType } from "./category-item";
-import { Subcategory } from "@/firebase/models";
+import { Category, Subcategory } from "@/firebase/models";
 
 export default {
   title: "Categories/CategoryItem",
@@ -16,8 +16,6 @@ const Template: StoryFn<CategoryItemPropsType> = (args) => <CategoryItem {...arg
 export const Default = Template.bind({});
 
 Default.args = {
-    name: "Savings",
+    category: new Category("catID", "Savings"),
     currencyString: "$",
-    assigned: 0,
-    available: 0
 }

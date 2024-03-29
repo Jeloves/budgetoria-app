@@ -23,7 +23,6 @@ export class Budget {
 export class Category {
 	id: string;
     name: string;
-	subcategories: Subcategory[] = [];
 	assigned: number = 0;
 	available: number = 0;
     constructor(id: string, name: string) {
@@ -65,16 +64,18 @@ export class Transaction {
     date: Timestamp;
     payee: string;
     memo: string;
+    outflow: boolean;
     balance: number;
     approval: boolean;
     accountID: string;
     categoryID: string;
     subcategoryID: string;
-    constructor(id: string, date: Timestamp, payee: string, memo: string, balance: number, approval: boolean, accountID: string, categoryID: string, subcategoryID: string) {
+    constructor(id: string, date: Timestamp, payee: string, memo: string, outflow: boolean, balance: number, approval: boolean, accountID: string, categoryID: string, subcategoryID: string) {
         this.id = id;
         this.date = date;
         this.payee = payee;
         this.memo = memo;
+        this.outflow = outflow;
         this.balance = balance;
         this.approval = approval;
         this.accountID = accountID;
