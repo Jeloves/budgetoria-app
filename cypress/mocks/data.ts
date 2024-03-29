@@ -1,6 +1,10 @@
 import { Account, Allocation, Category, Subcategory, Transaction } from "@/firebase/models";
 import { Timestamp } from "firebase/firestore";
-import { v4 as uuidv4 } from "uuid";
+
+// Test Firebase User
+// email = 2bc61068-ab6a-492d-9cf5-1d9ac5eadf5b@email.com
+// password = 2bc61068-ab6a-492d-9cf5-1d9ac5eadf5b
+// user.uid = KjLc2EI2ppTePqEXp7ERL24p2Jd2
 
 export function getMockCategories(): Category[] {
 	return [new Category("categoryID1", "Test Category 1"), new Category("categoryID2", "Test Category 2"), new Category("categoryID3", "Test Category 3"), new Category("categoryID4", "Test Category 4")];
