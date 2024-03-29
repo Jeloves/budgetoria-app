@@ -12,6 +12,7 @@ export type EditPagePropsType = {
 	userID: string;
 	budgetID: string;
 	categoryData: Category[];
+	subcategoryData: Subcategory[];
 	handleCancelEditCategoriesClick: () => void;
 	handleFinishEditsClick: (deletedCategoriesByID: string[], newCategories: Category[], deletedSubcategoriesByID: string[], newSubcategories: Subcategory[], movedSubcategories: MovedSubcategoryMap[]) => void;
 };
@@ -24,6 +25,7 @@ export interface MovedSubcategoryMap {
 
 export function EditPage(props: EditPagePropsType) {
 	const [categories, setCategories] = useState<Category[]>(props.categoryData);
+	const [subcategories, setSubcategories] = useState<Subcategory[]>(props.subcategoryData);
 	const [deletedCategoriesByID, setDeletedCategoriesByID] = useState<string[]>([]);
 	const [newCategories, setNewCategories] = useState<Category[]>([]);
 	const [deletedSubcategoriesByID, setDeletedSubcategoriesByID] = useState<string[]>([]);
@@ -40,7 +42,10 @@ export function EditPage(props: EditPagePropsType) {
 			const targetCategoryIndex = categories.findIndex((category) => category.id === categoryID);
 			const targetCategory = categories[targetCategoryIndex];
 
-			for (const subcategory of targetCategory.subcategories) {
+			const filteredSubcategories = subcategories.filter((subcategory) => {
+				return subcategory.categoryID === targetCategory.id;
+			});
+			for (const subcategory of filteredSubcategories) {
 				if (!deletedSubcategoriesByID.includes(subcategory.id)) {
 					deletedSubcategoriesByID.push(subcategory.id);
 				}
@@ -77,23 +82,21 @@ export function EditPage(props: EditPagePropsType) {
 		}
 	};
 
-	const handleDeleteSubcategoryClick = (subcategoryID: string, categoryID: string) => {
+	const handleDeleteSubcategoryClick = (subcategoryID: string) => {
 		if (!deletedSubcategoriesByID.includes(subcategoryID)) {
 			deletedSubcategoriesByID.push(subcategoryID);
-
-			const targetCategoryIndex = categories.findIndex((category) => category.id === categoryID);
-			const targetSubcategoryIndex = categories[targetCategoryIndex].subcategories.findIndex((subcategory) => subcategory.id === subcategoryID);
-			categories[targetCategoryIndex].subcategories.splice(targetSubcategoryIndex, 1);
+			const targetSubcategoryIndex = subcategories.findIndex((subcategory) => {
+				subcategory.id === subcategoryID;
+			});
+			subcategories.splice(targetSubcategoryIndex, 1);
 			setMainKey(mainKey === 0 ? 1 : 0);
 		}
 	};
 	const handleAddSubcategoryClick = (subcategory: Subcategory) => {
 		if (!newSubcategories.includes(subcategory)) {
 			newSubcategories.push(subcategory);
-
-			const targetIndex = categories.findIndex((category) => category.id === subcategory.categoryID);
-			categories[targetIndex].subcategories.push(subcategory);
-			categories[targetIndex].subcategories.sort((a, b) => {
+			subcategories.push(subcategory);
+			subcategories.sort((a, b) => {
 				if (a.name < b.name) {
 					return -1;
 				} else if (a.name > b.name) {
@@ -117,32 +120,18 @@ export function EditPage(props: EditPagePropsType) {
 		if (oldCategoryID !== newCategoryID) {
 			movedSubcategories.push({ oldCategoryID: oldCategoryID, newCategoryID: newCategoryID, subcategoryID: selectedSubcategory!.id });
 
-			const targetOldCategoryIndex = categories.findIndex((category) => category.id === oldCategoryID);
-			const targetNewCategoryIndex = categories.findIndex((category) => category.id === newCategoryID);
-			const targetOldSubcategoryIndex = categories[targetOldCategoryIndex].subcategories.findIndex((subcategory) => subcategory.id === selectedSubcategory!.id);
-
-			categories[targetOldCategoryIndex].subcategories.splice(targetOldSubcategoryIndex, 1);
-			categories[targetNewCategoryIndex].subcategories.push(selectedSubcategory!);
-			categories[targetNewCategoryIndex].subcategories.sort((a, b) => {
-				if (a.name < b.name) {
-					return -1;
-				} else if (a.name > b.name) {
-					return 1;
-				} else {
-					return 0;
-				}
-			});
+			const targetSubcategoryIndex = subcategories.findIndex((subcategory) => subcategory.id === selectedSubcategory!.id);
+			subcategories[targetSubcategoryIndex].categoryID = newCategoryID;
 
 			setSelectedSubcategory(null);
 			setMainKey(mainKey === 0 ? 1 : 0);
-			console.log(movedSubcategories);
 		}
 	};
 
 	const handleDoneClick = () => {
 		setIsLoadingChanges(true);
 		props.handleFinishEditsClick(deletedCategoriesByID, newCategories, deletedSubcategoriesByID, newSubcategories, movedSubcategories);
-	}
+	};
 
 	const editHeader = (
 		<header className={styles.header}>
@@ -162,10 +151,7 @@ export function EditPage(props: EditPagePropsType) {
 					src={isShowingEmptyCategory ? "/icons/delete-folder.svg" : "/icons/add-folder.svg"}
 					altText="Button to add new category"
 				/>
-				<button
-					className={classNames(styles.textButton, styles.finish)}
-					onClick={handleDoneClick}
-				>
+				<button className={classNames(styles.textButton, styles.finish)} onClick={handleDoneClick}>
 					Done
 				</button>
 			</div>
@@ -196,13 +182,14 @@ export function EditPage(props: EditPagePropsType) {
 
 	for (let i = 0; i < categories.length; i++) {
 		const category = categories[i];
-		if (category.id === NIL_UUID) {
-			continue;
-		}
+		const filteredSubcategories = subcategories.filter((subcategory) => {
+			return subcategory.categoryID === category.id;
+		})
 		editContent.push(
 			<EditCategoryItem
 				key={i}
 				category={category}
+				subcategories={filteredSubcategories}
 				handleDeleteCategoryClick={handleDeleteCategoryClick}
 				handleDeleteSubcategoryClick={handleDeleteSubcategoryClick}
 				handleAddSubcategoryClick={handleAddSubcategoryClick}
@@ -215,8 +202,6 @@ export function EditPage(props: EditPagePropsType) {
 			</button>
 		);
 	}
-
-	console.log(categories);
 
 	return (
 		<>

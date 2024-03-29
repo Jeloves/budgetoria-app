@@ -49,7 +49,7 @@ export default function BudgetPage() {
 	};
 	const handleFinishEditsClick = (deletedCategoriesByID: string[], newCategories: Category[], deletedSubcategoriesByID: string[], newSubcategories: Subcategory[], movedSubcategories: MovedSubcategoryMap[]) => {
 		handleCategoryChanges(user!.uid, budget!.id, allocations, clearedTransactions.concat(unclearedTransactions), deletedCategoriesByID, newCategories, deletedSubcategoriesByID, newSubcategories, movedSubcategories).then(() => {
-			setIsEditing(false)
+			setIsEditing(false);
 			setDataListenerKey(!dataListenerKey);
 		});
 	};
@@ -121,7 +121,7 @@ export default function BudgetPage() {
 				setUnclearedTransactions(unclearedTransactions);
 			}
 		};
-		fetchBudgetSubcollections()
+		fetchBudgetSubcollections();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [budget, dataListenerKey]);
 
@@ -134,28 +134,39 @@ export default function BudgetPage() {
 
 	const categoryItems: JSX.Element[] = [];
 	if (categories.length > 0) {
-		for (let i=0; i<categories.length; i++) {
+		for (let i = 0; i < categories.length; i++) {
 			const category = categories[i];
 
 			// Filtering necessary props for this CategoryItem.
 			const filteredSubcategories = subcategories.filter((subcategory) => {
 				return subcategory.categoryID === category.id;
-			})
+			});
 			const filteredAllocations = allocations.filter((allocation) => {
 				return filteredSubcategories.some((subcategory) => {
 					return subcategory.id === allocation.subcategoryID;
-				})
-			})
+				});
+			});
 			const filteredTransactions = clearedTransactions.filter((transaction) => {
 				return transaction.categoryID === category.id;
-			})
+			});
 
-			categoryItems.push(<CategoryItem key={i} currencyString={"$"} category={category} subcategories={filteredSubcategories} allocations={filteredAllocations} transactions={filteredTransactions} updateSubcategoryAllocation={updateSubcategoryAllocation} />);
+			categoryItems.push(
+				<CategoryItem key={i} currencyString={"$"} category={category} subcategories={filteredSubcategories} allocations={filteredAllocations} transactions={filteredTransactions} updateSubcategoryAllocation={updateSubcategoryAllocation} />
+			);
 		}
 	}
 
 	if (isEditing) {
-		return <EditPage userID={user ? user.uid : ""} budgetID={budget ? budget.id : ""} categoryData={[...categories]} handleCancelEditCategoriesClick={handleCancelEditCategoriesClick} handleFinishEditsClick={handleFinishEditsClick}/>;
+		return (
+			<EditPage
+				userID={user ? user.uid : ""}
+				budgetID={budget ? budget.id : ""}
+				categoryData={[...categories]}
+				subcategoryData={[...subcategories]}
+				handleCancelEditCategoriesClick={handleCancelEditCategoriesClick}
+				handleFinishEditsClick={handleFinishEditsClick}
+			/>
+		);
 	} else {
 		return (
 			<>
