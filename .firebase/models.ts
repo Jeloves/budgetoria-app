@@ -20,6 +20,19 @@ export class Budget {
 	}
 }
 
+export class Account {
+    id: string;
+    name: string;
+    initialBalance: number;
+    balance: number;
+    constructor(id: string, name: string,initialBalance: number, balance: number) {
+        this.id = id;
+        this.name = name;
+        this.initialBalance = initialBalance;
+        this.balance = balance;
+    }
+}
+
 export class Category {
 	id: string;
     name: string;
