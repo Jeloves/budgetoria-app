@@ -5,36 +5,4 @@
 .main {
   min-height: 100vh;
 	background-color: color.$secondary-dark;
-
-  & div {
-    width: 100%;
-    height: 50vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    & span {
-      display: flex;
-      align-items: center;
-      flex: 1;
-      font: font.$heading-regular;
-      color: white;
-    }
-
-    & img {
-      width: space.$s15;
-      height: space.$s15;
-      animation: rotate 1.5s linear infinite;
-    }
-
-    @keyframes rotate {
-      from {
-        transform: rotate(0deg);
-      }
-  
-      to {
-        transform: rotate(360deg);
-      }
-    }
-  }
 }
