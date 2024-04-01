@@ -1,9 +1,10 @@
 "use client";
 import "../../../pages/reset.css";
 import styles from "./login-page.module.scss";
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { signInUser } from "@/firebase/auth";
+import { signInUser, createUser } from "@/firebase/auth";
+import { createInitialBudget } from "@/firebase/initial-budget";
 
 type LoginFormData = {
 	email: string;
@@ -11,6 +12,9 @@ type LoginFormData = {
 };
 
 export function LoginPage() {
+	const [renderKey, setRenderKey] = useState<0 | 1>(0);
+	const [isUserLoggingIn, setIsUserLoggingIn] = useState<boolean>(true);
+	const [userID, setUserID] = useState<string>("");
 	const [formData, setFormData] = useState<LoginFormData>({
 		email: "",
 		password: "",
@@ -25,23 +29,53 @@ export function LoginPage() {
 	};
 
 	const router = useRouter();
-	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+
+	const handleFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		try {
-			await signInUser(formData.email, formData.password);
-			const destinationUrl = "/budget";
-			router.push(destinationUrl);
-		} catch (error) {
-			console.error("Failed to sign in and navigate to budget-page:", error);
+		if (isUserLoggingIn) {
+			signInUser(formData.email, formData.password).then(
+				() => {
+					router.push("/budget");
+				},
+				(error: string) => {
+					alert(error);
+					setRenderKey(renderKey === 0 ? 1 : 0);
+				}
+			);
+		} else {
+			createUser(formData.email, formData.password).then(
+				(userID) => {
+					setUserID(userID as string);
+				},
+				(error: string) => {
+					alert(error);
+					setRenderKey(renderKey === 0 ? 1 : 0);
+				}
+			);
 		}
 	};
 
-	return (
-		<section className={styles.loginContainer}>
-			<div className={styles.logoContainer}>
-				{/* eslint-disable-next-line @next/next/no-img-element */}
-				<img className={styles.logo} src="/icons/budgetoria-logo.svg" alt="Budgetoria logo" />
-			</div>
+	// Clears form data after failed sign-in or failed sign-up.
+	useEffect(() => {
+		setFormData({
+			email: "",
+			password: "",
+		});
+	}, [renderKey]);
+
+	// Creates initial budget data when a new user signs up, and navigates to budget-page.
+	useEffect(() => {
+		const initializeBudgetData = async () => {
+			if (userID !== "") {
+				await createInitialBudget(userID);
+				router.push("/budget");
+			}
+		}
+		initializeBudgetData();
+	}, [router, userID])
+
+	const socialLoginElement = (
+		<>
 			<div className={styles.socialSignIn}>
 				<button>
 					{/* eslint-disable-next-line @next/next/no-img-element */}
@@ -54,24 +88,63 @@ export function LoginPage() {
 					Continue with Apple
 				</button>
 			</div>
-
 			<div className={styles.divider}>
 				<hr />
 				<span>or</span>
 				<hr />
 			</div>
+		</>
+	);
 
-			<form className={styles.nativeSignIn} onSubmit={handleSubmit}>
-				<input className="login_credential" id="email" type="email" name="email" placeholder="Email address" required value={formData.email} onChange={handleInputChange} />
-				<input className="login_credential" id="password" type="password" name="password" placeholder="Password" required value={formData.password} onChange={handleInputChange} />
+	const signupHeaderElement = (
+		<>
+			<h1 className={styles.signupHeader}>Sign Up with Budgetoria</h1>
+			<div className={styles.divider}>
+				<hr />
+			</div>
+		</>
+	);
 
-				<div>
-					<a className="forgot_password">Forgot password?</a>
-					<a className="forgot_password">Sign up</a>
-				</div>
+	return (
+		<section key={renderKey} className={styles.loginContainer}>
+			<div className={styles.logoContainer}>
+				{/* eslint-disable-next-line @next/next/no-img-element */}
+				<img src="/icons/budgetoria-logo.svg" alt="Budgetoria logo" />
+			</div>
 
-				<button className="login" type="submit">
-					Log In
+			{isUserLoggingIn ? socialLoginElement : signupHeaderElement}
+
+			<form className={styles.nativeSignIn} onSubmit={handleFormSubmit}>
+				<input id="email" type="email" name="email" placeholder="Email address" required value={formData.email} onChange={handleInputChange} />
+				<input id="password" type="password" name="password" placeholder="Password" required value={formData.password} onChange={handleInputChange} />
+
+				{isUserLoggingIn ? (
+					<div>
+						<a className="forgot_password">Forgot password?</a>
+						<a
+							className="forgot_password"
+							onClick={() => {
+								setIsUserLoggingIn(false);
+							}}
+						>
+							Sign up
+						</a>
+					</div>
+				) : (
+					<div>
+						<a
+							className="forgot_password"
+							onClick={() => {
+								setIsUserLoggingIn(true);
+							}}
+						>
+							Existing user?
+						</a>
+					</div>
+				)}
+
+				<button className={isUserLoggingIn ? "" : styles.signupConfirm} type="submit">
+					{isUserLoggingIn ? "Log In" : "Sign Up"}
 				</button>
 			</form>
 		</section>
