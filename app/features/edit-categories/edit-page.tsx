@@ -3,7 +3,7 @@ import { Category, Subcategory } from "@/firebase/models";
 import { NIL as NIL_UUID } from "uuid";
 import { IconButton } from "../ui";
 import styles from "./edit-page.module.scss";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import classNames from "classnames";
 import { v4 as uuidv4 } from "uuid";
 import { handleCategoryChanges } from "@/utils/handleCategoryChanges";
@@ -27,47 +27,71 @@ export function EditPage(props: EditPagePropsType) {
 	const [categories, setCategories] = useState<Category[]>(props.categoryData);
 	const [subcategories, setSubcategories] = useState<Subcategory[]>(props.subcategoryData);
 	const [deletedCategoriesByID, setDeletedCategoriesByID] = useState<string[]>([]);
-	const [newCategories, setNewCategories] = useState<Category[]>([]);
+	const [addedCategories, setNewCategories] = useState<Category[]>([]);
 	const [deletedSubcategoriesByID, setDeletedSubcategoriesByID] = useState<string[]>([]);
-	const [newSubcategories, setNewSubcategories] = useState<Subcategory[]>([]);
+	const [addedSubcategories, setNewSubcategories] = useState<Subcategory[]>([]);
 	const [movedSubcategories, setMovedSubcategories] = useState<MovedSubcategoryMap[]>([]);
 	const [selectedSubcategory, setSelectedSubcategory] = useState<Subcategory | null>(null);
 	const [isShowingEmptyCategory, setIsShowingEmptyCategory] = useState<boolean>(false);
 	const [isLoadingChanges, setIsLoadingChanges] = useState<boolean>(false);
 	const [mainKey, setMainKey] = useState<number>(0);
 
-	const handleDeleteCategoryClick = (categoryID: string) => {
-		if (!deletedCategoriesByID.includes(categoryID)) {
-			deletedCategoriesByID.push(categoryID);
-			const targetCategoryIndex = categories.findIndex((category) => category.id === categoryID);
-			const targetCategory = categories[targetCategoryIndex];
+	// Re-renders and alphabetically sorts categories whenever they are changed.
+	useEffect(() => {
+		categories.sort((a, b) => {
+			if (a.name < b.name) {
+				return -1;
+			} else if (a.name > b.name) {
+				return 1;
+			} else {
+				return 0;
+			}
+		});
+		setMainKey(mainKey === 0 ? 1 : 0);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [categories]);
 
+	// Re-renders and alphabetically sorts subcategories whenever they are changed.
+	useEffect(() => {
+		subcategories.sort((a, b) => {
+			if (a.name < b.name) {
+				return -1;
+			} else if (a.name > b.name) {
+				return 1;
+			} else {
+				return 0;
+			}
+		});
+		setMainKey(mainKey === 0 ? 1 : 0);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [subcategories]);
+
+	const handleDeleteCategoryClick = (targetCategoryID: string) => {
+		if (!deletedCategoriesByID.includes(targetCategoryID)) {
+			// Removing the category 
+			deletedCategoriesByID.push(targetCategoryID);
+			const newCategories = categories.filter((category) => category.id !== targetCategoryID);
+			setCategories(newCategories)
+
+			// Removing subcategories 
 			const filteredSubcategories = subcategories.filter((subcategory) => {
-				return subcategory.categoryID === targetCategory.id;
+				return subcategory.categoryID === targetCategoryID;
 			});
 			for (const subcategory of filteredSubcategories) {
 				if (!deletedSubcategoriesByID.includes(subcategory.id)) {
 					deletedSubcategoriesByID.push(subcategory.id);
 				}
 			}
-			categories.splice(targetCategoryIndex, 1);
-			setMainKey(mainKey === 0 ? 1 : 0);
+			const newSubcategories = subcategories.filter((subcategory) => subcategory.categoryID !== targetCategoryID);
+			setSubcategories(newSubcategories);
 		}
 	};
-	const handleAddCategory = (category: Category) => {
-		if (!newCategories.includes(category)) {
-			newCategories.push(category);
-			categories.push(category);
-			categories.sort((a, b) => {
-				if (a.name < b.name) {
-					return -1;
-				} else if (a.name > b.name) {
-					return 1;
-				} else {
-					return 0;
-				}
-			});
-			setMainKey(mainKey === 0 ? 1 : 0);
+	const handleAddCategory = (newCategory: Category) => {
+		if (!addedCategories.includes(newCategory)) {
+			addedCategories.push(newCategory);
+			const newCategories = [...categories];
+			newCategories.push(newCategory);
+			setCategories(newCategories);
 		}
 	};
 	const handleEnterKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -85,27 +109,16 @@ export function EditPage(props: EditPagePropsType) {
 	const handleDeleteSubcategoryClick = (subcategoryID: string) => {
 		if (!deletedSubcategoriesByID.includes(subcategoryID)) {
 			deletedSubcategoriesByID.push(subcategoryID);
-			const targetSubcategoryIndex = subcategories.findIndex((subcategory) => {
-				subcategory.id === subcategoryID;
-			});
-			subcategories.splice(targetSubcategoryIndex, 1);
-			setMainKey(mainKey === 0 ? 1 : 0);
+			const newSubcategories = subcategories.filter((subcategory) => subcategory.id !== subcategoryID);
+			setSubcategories(newSubcategories);
 		}
 	};
 	const handleAddSubcategoryClick = (subcategory: Subcategory) => {
-		if (!newSubcategories.includes(subcategory)) {
+		if (!addedSubcategories.includes(subcategory)) {
+			addedSubcategories.push(subcategory);
+			const newSubcategories = [...subcategories];
 			newSubcategories.push(subcategory);
-			subcategories.push(subcategory);
-			subcategories.sort((a, b) => {
-				if (a.name < b.name) {
-					return -1;
-				} else if (a.name > b.name) {
-					return 1;
-				} else {
-					return 0;
-				}
-			});
-			setMainKey(mainKey === 0 ? 1 : 0);
+			setSubcategories(newSubcategories);
 		}
 	};
 	const handleSelectSubcategoryClick = (subcategory: Subcategory) => {
@@ -130,7 +143,7 @@ export function EditPage(props: EditPagePropsType) {
 
 	const handleDoneClick = () => {
 		setIsLoadingChanges(true);
-		props.handleFinishEditsClick(deletedCategoriesByID, newCategories, deletedSubcategoriesByID, newSubcategories, movedSubcategories);
+		props.handleFinishEditsClick(deletedCategoriesByID, addedCategories, deletedSubcategoriesByID, addedSubcategories, movedSubcategories);
 	};
 
 	const editHeader = (
