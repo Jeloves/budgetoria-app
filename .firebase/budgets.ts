@@ -2,6 +2,7 @@ import { getDocs, collection, doc, updateDoc, getDoc } from "firebase/firestore"
 import { collectionLabel } from "./firebase.config";
 import { firestore } from "./firebase.config";
 import { Budget } from "./models";
+import { v4 as uuidv4 } from "uuid";
 
 export async function getBudgets(userID: string): Promise<Budget[]> {
 	try {
@@ -24,7 +25,7 @@ export async function getSelectedBudget(userID: string): Promise<Budget> {
 		const budgetsSnapshot = await getDocs(collection(firestore, collectionLabel.users, userID, collectionLabel.budgets));
 
 		const budgetDoc = budgetsSnapshot.docs.find((doc) => {
-			return doc.data().selectedBool;
+			return doc.data().selected;
 		});
 
 		if (budgetDoc) {
@@ -59,7 +60,7 @@ export async function updateUnassignedBalance(userID: string, changeInBalance: n
 		const budgetsSnapshot = await getDocs(collection(firestore, collectionLabel.users, userID, collectionLabel.budgets));
 		const budgetDoc = budgetsSnapshot.docs.find((doc) => {
 			const data = doc.data();
-			return data.selectedBool;
+			return data.selected;
 		});
 
 		if (budgetDoc) {
@@ -74,3 +75,4 @@ export async function updateUnassignedBalance(userID: string, changeInBalance: n
 		throw error;
 	}
 }
+
