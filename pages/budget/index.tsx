@@ -32,8 +32,6 @@ export default function BudgetPage() {
 
 	const [unassignedKey, setUnassignedKey] = useState<0 | 1>(0);
 
-	console.log(clearedTransactions[0])
-
 	// Passed to DatePicker
 	const handleDateChangeOnClick = (monthIndex: number, newYear: number) => {
 		setMonth(monthIndex);
