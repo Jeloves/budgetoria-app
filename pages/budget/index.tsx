@@ -8,29 +8,50 @@ import { getSelectedBudget, getUnassignedBalance, updateUnassignedBalance } from
 import { getAllocations, updateAssignedAllocation } from "@/firebase/allocations";
 import { getCategories, getSubcategories } from "@/firebase/categories";
 import { getTransactions } from "@/firebase/transactions";
-import { Allocation, Budget, Category, Subcategory, Transaction } from "@/firebase/models";
+import { Account, Allocation, Budget, Category, Subcategory, Transaction } from "@/firebase/models";
 import { Topbar } from "@/features/topbar/topbar";
 import { Unassigned } from "@/features/unassigned";
 import { CategoryItem } from "@/features/category-item";
 import { EditPage } from "@/features/edit-categories";
 import { MovedSubcategoryMap } from "@/features/edit-categories/edit-page";
 import { handleCategoryChanges } from "@/utils/handleCategoryChanges";
+import { AccountsPage } from "@/features/accounts-page";
+import classNames from "classnames";
+import { AccountsHeader } from "@/features/accounts-page/accounts-header";
+import { createAccount, getAccounts } from "@/firebase/accounts";
 
 export default function BudgetPage() {
 	const [user, setUser] = useState<User | null>(null);
 	const [budget, setBudget] = useState<Budget | null>(null);
+	const [accounts, setAccounts] = useState<Account[]>([]);
 	const [allocations, setAllocations] = useState<Allocation[]>([]);
 	const [categories, setCategories] = useState<Category[]>([]);
 	const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
 	const [clearedTransactions, setClearedTransactions] = useState<Transaction[]>([]);
 	const [unclearedTransactions, setUnclearedTransactions] = useState<Transaction[]>([]);
-	const [isEditing, setIsEditing] = useState<boolean>(false);
 	const [dataListenerKey, setDataListenerKey] = useState<boolean>(false);
 
 	const [month, setMonth] = useState<number>(new Date().getMonth());
 	const [year, setYear] = useState(new Date().getFullYear());
 
 	const [unassignedKey, setUnassignedKey] = useState<0 | 1>(0);
+
+	// Pages
+	const [onBudgetPage, setOnBudgetPage] = useState<boolean>(true);
+	const [isEditing, setIsEditing] = useState<boolean>(false);
+	const [onAccountsPage, setOnAccountsPage] = useState<boolean>(false);
+
+	// Navigation Functions
+	const navigateToBudgetPage = () => {
+		setOnBudgetPage(true);
+		setIsEditing(false);
+		setOnAccountsPage(false);
+	}
+	const navigateToAccountsPage = () => {
+		setOnBudgetPage(false);
+		setIsEditing(false);
+		setOnAccountsPage(true);
+	};
 
 	// Passed to DatePicker
 	const handleDateChangeOnClick = (monthIndex: number, newYear: number) => {
@@ -54,6 +75,11 @@ export default function BudgetPage() {
 		});
 	};
 
+	// Passed to AccountsPage
+	const handleConfirmNewAccount = async (newAccount: Account) => {
+		await createAccount(user!.uid, budget!.id, newAccount);
+	}
+
 	// Sets user
 	useEffect(() => {
 		auth.onAuthStateChanged((user: User | null) => {
@@ -76,13 +102,14 @@ export default function BudgetPage() {
 	useEffect(() => {
 		const fetchBudgetSubcollections = async () => {
 			if (budget) {
-				const categoryData = await getCategories(user!.uid, budget.id);
-				const subcategoryData = await getSubcategories(user!.uid, budget.id);
+				const accountsData = await getAccounts(user!.uid, budget.id);
 
 				// Allocation and transaction data are filtered by month & year.
 				const allocationData = await getAllocations(user!.uid, budget.id, month, year);
 				const transactionData = await getTransactions(user!.uid, budget.id, month, year);
 
+				const categoryData = await getCategories(user!.uid, budget.id);
+				const subcategoryData = await getSubcategories(user!.uid, budget.id);
 				// Sorting categories and subcategories alphabetically.
 				categoryData.sort((a, b) => {
 					if (a.name < b.name) {
@@ -113,7 +140,7 @@ export default function BudgetPage() {
 						clearedTransactionData.push(transaction);
 					}
 				}
-
+				setAccounts(accountsData);
 				setCategories(categoryData);
 				setSubcategories(subcategoryData);
 				setAllocations(allocationData);
@@ -156,6 +183,25 @@ export default function BudgetPage() {
 		}
 	}
 
+	const headerContent: JSX.Element[] = [];
+	const mainContent: JSX.Element[] = [];
+	// User is on Budget Page
+	onBudgetPage &&
+		headerContent.push(
+			<>
+				<Topbar month={month} year={year} handleDateChangeOnClick={handleDateChangeOnClick} handleEditCategoriesClick={handleEditCategoriesClick} />
+				<Unassigned currency={budget ? budget.currency : "USD"} unassignedBalance={budget ? budget.unassignedBalance : 0} key={unassignedKey} />
+			</>
+		) &&
+		mainContent.push(<>{categoryItems}</>);
+
+	// User is on Accounts Page
+	onAccountsPage &&
+		headerContent.push(<AccountsHeader navigateToBudgetPage={navigateToBudgetPage}/>) &&
+		mainContent.push(<AccountsPage accounts={accounts} handleConfirmNewAccount={handleConfirmNewAccount}/>);
+
+	console.log("accounts", accounts)
+
 	if (isEditing) {
 		return (
 			<EditPage
@@ -170,11 +216,10 @@ export default function BudgetPage() {
 	} else {
 		return (
 			<>
-				<header className={styles.header}>
-					<Topbar month={month} year={year} handleDateChangeOnClick={handleDateChangeOnClick} handleEditCategoriesClick={handleEditCategoriesClick} />
-					<Unassigned currency={budget ? budget.currency : "USD"} unassignedBalance={budget ? budget.unassignedBalance : 0} key={unassignedKey} />
+				<header className={classNames(styles.header, onBudgetPage && styles.budgetPageHeader)}>
+					{headerContent}
 				</header>
-				<main className={styles.main}>{categoryItems}</main>
+				<main onClick={navigateToAccountsPage}  className={classNames(styles.main, onBudgetPage && styles.budgetPageContent)}>{mainContent}</main>
 			</>
 		);
 	}
