@@ -2,26 +2,33 @@
 @use "@styles/color";
 
 .header {
+	background-color: color.$secondary-dark;
 	height: space.$s15;
 	width: 100vw;
-	position: fixed;
+
+	position: absolute;
+	top: 0;
+
 	display: flex;
 	flex-direction: column;
-	background-color: color.$secondary-dark;
-    border-bottom: space.$s0-1 solid color.$gray-500;
 }
 
 .budgetPageHeader {
-	height: calc(space.$s20 + space.$s15); // = unassigned.height + topbar.height
+	height: calc(space.$s20 + space.$s15); 
 }
 
 .main {
-	height: 100vh;
-	padding-top: space.$s15;
-	padding-bottom: space.$s15;
-	box-sizing: border-box;
+	height: calc(100vh - space.$s15);	// 100vh - header.height
+	width: 100vw;
+	
+	border-top: space.$s0-1 solid color.$gray-500;
+
+	position: absolute;
+	top: calc(space.$s15);
+	bottom: space.$s15;
 }
 
 .budgetPageContent {
-	padding-top: calc(space.$s20 + space.$s15);
+	height: calc(100vh - space.$s15 - space.$s20);
+	top: calc(space.$s15 + space.$s20);
 }
