@@ -3,6 +3,7 @@
 @use "@styles/space";
 
 .accountsPage {
+	height: inherit;
 	display: flex;
 	flex-direction: column;
 }
