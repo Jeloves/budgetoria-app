@@ -6,12 +6,8 @@
     width: inherit;
     height: inherit;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     color: white;
     background-color: color.$secondary-dark;
-}
-
-.empty {
-    width: space.$s5;
 }

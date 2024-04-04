@@ -1,6 +1,6 @@
 import React from "react";
 import { Meta, StoryFn } from "@storybook/react";
-import { AccountsHeader, AccountsHeaderPropsType } from "./accounts-header";
+import { AccountsHeader } from "./accounts-header";
 
 export default {
   title: "AccountsPage/AccountsHeader",
@@ -10,12 +10,7 @@ export default {
   },
 } as Meta<typeof AccountsHeader>;
 
-const Template: StoryFn<AccountsHeaderPropsType> = (args) => <AccountsHeader {...args}/>;
+const Template: StoryFn = () => <AccountsHeader/>;
 
 export const Default = Template.bind({});
 
-Default.args = {
-    navigateToBudgetPage: () => {
-        alert("Navigating to Budget Page")
-    }
-}

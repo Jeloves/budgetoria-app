@@ -19,6 +19,7 @@ import { AccountsPage } from "@/features/accounts-page";
 import classNames from "classnames";
 import { AccountsHeader } from "@/features/accounts-page/accounts-header";
 import { createAccount, getAccounts } from "@/firebase/accounts";
+import { NavigationBar } from "@/features/navigation-bar";
 
 export default function BudgetPage() {
 	const [user, setUser] = useState<User | null>(null);
@@ -197,10 +198,9 @@ export default function BudgetPage() {
 
 	// User is on Accounts Page
 	onAccountsPage &&
-		headerContent.push(<AccountsHeader navigateToBudgetPage={navigateToBudgetPage}/>) &&
+		headerContent.push(<AccountsHeader/>) &&
 		mainContent.push(<AccountsPage accounts={accounts} handleConfirmNewAccount={handleConfirmNewAccount}/>);
 
-	console.log("accounts", accounts)
 
 	if (isEditing) {
 		return (
@@ -219,7 +219,8 @@ export default function BudgetPage() {
 				<header className={classNames(styles.header, onBudgetPage && styles.budgetPageHeader)}>
 					{headerContent}
 				</header>
-				<main onClick={navigateToAccountsPage}  className={classNames(styles.main, onBudgetPage && styles.budgetPageContent)}>{mainContent}</main>
+				<main className={classNames(styles.main, onBudgetPage && styles.budgetPageContent)}>{mainContent}</main>
+				<NavigationBar navigateToBudget={navigateToBudgetPage} navigateToCreateTransaction={() => {alert("Creating new transaction")}} navigateToAccounts={navigateToAccountsPage}/>
 			</>
 		);
 	}
