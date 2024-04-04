@@ -3,6 +3,7 @@ import styles from "./accounts-page.module.scss";
 import { Account } from "@/firebase/models";
 import { ChangeEvent, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { IconButton } from "../ui";
 
 export type AccountsPagePropsType = {
 	accounts: Account[];
