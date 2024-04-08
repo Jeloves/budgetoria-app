@@ -1,0 +1,62 @@
+@use "@styles/color";
+@use "@styles/space";
+
+.editCategoryContainer {
+	box-sizing: border-box;
+}
+
+.editCategoryContent {
+	box-sizing: border-box;
+	background: color.$secondary-dark;
+	padding: space.$s2 space.$s2;
+    color: white;
+	display: flex;
+    border-bottom: space.$s0-1 solid color.$gray-500;
+    gap: space.$s4;
+    align-items: center;
+
+    input[type="text"] {
+		// Reset
+		margin: 0;
+		padding: 0;
+		border: none;
+		outline: none;
+		background: none;
+		font: inherit;
+		color: inherit;
+        flex: 1;
+	}
+}
+
+.showingEmptySubcategory {
+	width: space.$s6;
+	height: space.$s5;
+
+	& img {
+		display: none;
+	}
+}
+
+.emptySubcategory {
+	box-sizing: border-box;
+	background-color: color.$primary-dark;
+	padding: space.$s4 calc(space.$s2 + space.$s4 + space.$s6) space.$s4 space.$s2;
+	border-bottom: space.$s0-1 solid color.$gray-500;
+	display: flex;
+
+	& input[type="text"] {
+		// Reset
+		margin-right: space.$s8;
+		padding: 0;
+		border: space.$s0-1 solid color.$gray-500;
+		outline: none;
+		background: none;
+		font: inherit;
+		color: white;
+        flex: 1;
+	}
+}
+
+
+
+
