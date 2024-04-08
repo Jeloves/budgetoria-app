@@ -29,17 +29,17 @@ export function NavigationBar(props: NavigationBarPropsType) {
 		<section className={styles.navigation}>
 			<button className={selectedPage === "Budget" ? styles.budgetSelected : ""} onClick={budgetOnClick}>
 				{/*eslint-disable-next-line @next/next/no-img-element*/}
-				<img src={selectedPage === "Budget" ? "/icons/cash-highlighted.svg" : "/icons/cash.svg"} alt="Navigation to BudgetPage" />
+				<img src={selectedPage === "Budget" ? "/icons/cash-grey-100.svg" : "/icons/cash.svg"} alt="Navigation to BudgetPage" />
 				Budget
 			</button>
 			<button className={selectedPage === "Transaction" ? styles.transactionSelected : ""} onClick={transactionOnClick}>
 				{/*eslint-disable-next-line @next/next/no-img-element*/}
-				<img src={selectedPage === "Transaction" ? "/icons/circled-plus-filled-highlighted.svg" : "/icons/circled-plus-filled.svg"} alt="Button to create a Transaction" />
+				<img src={selectedPage === "Transaction" ? "/icons/circled-plus-filled-grey-100.svg" : "/icons/circled-plus-filled.svg"} alt="Button to create a Transaction" />
 				Transaction
 			</button>
 			<button className={selectedPage === "Accounts" ? styles.accountsSelected : ""} onClick={accountsOnClick}>
 				{/*eslint-disable-next-line @next/next/no-img-element*/}
-				<img src={selectedPage === "Accounts" ? "/icons/bank-highlighted.svg" : "/icons/bank.svg"} alt="Navigation to AccountsPage" />
+				<img src={selectedPage === "Accounts" ? "/icons/bank-grey-100.svg" : "/icons/bank.svg"} alt="Navigation to AccountsPage" />
 				Accounts
 			</button>
 		</section>
