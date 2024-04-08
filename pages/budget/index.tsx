@@ -20,6 +20,7 @@ import classNames from "classnames";
 import { AccountsHeader } from "@/features/accounts-page/accounts-header";
 import { createAccount, getAccounts } from "@/firebase/accounts";
 import { NavigationBar } from "@/features/navigation-bar";
+import { EditPageHeader } from "@/features/edit-categories/edit-page-header/edit-page-header";
 
 export default function BudgetPage() {
 	const [user, setUser] = useState<User | null>(null);
@@ -202,6 +203,7 @@ export default function BudgetPage() {
 		mainContent.push(<AccountsPage accounts={accounts} handleConfirmNewAccount={handleConfirmNewAccount}/>);
 
 
+	/*
 	if (isEditing) {
 		return (
 			<EditPage
@@ -223,5 +225,34 @@ export default function BudgetPage() {
 				<NavigationBar navigateToBudget={navigateToBudgetPage} navigateToCreateTransaction={() => {alert("Creating new transaction")}} navigateToAccounts={navigateToAccountsPage}/>
 			</>
 		);
+	}
+	*/
+
+	if (categories.length > 0) {
+
+	return (
+		<>
+			<header className={classNames(styles.header)}>
+				<EditPageHeader handleCancelEdits={function (): void {
+					console.log("Function not implemented.");
+				} } handleConfirmEdits={function (): void {
+					console.log("Function not implemented.");
+				} } handleShowNewCategory={function (): void {
+					console.log("Function not implemented.");
+				} } />
+			</header>
+			<main className={classNames(styles.main)}>
+			<EditPage
+				userID={user ? user.uid : ""}
+				budgetID={budget ? budget.id : ""}
+				categoryData={[...categories]}
+				subcategoryData={[...subcategories]}
+				handleCancelEditCategoriesClick={handleCancelEditCategoriesClick}
+				handleFinishEditsClick={handleFinishEditsClick}
+			/>
+			</main>
+			<NavigationBar navigateToBudget={navigateToBudgetPage} navigateToCreateTransaction={() => {alert("Creating new transaction")}} navigateToAccounts={navigateToAccountsPage}/>
+		</>
+	);
 	}
 }

@@ -48,7 +48,7 @@ export function EditPage(props: EditPagePropsType) {
 			}
 		});
 		setMainKey(mainKey === 0 ? 1 : 0);
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [categories]);
 
 	// Re-renders and alphabetically sorts subcategories whenever they are changed.
@@ -63,17 +63,17 @@ export function EditPage(props: EditPagePropsType) {
 			}
 		});
 		setMainKey(mainKey === 0 ? 1 : 0);
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [subcategories]);
 
 	const handleDeleteCategoryClick = (targetCategoryID: string) => {
 		if (!deletedCategoriesByID.includes(targetCategoryID)) {
-			// Removing the category 
+			// Removing the category
 			deletedCategoriesByID.push(targetCategoryID);
 			const newCategories = categories.filter((category) => category.id !== targetCategoryID);
-			setCategories(newCategories)
+			setCategories(newCategories);
 
-			// Removing subcategories 
+			// Removing subcategories
 			const filteredSubcategories = subcategories.filter((subcategory) => {
 				return subcategory.categoryID === targetCategoryID;
 			});
@@ -146,31 +146,6 @@ export function EditPage(props: EditPagePropsType) {
 		props.handleFinishEditsClick(deletedCategoriesByID, addedCategories, deletedSubcategoriesByID, addedSubcategories, movedSubcategories);
 	};
 
-	const editHeader = (
-		<header className={styles.header}>
-			<div>
-				<button className={classNames(styles.textButton, styles.cancel)} onClick={props.handleCancelEditCategoriesClick}>
-					Cancel
-				</button>
-			</div>
-			Edit Categories
-			<div>
-				<IconButton
-					button={{
-						onClick: () => {
-							setIsShowingEmptyCategory(!isShowingEmptyCategory);
-						},
-					}}
-					src={isShowingEmptyCategory ? "/icons/delete-folder.svg" : "/icons/add-folder.svg"}
-					altText="Button to add new category"
-				/>
-				<button className={classNames(styles.textButton, styles.finish)} onClick={handleDoneClick}>
-					Done
-				</button>
-			</div>
-		</header>
-	);
-
 	const categorySelectionHeader = (
 		<header className={classNames(styles.header, styles.selectionHeader)}>
 			<button
@@ -197,7 +172,7 @@ export function EditPage(props: EditPagePropsType) {
 		const category = categories[i];
 		const filteredSubcategories = subcategories.filter((subcategory) => {
 			return subcategory.categoryID === category.id;
-		})
+		});
 		editContent.push(
 			<EditCategoryItem
 				key={i}
@@ -219,24 +194,22 @@ export function EditPage(props: EditPagePropsType) {
 	return (
 		<>
 			{isLoadingChanges ? <div className={styles.loading}>Loading</div> : null}
-			{selectedSubcategory ? categorySelectionHeader : editHeader}
-			<main key={mainKey} className={styles.content}>
-				{isShowingEmptyCategory ? (
-					<div className={styles.emptyCategory}>
-						<input type="text" onKeyDown={handleEnterKeyDown} />
-						<IconButton
-							button={{
-								onClick: () => {
-									setIsShowingEmptyCategory(false);
-								},
-							}}
-							src={"/icons/circled-minus.svg"}
-							altText={"Button to cancel new subcategory"}
-						/>
-					</div>
-				) : null}
-				{selectedSubcategory ? categorySelectionContent : editContent}
-			</main>
+
+			{isShowingEmptyCategory ? (
+				<div className={styles.emptyCategory}>
+					<input type="text" onKeyDown={handleEnterKeyDown} />
+					<IconButton
+						button={{
+							onClick: () => {
+								setIsShowingEmptyCategory(false);
+							},
+						}}
+						src={"/icons/circled-minus.svg"}
+						altText={"Button to cancel new subcategory"}
+					/>
+				</div>
+			) : null}
+			{selectedSubcategory ? categorySelectionContent : editContent}
 		</>
 	);
 }
