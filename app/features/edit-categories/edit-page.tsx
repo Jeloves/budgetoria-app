@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { EditCategoryItem } from "@/features/edit-categories";
 import { Category, Subcategory } from "@/firebase/models";
 import { NIL as NIL_UUID } from "uuid";
@@ -12,11 +13,19 @@ export type EditPagePropsType = {
 	userID: string;
 	budgetID: string;
 	categoryData: Category[];
-	subcategoryData: Subcategory[];
+	subcategories: Subcategory[];
+	handleDeleteSubcategory: (subcategoryID: string) => void;
 	handleCancelEditCategoriesClick: () => void;
 	handleFinishEditsClick: (deletedCategoriesByID: string[], newCategories: Category[], deletedSubcategoriesByID: string[], newSubcategories: Subcategory[], movedSubcategories: MovedSubcategoryMap[]) => void;
 };
 
+export interface EditDataMap {
+	deletedCategoriesByID: string[];
+	newCategories: Category[];
+	deletedSubcategoriesByID: string[];
+	newSubcategories: Subcategory[];
+	movedSubcategories: MovedSubcategoryMap[];
+}
 export interface MovedSubcategoryMap {
 	oldCategoryID: string;
 	newCategoryID: string;
@@ -24,13 +33,9 @@ export interface MovedSubcategoryMap {
 }
 
 export function EditPage(props: EditPagePropsType) {
+	const { subcategories, handleDeleteSubcategory } = props;
 	const [categories, setCategories] = useState<Category[]>(props.categoryData);
-	const [subcategories, setSubcategories] = useState<Subcategory[]>(props.subcategoryData);
-	const [deletedCategoriesByID, setDeletedCategoriesByID] = useState<string[]>([]);
-	const [addedCategories, setNewCategories] = useState<Category[]>([]);
-	const [deletedSubcategoriesByID, setDeletedSubcategoriesByID] = useState<string[]>([]);
-	const [addedSubcategories, setNewSubcategories] = useState<Subcategory[]>([]);
-	const [movedSubcategories, setMovedSubcategories] = useState<MovedSubcategoryMap[]>([]);
+	
 	const [selectedSubcategory, setSelectedSubcategory] = useState<Subcategory | null>(null);
 	const [isShowingEmptyCategory, setIsShowingEmptyCategory] = useState<boolean>(false);
 	const [isLoadingChanges, setIsLoadingChanges] = useState<boolean>(false);
@@ -51,20 +56,9 @@ export function EditPage(props: EditPagePropsType) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [categories]);
 
-	// Re-renders and alphabetically sorts subcategories whenever they are changed.
-	useEffect(() => {
-		subcategories.sort((a, b) => {
-			if (a.name < b.name) {
-				return -1;
-			} else if (a.name > b.name) {
-				return 1;
-			} else {
-				return 0;
-			}
-		});
-		setMainKey(mainKey === 0 ? 1 : 0);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [subcategories]);
+
+
+	// Updates edit data whenever edits are made.
 
 	const handleDeleteCategoryClick = (targetCategoryID: string) => {
 		if (!deletedCategoriesByID.includes(targetCategoryID)) {
@@ -106,13 +100,6 @@ export function EditPage(props: EditPagePropsType) {
 		}
 	};
 
-	const handleDeleteSubcategoryClick = (subcategoryID: string) => {
-		if (!deletedSubcategoriesByID.includes(subcategoryID)) {
-			deletedSubcategoriesByID.push(subcategoryID);
-			const newSubcategories = subcategories.filter((subcategory) => subcategory.id !== subcategoryID);
-			setSubcategories(newSubcategories);
-		}
-	};
 	const handleAddSubcategoryClick = (subcategory: Subcategory) => {
 		if (!addedSubcategories.includes(subcategory)) {
 			addedSubcategories.push(subcategory);
@@ -139,11 +126,6 @@ export function EditPage(props: EditPagePropsType) {
 			setSelectedSubcategory(null);
 			setMainKey(mainKey === 0 ? 1 : 0);
 		}
-	};
-
-	const handleDoneClick = () => {
-		setIsLoadingChanges(true);
-		props.handleFinishEditsClick(deletedCategoriesByID, addedCategories, deletedSubcategoriesByID, addedSubcategories, movedSubcategories);
 	};
 
 	const categorySelectionHeader = (
@@ -178,9 +160,8 @@ export function EditPage(props: EditPagePropsType) {
 				key={i}
 				category={category}
 				subcategories={filteredSubcategories}
+				handleDeleteSubcategory={handleDeleteSubcategory}
 				handleDeleteCategoryClick={handleDeleteCategoryClick}
-				handleDeleteSubcategoryClick={handleDeleteSubcategoryClick}
-				handleAddSubcategoryClick={handleAddSubcategoryClick}
 				handleSelectSubcategoryClick={handleSelectSubcategoryClick}
 			/>
 		);
@@ -194,7 +175,6 @@ export function EditPage(props: EditPagePropsType) {
 	return (
 		<>
 			{isLoadingChanges ? <div className={styles.loading}>Loading</div> : null}
-
 			{isShowingEmptyCategory ? (
 				<div className={styles.emptyCategory}>
 					<input type="text" onKeyDown={handleEnterKeyDown} />

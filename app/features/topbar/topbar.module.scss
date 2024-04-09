@@ -7,19 +7,18 @@
 	height: space.$s15;
 	padding: space.$s3-1 space.$s2-1;
 	display: flex;
+	justify-content: space-between;
 	background-color: color.$secondary-dark;
 	align-items: center;
-	gap: space.$s4;
 	border-bottom: space.$s0-1 solid color.$gray-500;
 	box-sizing: border-box;
 }
 
 .dateDisplay {
-	//margin-left = widthOfIcon + gapSize
-	margin-left: calc(space.$s6 + space.$s4);
+	//margin-left = widthOfIcon (to center date text)
+	margin-left: calc(space.$s6);
 	display: flex;
 	justify-content: center;
-	flex: 1 0 0;
 	gap: space.$s2;
 
 	& span {

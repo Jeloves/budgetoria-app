@@ -4,6 +4,7 @@
     display: flex;
     background: none;
     border: none;
+    box-sizing: border-box;
 
     & img {
         width: space.$s6;

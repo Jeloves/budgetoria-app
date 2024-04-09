@@ -1,7 +1,7 @@
 "use client";
 import "../reset.css";
 import styles from "./index.module.scss";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { auth, getUser } from "@/firebase/auth";
 import { User } from "firebase/auth/cordova";
 import { getSelectedBudget, getUnassignedBalance, updateUnassignedBalance } from "@/firebase/budgets";
@@ -13,7 +13,7 @@ import { Topbar } from "@/features/topbar/topbar";
 import { Unassigned } from "@/features/unassigned";
 import { CategoryItem } from "@/features/category-item";
 import { EditPage } from "@/features/edit-categories";
-import { MovedSubcategoryMap } from "@/features/edit-categories/edit-page";
+import { EditDataMap, MovedSubcategoryMap } from "@/features/edit-categories/edit-page";
 import { handleCategoryChanges } from "@/utils/handleCategoryChanges";
 import { AccountsPage } from "@/features/accounts-page";
 import classNames from "classnames";
@@ -38,21 +38,28 @@ export default function BudgetPage() {
 
 	const [unassignedKey, setUnassignedKey] = useState<0 | 1>(0);
 
+	const [isLoading, setIsLoading] = useState<boolean>(true);
+
 	// Pages
 	const [onBudgetPage, setOnBudgetPage] = useState<boolean>(true);
-	const [isEditing, setIsEditing] = useState<boolean>(false);
+	const [onEditPage, setOnEditPage] = useState<boolean>(false);
 	const [onAccountsPage, setOnAccountsPage] = useState<boolean>(false);
 
 	// Navigation Functions
 	const navigateToBudgetPage = () => {
 		setOnBudgetPage(true);
-		setIsEditing(false);
+		setOnEditPage(false);
 		setOnAccountsPage(false);
-	}
+	};
 	const navigateToAccountsPage = () => {
 		setOnBudgetPage(false);
-		setIsEditing(false);
+		setOnEditPage(false);
 		setOnAccountsPage(true);
+	};
+	const navigateToEditPage = () => {
+		setOnBudgetPage(false);
+		setOnEditPage(true);
+		setOnAccountsPage(false);
 	};
 
 	// Passed to DatePicker
@@ -63,16 +70,45 @@ export default function BudgetPage() {
 
 	// Passed to Topbar
 	const handleEditCategoriesClick = () => {
-		setIsEditing(true);
+		navigateToEditPage();
 	};
 
-	// Passed to EditPage
-	const handleCancelEditCategoriesClick = () => {
-		setIsEditing(false);
+	// EditPage
+	const newCategories = useRef<Category[]>([]);
+	const newSubcategories = useRef<Subcategory[]>([]);
+	const deletedCategoryIDs = useRef<string[]>([]);
+	const deletedSubcategoryIDs = useRef<string[]>([]);
+	const movedSubcategories = useRef<MovedSubcategoryMap[]>([]);
+
+	const resetEditData = () => {
+		newCategories.current.length = 0;
+		newSubcategories.current.length = 0;
+		deletedCategoryIDs.current.length = 0;
+		deletedSubcategoryIDs.current.length = 0;
+		movedSubcategories.current.length = 0;
 	};
-	const handleFinishEditsClick = (deletedCategoriesByID: string[], newCategories: Category[], deletedSubcategoriesByID: string[], newSubcategories: Subcategory[], movedSubcategories: MovedSubcategoryMap[]) => {
-		handleCategoryChanges(user!.uid, budget!.id, allocations, clearedTransactions.concat(unclearedTransactions), deletedCategoriesByID, newCategories, deletedSubcategoriesByID, newSubcategories, movedSubcategories).then(() => {
-			setIsEditing(false);
+	const handleCancelEditCategoriesClick = () => {
+		setOnEditPage(false);
+		resetEditData();
+	};
+	const handleDeleteSubcategory = (subcategoryID: string) => {
+		if (!deletedSubcategoryIDs.current.includes(subcategoryID)) {
+			deletedSubcategoryIDs.current.push(subcategoryID);
+		}
+	};
+	const handleConfirmEdits = () => {
+		handleCategoryChanges(
+			user!.uid,
+			budget!.id,
+			allocations,
+			clearedTransactions.concat(unclearedTransactions),
+			newCategories.current,
+			newSubcategories.current,
+			deletedCategoryIDs.current,
+			deletedSubcategoryIDs.current,
+			movedSubcategories.current
+		).then(() => {
+			resetEditData();
 			setDataListenerKey(!dataListenerKey);
 		});
 	};
@@ -80,7 +116,7 @@ export default function BudgetPage() {
 	// Passed to AccountsPage
 	const handleConfirmNewAccount = async (newAccount: Account) => {
 		await createAccount(user!.uid, budget!.id, newAccount);
-	}
+	};
 
 	// Sets user
 	useEffect(() => {
@@ -102,6 +138,7 @@ export default function BudgetPage() {
 
 	// Fetches subcollections when budget changes
 	useEffect(() => {
+		setIsLoading(true);
 		const fetchBudgetSubcollections = async () => {
 			if (budget) {
 				const accountsData = await getAccounts(user!.uid, budget.id);
@@ -148,9 +185,11 @@ export default function BudgetPage() {
 				setAllocations(allocationData);
 				setClearedTransactions(clearedTransactionData);
 				setUnclearedTransactions(unclearedTransactions);
+				setIsLoading(false);
 			}
 		};
 		fetchBudgetSubcollections();
+		navigateToBudgetPage();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [budget, dataListenerKey]);
 
@@ -198,61 +237,51 @@ export default function BudgetPage() {
 		mainContent.push(<>{categoryItems}</>);
 
 	// User is on Accounts Page
-	onAccountsPage &&
-		headerContent.push(<AccountsHeader/>) &&
-		mainContent.push(<AccountsPage accounts={accounts} handleConfirmNewAccount={handleConfirmNewAccount}/>);
+	onAccountsPage && headerContent.push(<AccountsHeader />) && mainContent.push(<AccountsPage accounts={accounts} handleConfirmNewAccount={handleConfirmNewAccount} />);
 
-
-	/*
-	if (isEditing) {
-		return (
+	// User is on Edit Page
+	onEditPage &&
+		headerContent.push(
+			<EditPageHeader
+				handleCancelEdits={navigateToBudgetPage}
+				handleConfirmEdits={handleConfirmEdits}
+				handleShowNewCategory={function (): void {
+					console.log("Function not implemented.");
+				}}
+			/>
+		) &&
+		mainContent.push(
 			<EditPage
 				userID={user ? user.uid : ""}
 				budgetID={budget ? budget.id : ""}
 				categoryData={[...categories]}
-				subcategoryData={[...subcategories]}
+				subcategories={[...subcategories]}
+				handleDeleteSubcategory={handleDeleteSubcategory}
 				handleCancelEditCategoriesClick={handleCancelEditCategoriesClick}
-				handleFinishEditsClick={handleFinishEditsClick}
+				handleFinishEditsClick={handleConfirmEdits}
 			/>
+		);
+
+	if (isLoading) {
+		return (
+			<div className={styles.loading}>
+				{/*eslint-disable-next-line @next/next/no-img-element*/}
+				<img src="/icons/loading.svg" alt="Loading screen icon"/>
+			</div>
 		);
 	} else {
 		return (
 			<>
-				<header className={classNames(styles.header, onBudgetPage && styles.budgetPageHeader)}>
-					{headerContent}
-				</header>
+				<header className={classNames(onBudgetPage ? styles.budgetPageHeader : styles.header)}>{headerContent}</header>
 				<main className={classNames(styles.main, onBudgetPage && styles.budgetPageContent)}>{mainContent}</main>
-				<NavigationBar navigateToBudget={navigateToBudgetPage} navigateToCreateTransaction={() => {alert("Creating new transaction")}} navigateToAccounts={navigateToAccountsPage}/>
+				<NavigationBar
+					navigateToBudget={navigateToBudgetPage}
+					navigateToCreateTransaction={() => {
+						alert("Creating new transaction");
+					}}
+					navigateToAccounts={navigateToAccountsPage}
+				/>
 			</>
 		);
-	}
-	*/
-
-	if (categories.length > 0) {
-
-	return (
-		<>
-			<header className={classNames(styles.header)}>
-				<EditPageHeader handleCancelEdits={function (): void {
-					console.log("Function not implemented.");
-				} } handleConfirmEdits={function (): void {
-					console.log("Function not implemented.");
-				} } handleShowNewCategory={function (): void {
-					console.log("Function not implemented.");
-				} } />
-			</header>
-			<main className={classNames(styles.main)}>
-			<EditPage
-				userID={user ? user.uid : ""}
-				budgetID={budget ? budget.id : ""}
-				categoryData={[...categories]}
-				subcategoryData={[...subcategories]}
-				handleCancelEditCategoriesClick={handleCancelEditCategoriesClick}
-				handleFinishEditsClick={handleFinishEditsClick}
-			/>
-			</main>
-			<NavigationBar navigateToBudget={navigateToBudgetPage} navigateToCreateTransaction={() => {alert("Creating new transaction")}} navigateToAccounts={navigateToAccountsPage}/>
-		</>
-	);
 	}
 }

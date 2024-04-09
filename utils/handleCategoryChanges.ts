@@ -4,17 +4,18 @@ import { updateUnassignedBalance } from "@/firebase/budgets";
 import { createCategory, createSubcategory, deleteCategory, deleteSubcategory } from "@/firebase/categories";
 import { Allocation, Category, Subcategory, Transaction } from "@/firebase/models";
 import { updateTransaction } from "@/firebase/transactions";
+import { EditDataMap } from "@/features/edit-categories/edit-page";
 
 export async function handleCategoryChanges(
 	userID: string,
 	budgetID: string,
 	allocations: Allocation[],
 	transactions: Transaction[],
-	deletedCategoriesByID: string[],
 	newCategories: Category[],
-	deletedSubcategoriesByID: string[],
 	newSubcategories: Subcategory[],
-	movedSubcategories: MovedSubcategoryMap[]
+	deletedCategoryIDs: string[],
+	deletedSubcategoryIDs: string[],
+	movedSubcategories: MovedSubcategoryMap[],
 ): Promise<boolean> {
 	try {
 		if (newCategories.length > 0) {
@@ -25,8 +26,8 @@ export async function handleCategoryChanges(
 			await createSubcategories(userID, budgetID, newSubcategories);
 		}
 
-		if (deletedCategoriesByID.length > 0 || deletedSubcategoriesByID.length > 0) {
-			await deleteCategories(userID, budgetID, allocations, transactions, deletedCategoriesByID, deletedSubcategoriesByID);
+		if (deletedCategoryIDs.length > 0 || deletedSubcategoryIDs.length > 0) {
+			await deleteCategories(userID, budgetID, allocations, transactions, deletedCategoryIDs, deletedSubcategoryIDs);
 		}
 		return Promise.resolve(true);
 	} catch (error) {
@@ -54,7 +55,7 @@ async function deleteCategories(userID: string, budgetID: string, allocations: A
 
 		const filteredTransactions = transactions.filter((transaction) => {
 			return transaction.categoryID === categoryID;
-		})
+		});
 		for (const transaction of filteredTransactions) {
 			transaction.categoryID = "";
 			transaction.approval = false;
@@ -67,7 +68,7 @@ async function deleteCategories(userID: string, budgetID: string, allocations: A
 
 		const filteredTransactions = transactions.filter((transaction) => {
 			return transaction.subcategoryID === subcategoryID;
-		})
+		});
 		for (const transaction of filteredTransactions) {
 			transaction.categoryID = "";
 			transaction.subcategoryID = "";
@@ -77,7 +78,7 @@ async function deleteCategories(userID: string, budgetID: string, allocations: A
 
 		const filteredAllocations = allocations.filter((allocation) => {
 			return allocation.subcategoryID === subcategoryID;
-		})
+		});
 		for (const allocation of filteredAllocations) {
 			await deleteAllocation(userID, budgetID, allocation.id);
 			await updateUnassignedBalance(userID, allocation.balance);

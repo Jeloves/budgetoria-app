@@ -5,7 +5,7 @@ import { Subcategory } from "@/firebase/models";
 
 export type EditSubcategoryItemPropsType = {
 	subcategory: Subcategory;
-	handleDeleteSubcategoryClick: (subcategoryID: string, categoryID: string) => void;
+	handleDeleteSubcategoryClick: (subcategoryID: string) => void;
 	handleSelectSubcategoryClick: (subcategory: Subcategory) => void;
 };
 
@@ -14,11 +14,13 @@ export function EditSubcategoryItem(props: EditSubcategoryItemPropsType) {
 
 	return (
 		<>
-			<section className={classNames(styles.editItem, styles.editSubcategory)}>
+			<div className={styles.editSubcategoryItem}>
 				<input type="text" defaultValue={subcategory.name} />
 				<IconButton
 					button={{
-						onClick: () => {handleDeleteSubcategoryClick(subcategory.id, subcategory.categoryID)},
+						onClick: () => {
+							handleDeleteSubcategoryClick(subcategory.id)
+						},
 					}}
 					src={"/icons/minus.svg"}
 					altText={"Button to delete category"}
@@ -32,7 +34,7 @@ export function EditSubcategoryItem(props: EditSubcategoryItemPropsType) {
 					src={"/icons/reorder.svg"}
 					altText={"Button to move subcategory"}
 				/>
-			</section>
+			</div>
 		</>
 	);
 }

@@ -51,7 +51,6 @@ export function Topbar(props: TopbarPropsType) {
 				<IconButton button={{ onClick: handleSideNavigationOnClick }} src="/icons/ellipsis.svg" altText="Button to open Side Navigation" />
 				{dateDisplay}
 				<IconButton button={{ onClick: handleEditCategoriesClick }} src="/icons/edit.svg" altText="Button to edit categories" />
-				<IconButton button={{ onClick: handleCreateTransactionOnClick }} src="/icons/circled-dollar.svg" altText="Button to create new transaction" />
 			</section>
 			{isDatePickerShowing && <DatePicker selectedMonth={month} selectedYear={year} monthAcronyms={monthAcronyms} handleMonthOnClick={handleMonthOnClick} />}
 		</>
