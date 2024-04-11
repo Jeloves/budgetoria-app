@@ -35,7 +35,7 @@ export interface MovedSubcategoryMap {
 }
 
 export function EditPage(props: EditPagePropsType) {
-	const { categoryData, subcategories, isShowingCategoryTemplate, handleCreateCategory, handleDeleteSubcategory, handleCreateSubcategory } = props;
+	const { subcategories, isShowingCategoryTemplate, handleCreateCategory, handleDeleteSubcategory, handleCreateSubcategory } = props;
 	const [categories, setCategories] = useState<Category[]>(props.categories);
 	const [selectedSubcategory, setSelectedSubcategory] = useState<Subcategory | null>(null);
 	const [renderKey, setRenderKey] = useState<number>(0);
