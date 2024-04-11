@@ -106,6 +106,9 @@ export default function BudgetPage() {
 		newCategories.current.push(category);
 		setIsShowingCategoryTemplate(false);
 	};
+	const handleDeleteCategory = (categoryID: string) => {
+		deletedCategoryIDs.current.push(categoryID);
+	}
 	const handleCreateSubcategory = (subcategory: Subcategory) => {
 		newSubcategories.current.push(subcategory);
 	};
@@ -268,6 +271,7 @@ export default function BudgetPage() {
 				subcategories={[...subcategories]}
 				isShowingCategoryTemplate={isShowingCategoryTemplate}
 				handleCreateCategory={handleCreateCategory}
+				handleDeleteCategory={handleDeleteCategory}
 				handleCreateSubcategory={handleCreateSubcategory}
 				handleDeleteSubcategory={handleDeleteSubcategory}
 				handleCancelEditCategoriesClick={handleCancelEditCategoriesClick}

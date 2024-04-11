@@ -16,6 +16,7 @@ export type EditPagePropsType = {
 	subcategories: Subcategory[];
 	isShowingCategoryTemplate: boolean;
 	handleCreateCategory: (category: Category) => void;
+	handleDeleteCategory: (categoryID: string) => void;
 	handleCreateSubcategory: (subcategory: Subcategory) => void;
 	handleDeleteSubcategory: (subcategoryID: string) => void;
 	handleCancelEditCategoriesClick: () => void;
@@ -35,13 +36,19 @@ export interface MovedSubcategoryMap {
 }
 
 export function EditPage(props: EditPagePropsType) {
-	const { subcategories, isShowingCategoryTemplate, handleCreateCategory, handleDeleteSubcategory, handleCreateSubcategory } = props;
+	const { subcategories, isShowingCategoryTemplate, handleCreateCategory, handleDeleteCategory, handleDeleteSubcategory, handleCreateSubcategory } = props;
 	const [categories, setCategories] = useState<Category[]>(props.categories);
 	const [selectedSubcategory, setSelectedSubcategory] = useState<Subcategory | null>(null);
 	const [renderKey, setRenderKey] = useState<number>(0);
 
 	// Updates edit data whenever edits are made.
-	const handleDeleteCategoryClick = (targetCategoryID: string) => {};
+	const handleDeleteCategoryClick = (targetCategoryID: string) => {
+		const updatedCategories = categories.filter((category) => category.id !== targetCategoryID);;
+		console.log(updatedCategories)
+		setCategories(updatedCategories);
+		setRenderKey(renderKey === 0 ? 1 : 0);
+		handleDeleteCategory(targetCategoryID);
+	};
 	const handleCreateCategoryClick = (name: string) => {
 		const newCategory = new Category(uuidv4(), name);
 		const updatedCategories = [...categories, newCategory];
@@ -70,7 +77,6 @@ export function EditPage(props: EditPagePropsType) {
 	};
 
 	const handleSelectSubcategoryClick = (subcategory: Subcategory) => {
-		console.log("Selected:", subcategory);
 		setSelectedSubcategory(subcategory);
 		setRenderKey(renderKey === 0 ? 1 : 0);
 	};
@@ -115,7 +121,7 @@ export function EditPage(props: EditPagePropsType) {
 				handleSelectSubcategoryClick={handleSelectSubcategoryClick}
 			/>
 		);
-		console.log(`Item ${i}`, itemToRender);
+
 		editContent.push(itemToRender);
 		categorySelectionContent.push(
 			<button key={i} id={category.id} onClick={handleSelectCategoryClick} className={styles.categoryOption}>
