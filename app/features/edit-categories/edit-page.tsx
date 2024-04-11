@@ -35,7 +35,7 @@ export interface MovedSubcategoryMap {
 }
 
 export function EditPage(props: EditPagePropsType) {
-	const { categoryData, subcategories, isShowingCategoryTemplate, handleCreateCategory, handleDeleteSubcategory, handleCreateSubcategory } = props;
+	const { subcategories, isShowingCategoryTemplate, handleCreateCategory, handleDeleteSubcategory, handleCreateSubcategory } = props;
 	const [categories, setCategories] = useState<Category[]>(props.categories);
 	const [selectedSubcategory, setSelectedSubcategory] = useState<Subcategory | null>(null);
 	const [renderKey, setRenderKey] = useState<number>(0);
@@ -57,30 +57,9 @@ export function EditPage(props: EditPagePropsType) {
 
 	// Updates edit data whenever edits are made.
 	const handleDeleteCategoryClick = (targetCategoryID: string) => {
-		if (!deletedCategoriesByID.includes(targetCategoryID)) {
-			// Removing the category
-			deletedCategoriesByID.push(targetCategoryID);
-			const newCategories = categories.filter((category) => category.id !== targetCategoryID);
-			setCategories(newCategories);
-
-			// Removing subcategories
-			const filteredSubcategories = subcategories.filter((subcategory) => {
-				return subcategory.categoryID === targetCategoryID;
-			});
-			for (const subcategory of filteredSubcategories) {
-				if (!deletedSubcategoriesByID.includes(subcategory.id)) {
-					deletedSubcategoriesByID.push(subcategory.id);
-				}
-			}
-			const newSubcategories = subcategories.filter((subcategory) => subcategory.categoryID !== targetCategoryID);
-			setSubcategories(newSubcategories);
-		}
+		
 	};
 	const handleCreateCategoryClick = (name: string) => {
-		const newCategory = new Category(uuidv4(), name);
-		const updatedCategories: Category[] = [...categories, newCategory];
-		setCategories(updatedCategories);
-		handleCreateCategory(newCategory);
 	}
 	const handleEnterKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
 		if (event.key === "Enter") {
@@ -102,17 +81,7 @@ export function EditPage(props: EditPagePropsType) {
 	};
 
 	const handleSelectCategoryClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-		const oldCategoryID = selectedSubcategory!.categoryID;
-		const newCategoryID = event.currentTarget.id;
-		if (oldCategoryID !== newCategoryID) {
-			movedSubcategories.push({ oldCategoryID: oldCategoryID, newCategoryID: newCategoryID, subcategoryID: selectedSubcategory!.id });
-
-			const targetSubcategoryIndex = subcategories.findIndex((subcategory) => subcategory.id === selectedSubcategory!.id);
-			subcategories[targetSubcategoryIndex].categoryID = newCategoryID;
-
-			setSelectedSubcategory(null);
-			setRenderKey(renderKey === 0 ? 1 : 0);
-		}
+		
 	};
 
 	const categorySelectionHeader = (

@@ -6,36 +6,61 @@ import { useState } from "react";
 export type DatePickerPropsType = {
 	selectedMonth: number;
 	selectedYear: number;
-	monthAcronyms: string[];
+	dateInterval: DateIntervalType;
 	handleMonthOnClick: (monthIndex: number, newYear: number) => void;
 };
 
+export type DateIntervalType = {
+	minDate: Date;
+	maxDate: Date;
+};
+
+const monthAcronyms = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
 export function DatePicker(props: DatePickerPropsType) {
-	const { selectedMonth, selectedYear, monthAcronyms, handleMonthOnClick } = props;
+	const { selectedMonth, selectedYear, dateInterval, handleMonthOnClick } = props;
+	console.log("dateIntervalObject", dateInterval);
 
 	const [yearDisplayed, setYearDisplayed] = useState<number>(selectedYear);
 
 	const handlePreviousYearOnClick = () => {
-		setYearDisplayed(yearDisplayed - 1);
+		const previousYear = yearDisplayed - 1;
+		if (dateInterval.minDate.getFullYear() <= previousYear) {
+			setYearDisplayed(yearDisplayed - 1);
+		}
 	};
 
 	const handleNextYearOnClick = () => {
-		setYearDisplayed(yearDisplayed + 1);
+		const nextYear = yearDisplayed + 1;
+		if (nextYear <= dateInterval.maxDate.getFullYear()) {
+			setYearDisplayed(yearDisplayed + 1);
+		}
 	};
 
 	let trArray: JSX.Element[] = [];
 	let tdArray: JSX.Element[] = [];
 	monthAcronyms.map((acronym, index) => {
+		const date = new Date(yearDisplayed, index);
+		const isClickable = date <= dateInterval.maxDate && dateInterval.minDate <= date ? true : false;
+
 		const classes = {
 			[styles.selected]: selectedMonth === index && selectedYear === yearDisplayed ? true : false,
+			// Only dates within the dateInterval will be clickable
+			[styles.unclickable]: !isClickable,
 		};
+
+		// What is INSIDE of the date interval?
+		// minYear <= selectedYear <= maxYear
+		// minMonth <= index <= maxMonth
 
 		tdArray.push(
 			<td
 				key={index}
 				className={classNames(classes)}
 				onClick={() => {
-					handleMonthOnClick(index, yearDisplayed);
+					if (isClickable) {
+						handleMonthOnClick(index, yearDisplayed);
+					}
 				}}
 			>
 				{acronym}

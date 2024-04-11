@@ -15,5 +15,5 @@ const Template: StoryFn<DatePickerPropsType> = (args) => <DatePicker {...args}/>
 export const Default = Template.bind({});
 
 Default.args = {
-    monthAcronyms: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    
 }
