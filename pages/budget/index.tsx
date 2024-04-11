@@ -96,8 +96,8 @@ export default function BudgetPage() {
 		movedSubcategories.current.length = 0;
 	};
 	const handleCancelEditCategoriesClick = () => {
-		setOnEditPage(false);
 		resetEditData();
+		setOnEditPage(false);
 	};
 	const handleShowCategoryTemplate = () => {
 		setIsShowingCategoryTemplate(!isShowingCategoryTemplate);
@@ -106,8 +106,17 @@ export default function BudgetPage() {
 		newCategories.current.push(category);
 		setIsShowingCategoryTemplate(false);
 	};
-	const handleDeleteCategory = (categoryID: string) => {
-		deletedCategoryIDs.current.push(categoryID);
+	const handleDeleteCategory = (categoryID: string) => {	
+		// Checks if the targeted category has been created in the same edit-session.
+		let isNewCategory = newCategories.current.some((category) => category.id === categoryID);
+		if (isNewCategory) {
+			// If it was created in the same edit-session, it only needs to be removed from the newCategories array.
+			const targetIndex = newCategories.current.findIndex((category) => category.id === categoryID)
+			newCategories.current.splice(targetIndex, 1);
+		} else {
+			// Else, it is an existing category in Firebase that must be deleted.
+			deletedCategoryIDs.current.push(categoryID);
+		}
 	}
 	const handleCreateSubcategory = (subcategory: Subcategory) => {
 		newSubcategories.current.push(subcategory);
@@ -219,6 +228,9 @@ export default function BudgetPage() {
 		budget!.unassignedBalance = await getUnassignedBalance(user!.uid, budget!.id);
 		setUnassignedKey(unassignedKey === 0 ? 1 : 0);
 	};
+
+	console.log("deleted", deletedCategoryIDs);
+	console.log("added", newCategories)
 
 	const categoryItems: JSX.Element[] = [];
 	if (categories.length > 0) {

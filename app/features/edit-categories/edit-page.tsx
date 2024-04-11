@@ -44,7 +44,6 @@ export function EditPage(props: EditPagePropsType) {
 	// Updates edit data whenever edits are made.
 	const handleDeleteCategoryClick = (targetCategoryID: string) => {
 		const updatedCategories = categories.filter((category) => category.id !== targetCategoryID);;
-		console.log(updatedCategories)
 		setCategories(updatedCategories);
 		setRenderKey(renderKey === 0 ? 1 : 0);
 		handleDeleteCategory(targetCategoryID);
