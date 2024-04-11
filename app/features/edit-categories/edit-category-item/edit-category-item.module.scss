@@ -1,26 +1,19 @@
 @use "@styles/color";
 @use "@styles/space";
 
-
-.editCategoryContent {
-	background: color.$secondary-dark;
-	padding: space.$s2 space.$s2;
-    color: white;
+.editCategoryItem {
+	height: space.$s15;
 	display: flex;
-    border-bottom: space.$s0-1 solid color.$gray-500;
-    gap: space.$s4;
-    align-items: center;
+	align-items: center;
+	gap: space.$s2; 
+	box-sizing: border-box;
+	padding: space.$s2;
+	border-bottom: space.$s0-1 solid color.$gray-500;
 
-    input[type="text"] {
-		// Reset
-		margin: 0;
-		padding: 0;
-		border: none;
-		outline: none;
-		background: none;
+	input[type="text"] {
 		font: inherit;
-		color: inherit;
-        flex: 1;
+		color: white;
+		flex: 1;
 	}
 }
 
@@ -49,10 +42,6 @@
 		background: none;
 		font: inherit;
 		color: white;
-        flex: 1;
+		flex: 1;
 	}
 }
-
-
-
-
