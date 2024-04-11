@@ -4,10 +4,10 @@
 
 .datePicker {
 	width: 100%;
-	margin-top: space.$s15; // = topbar.height
 	position: fixed;
 	display: flex;
 	justify-content: center;
+	z-index: 16;
 }
 
 .datePickerContent {
@@ -48,6 +48,10 @@
 
 		&.selected {
 			background-color: lightblue;
+		}
+
+		&.unclickable {
+			background-color: color.$secondary-dark;
 		}
 	}
 }

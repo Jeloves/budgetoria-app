@@ -21,6 +21,8 @@ import { AccountsHeader } from "@/features/accounts-page/accounts-header";
 import { createAccount, getAccounts } from "@/firebase/accounts";
 import { NavigationBar } from "@/features/navigation-bar";
 import { EditPageHeader } from "@/features/edit-categories/edit-page-header/edit-page-header";
+import { getDateInterval } from "@/utils/getDateInterval";
+import { DateIntervalType } from "@/features/date-picker/date-picker";
 
 export default function BudgetPage() {
 	const [user, setUser] = useState<User | null>(null);
@@ -35,6 +37,10 @@ export default function BudgetPage() {
 
 	const [month, setMonth] = useState<number>(new Date().getMonth());
 	const [year, setYear] = useState(new Date().getFullYear());
+	const [dateInterval, setDateInterval] = useState<DateIntervalType>({
+		minDate: new Date(),
+		maxDate: new Date(),
+	});
 
 	const [unassignedKey, setUnassignedKey] = useState<0 | 1>(0);
 
@@ -95,14 +101,14 @@ export default function BudgetPage() {
 	};
 	const handleShowCategoryTemplate = () => {
 		setIsShowingCategoryTemplate(!isShowingCategoryTemplate);
-	}
+	};
 	const handleCreateCategory = (category: Category) => {
-		newCategories.current.push(category)
+		newCategories.current.push(category);
 		setIsShowingCategoryTemplate(false);
-	}
+	};
 	const handleCreateSubcategory = (subcategory: Subcategory) => {
 		newSubcategories.current.push(subcategory);
-	}
+	};
 	const handleDeleteSubcategory = (subcategoryID: string) => {
 		deletedSubcategoryIDs.current.push(subcategoryID);
 	};
@@ -196,6 +202,7 @@ export default function BudgetPage() {
 				setClearedTransactions(clearedTransactionData);
 				setUnclearedTransactions(unclearedTransactions);
 				setIsLoading(false);
+				setDateInterval(getDateInterval(user!.uid, budget.id, budget.dateCreated));
 			}
 		};
 		fetchBudgetSubcollections();
@@ -236,11 +243,12 @@ export default function BudgetPage() {
 
 	const headerContent: JSX.Element[] = [];
 	const mainContent: JSX.Element[] = [];
+
 	// User is on Budget Page
 	onBudgetPage &&
 		headerContent.push(
 			<>
-				<Topbar month={month} year={year} handleDateChangeOnClick={handleDateChangeOnClick} handleEditCategoriesClick={handleEditCategoriesClick} />
+				<Topbar month={month} year={year} dateInterval={dateInterval} handleDateChangeOnClick={handleDateChangeOnClick} handleEditCategoriesClick={handleEditCategoriesClick} />
 				<Unassigned currency={budget ? budget.currency : "USD"} unassignedBalance={budget ? budget.unassignedBalance : 0} key={unassignedKey} />
 			</>
 		) &&
@@ -251,14 +259,7 @@ export default function BudgetPage() {
 
 	// User is on Edit Page
 	onEditPage &&
-		headerContent.push(
-			<EditPageHeader
-				handleCancelEdits={navigateToBudgetPage}
-				handleConfirmEdits={handleConfirmEdits}
-				handleShowCategoryTemplate={handleShowCategoryTemplate}
-				isShowingCategoryTemplate={isShowingCategoryTemplate}
-			/>
-		) &&
+		headerContent.push(<EditPageHeader handleCancelEdits={navigateToBudgetPage} handleConfirmEdits={handleConfirmEdits} handleShowCategoryTemplate={handleShowCategoryTemplate} isShowingCategoryTemplate={isShowingCategoryTemplate} />) &&
 		mainContent.push(
 			<EditPage
 				userID={user ? user.uid : ""}
@@ -277,7 +278,7 @@ export default function BudgetPage() {
 		return (
 			<div className={styles.loading}>
 				{/*eslint-disable-next-line @next/next/no-img-element*/}
-				<img src="/icons/loading.svg" alt="Loading screen icon"/>
+				<img src="/icons/loading.svg" alt="Loading screen icon" />
 			</div>
 		);
 	} else {

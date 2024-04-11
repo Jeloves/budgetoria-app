@@ -3,18 +3,20 @@ import Image from "next/image";
 import styles from "./topbar.module.scss";
 import { IconButton } from "@/features/ui/icon-button/icon-button";
 import { DatePicker } from "../date-picker";
-
-const monthAcronyms = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+import { DateIntervalType } from "../date-picker/date-picker";
 
 export type TopbarPropsType = {
 	month: number;
 	year: number;
+	dateInterval: DateIntervalType;
 	handleDateChangeOnClick: (monthIndex: number, newYear: number) => void;
 	handleEditCategoriesClick: () => void;
 };
 
+const monthAcronyms = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
 export function Topbar(props: TopbarPropsType) {
-	const { month, year, handleDateChangeOnClick, handleEditCategoriesClick } = props;
+	const { month, year, dateInterval, handleDateChangeOnClick, handleEditCategoriesClick } = props;
 	const [isDatePickerShowing, setIsDatePickerShowing] = useState(false);
 
 	const handleDateDisplayOnClick = () => {
@@ -52,7 +54,7 @@ export function Topbar(props: TopbarPropsType) {
 				{dateDisplay}
 				<IconButton button={{ onClick: handleEditCategoriesClick }} src="/icons/edit.svg" altText="Button to edit categories" />
 			</section>
-			{isDatePickerShowing && <DatePicker selectedMonth={month} selectedYear={year} monthAcronyms={monthAcronyms} handleMonthOnClick={handleMonthOnClick} />}
+			{isDatePickerShowing && <DatePicker selectedMonth={month} selectedYear={year} dateInterval={dateInterval} handleMonthOnClick={handleMonthOnClick} />}
 		</>
 	);
 }
