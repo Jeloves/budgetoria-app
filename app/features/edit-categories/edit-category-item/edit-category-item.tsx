@@ -98,7 +98,7 @@ export function EditCategoryItem(props: EditCategoryItemPropsType) {
 				<IconButton button={{ onClick: handleDisplayNewSubcategory }} src={isShowingEmptySubcategory ? "/icons/minus.svg" : "/icons/circled-plus.svg"} altText={"Button to show or hide new subcategory template"} />
 			</div>
 
-			<div key={mainKey} className={styles.editSubcategoryItems}>
+			<div key={mainKey}>
 				{isShowingEmptySubcategory && newSubcategoryItem}
 				{subcategoryEditItems}
 			</div>
