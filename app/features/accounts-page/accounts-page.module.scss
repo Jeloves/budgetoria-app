@@ -1,0 +1,123 @@
+@use "@styles/color";
+@use "@styles/font";
+@use "@styles/space";
+
+.accountsPage {
+	height: inherit;
+	display: flex;
+	flex-direction: column;
+}
+
+.accountItem {
+	color: white;
+	background-color: color.$primary-dark;
+	padding: space.$s2;
+	border-bottom: space.$s0-1 solid color.$gray-500;
+	display: flex;
+	justify-content: space-between;
+}
+
+.totalItem {
+	background-color: color.$secondary-dark;
+	font-weight: bold;
+}
+
+.accountButtons {
+	padding: space.$s2;
+	display: flex;
+	flex-direction: column;
+	gap: space.$s2;
+
+	& button {
+		width: 100%;
+		color: white;
+		background-color: color.$gray-500;
+		padding: space.$s2 space.$s2;
+		border: 0;
+		border-radius: 4px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	& img {
+		width: space.$s5;
+		height: space.$s5;
+	}
+}
+
+.addAccount {
+	width: 100%;
+	height: 0;
+	background-color: color.$primary-dark;
+	bottom: 0;
+	position: fixed;
+	display: flex;
+	flex-direction: column;
+	color: white;
+
+	& header {
+		height: space.$s15;
+		background-color: color.$secondary-dark;
+		border-bottom: space.$s0-1 solid color.$gray-500;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0 space.$s2;
+
+		& button {
+			color: white;
+            font-size: space.$s4;
+		}
+        & .cancel {
+            color: red;
+        }
+        & .done {
+            color: color.$green;
+        }
+	}
+
+	& div {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		padding: space.$s4;
+		gap: space.$s4;
+
+		& input {
+			padding: 0;
+			outline: none;
+			background: none;
+			font: inherit;
+			color: white;
+            border: 1px solid color.$gray-500;
+            border-radius: 4px;
+            padding: space.$s2;
+		}
+	}
+}
+
+.displayAddAccount {
+	animation: growAnimation 0.5s forwards;
+}
+.hideAddAccount {
+	animation: shrinkAnimation 0.5s forwards;
+}
+
+@keyframes growAnimation {
+	0% {
+		height: 0;
+	}
+	100% {
+		height: 100vh;
+	}
+}
+
+@keyframes shrinkAnimation {
+	0% {
+		height: 100vh;
+	}
+	100% {
+		height: 0;
+	}
+}

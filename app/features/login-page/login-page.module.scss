@@ -1,0 +1,117 @@
+@use "@styles/color";
+@use "@styles/font";
+@use "@styles/space";
+
+.loginContainer {
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 0 space.$s4;
+}
+
+.logoContainer {
+	width: 100%;
+	height: 35%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	& img {
+		width: 200px;
+		height: 200px;
+	}
+}
+
+.socialSignIn {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: space.$s2;
+
+	& button {
+		width: 100%;
+		height: space.$s12;
+		background-color: color.$primary-dark;
+		font: font.$button-regular;
+		border: 1px solid color.$gray-500;
+		border-radius: 4px;
+		box-sizing: border-box;
+		padding: 16px 8px;
+		color: white;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: space.$s4;
+
+		& img {
+			width: 20px;
+			height: 20px;
+		}
+	}
+}
+
+.divider {
+    width: 100%;
+    height: space.$s16;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    & hr {
+        width: 100%;
+        height: 2px;
+        background-color: color.$gray-500;
+    }
+
+    & span {
+        color: color.$gray-500;
+    }
+}
+
+.nativeSignIn {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: space.$s2;
+
+    & input {
+        width: 100%;
+		height: space.$s12;
+        background-color: color.$primary-dark;
+		font: font.$button-regular;
+		border: 1px solid color.$gray-500;
+		border-radius: 4px;
+        color: white;
+        padding: 0 space.$s2;
+        box-sizing: border-box;
+    }
+
+	& div {
+		height: space.$s16;
+		display: flex;
+		color: color.$gray-400;
+
+		& :nth-child(2) {
+			text-align: end;
+			flex: 1;
+		}
+	}
+
+	& button {
+		width: 100%;
+		height: space.$s12;
+		background-color: color.$green;
+		font: font.$button-regular;
+		border: 1px solid color.$gray-500;
+		border-radius: 4px;
+	}
+}
+
+.signupHeader {
+	color: white;
+}
+
+.signupConfirm {
+	margin-top: space.$s6;
+}

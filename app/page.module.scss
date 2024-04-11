@@ -1,0 +1,8 @@
+@use "@styles/color";
+@use "@styles/font";
+@use "@styles/space";
+
+.main {
+  min-height: 100vh;
+	background-color: color.$secondary-dark;
+}

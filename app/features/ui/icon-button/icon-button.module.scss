@@ -1,0 +1,13 @@
+@use "@styles/space";
+
+.iconButton {
+    display: flex;
+    background: none;
+    border: none;
+    box-sizing: border-box;
+
+    & img {
+        width: space.$s6;
+		height: space.$s6;
+    }
+}

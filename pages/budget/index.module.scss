@@ -1,0 +1,84 @@
+@use "@styles/space";
+@use "@styles/color";
+@use "@styles/font";
+
+.header {
+	background-color: color.$secondary-dark;
+	height: space.$s15;
+	width: 100vw;
+	position: absolute;
+	top: 0;
+
+	box-sizing: border-box;
+	padding: space.$s2 space.$s2;
+
+	display: flex;
+	align-items: center;
+	color: white;
+
+	& > {
+		height: 100%;
+	}
+
+	& button {
+        padding: 0;
+        border: none;
+        background: none;
+		box-sizing: border-box;
+    }
+}
+
+.budgetPageHeader {
+	height: calc(space.$s20 + space.$s15); 
+	flex-direction: column;
+	padding: none;
+}
+
+.main {
+	box-sizing: border-box;
+	height: calc(100vh - space.$s15);	// 100vh - header.height
+	width: 100vw;
+	border-top: space.$s0-1 solid color.$gray-500;
+	position: absolute;
+	top: calc(space.$s15);
+	bottom: space.$s15;
+
+
+	& input[type="text"] {
+		margin: 0;
+		padding: 0;
+		border: none;
+		outline: none;
+		background: none;
+		box-sizing: border-box;
+		color: white;
+	}
+}
+
+.budgetPageContent {
+	height: calc(100vh - space.$s15 - space.$s20);
+	top: calc(space.$s15 + space.$s20);
+}
+
+.loading {
+	width: 100vw;
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	& img {
+		width: space.$s10;
+		height: space.$s10;
+		animation: spin 1s linear infinite;
+	}
+
+	@keyframes spin {
+		from {
+		  transform: rotate(0deg);
+		}
+		to {
+		  transform: rotate(360deg);
+		}
+	  }
+}
