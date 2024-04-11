@@ -40,11 +40,12 @@ export function EditPage(props: EditPagePropsType) {
 	const [selectedSubcategory, setSelectedSubcategory] = useState<Subcategory | null>(null);
 	const [renderKey, setRenderKey] = useState<number>(0);
 
-	// Alphabetically ordering categories
-	useEffect(() => {
-		console.log("use effect called");
-		const sortedCategories = [...categories];
-		sortedCategories.sort((a: Category, b: Category) => {
+	// Updates edit data whenever edits are made.
+	const handleDeleteCategoryClick = (targetCategoryID: string) => {};
+	const handleCreateCategoryClick = (name: string) => {
+		const newCategory = new Category(uuidv4(), name);
+		const updatedCategories = [...categories, newCategory];
+		updatedCategories.sort((a, b) => {
 			if (a.name.toLowerCase() < b.name.toLowerCase()) {
 				return -1;
 			} else if (a.name.toLowerCase() > b.name.toLowerCase()) {
@@ -53,14 +54,10 @@ export function EditPage(props: EditPagePropsType) {
 				return 0;
 			}
 		});
-	}, [categories])
-
-	// Updates edit data whenever edits are made.
-	const handleDeleteCategoryClick = (targetCategoryID: string) => {
-		
+		setCategories(updatedCategories);
+		setRenderKey(renderKey === 0 ? 1 : 0);
+		handleCreateCategory(newCategory);
 	};
-	const handleCreateCategoryClick = (name: string) => {
-	}
 	const handleEnterKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
 		if (event.key === "Enter") {
 			const inputValue = event.currentTarget.value;
@@ -72,17 +69,13 @@ export function EditPage(props: EditPagePropsType) {
 		}
 	};
 
-	console.log("rendered categories", categories);
-
 	const handleSelectSubcategoryClick = (subcategory: Subcategory) => {
 		console.log("Selected:", subcategory);
 		setSelectedSubcategory(subcategory);
 		setRenderKey(renderKey === 0 ? 1 : 0);
 	};
 
-	const handleSelectCategoryClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-		
-	};
+	const handleSelectCategoryClick = (event: React.MouseEvent<HTMLButtonElement>) => {};
 
 	const categorySelectionHeader = (
 		<header className={classNames(styles.header, styles.selectionHeader)}>
@@ -121,11 +114,9 @@ export function EditPage(props: EditPagePropsType) {
 				handleDeleteCategoryClick={handleDeleteCategoryClick}
 				handleSelectSubcategoryClick={handleSelectSubcategoryClick}
 			/>
-		)
-		console.log(`Item ${i}`, itemToRender)
-		editContent.push(
-			itemToRender
 		);
+		console.log(`Item ${i}`, itemToRender);
+		editContent.push(itemToRender);
 		categorySelectionContent.push(
 			<button key={i} id={category.id} onClick={handleSelectCategoryClick} className={styles.categoryOption}>
 				{category.name}
@@ -147,7 +138,7 @@ export function EditPage(props: EditPagePropsType) {
 					/>
 				</div>
 			) : null}
-			{selectedSubcategory ? categorySelectionContent : editContent}
+			<div key={renderKey}>{selectedSubcategory ? categorySelectionContent : editContent}</div>
 		</>
 	);
 }
