@@ -16,5 +16,6 @@ export default {
   Default.args = {
     handleCancelEdits: () => {alert("Canceling edits")},
     handleConfirmEdits: () => {alert("Confirming edits")},
-    handleShowNewCategory: () => {alert("Showing New Category")}
+    handleShowCategoryTemplate: () => {alert("Showing New Category")},
+    isShowingCategoryTemplate: false,
   }
