@@ -9,15 +9,16 @@ import { v4 as uuidv4 } from "uuid";
 export type EditCategoryItemPropsType = {
 	category: Category;
 	subcategories: Subcategory[];
+	handleCreateSubcategory: (subcategory: Subcategory) => void;
 	handleDeleteSubcategory: (subcategoryID: string) => void;
 	handleDeleteCategoryClick: (categoryID: string) => void;
 	handleSelectSubcategoryClick: (subcategory: Subcategory) => void;
 };
 
 export function EditCategoryItem(props: EditCategoryItemPropsType) {
-	const { category, handleDeleteSubcategory, handleDeleteCategoryClick, handleSelectSubcategoryClick } = props;
+	const { handleCreateSubcategory, handleDeleteSubcategory, handleDeleteCategoryClick, handleSelectSubcategoryClick } = props;
 
-
+	const [category, setCategory] = useState<Category>(props.category);
 	const [subcategories, setSubcategories] = useState<Subcategory[]>(props.subcategories);
 	const [isShowingEmptySubcategory, setIsShowingEmptySubcategory] = useState<boolean>(false);
 	const [mainKey, setMainKey] = useState<number>(0);
@@ -31,16 +32,17 @@ export function EditCategoryItem(props: EditCategoryItemPropsType) {
 		const newSubcategory = new Subcategory(uuidv4(), name, category.id)
 		const updatedSubcategories = [...subcategories, newSubcategory];
 		updatedSubcategories.sort((a, b) => {
-			if (a.name < b.name) {
+			if ((a.name).toLowerCase() < (b.name).toLowerCase()) {
 				return -1;
-			} else if (a.name > b.name) {
+			} else if ((a.name).toLowerCase() > (b.name).toLowerCase()) {
 				return 1;
-			} else {
+			} else {	
 				return 0;
 			}
 		});
 		setSubcategories(updatedSubcategories);
 		setMainKey(mainKey === 0 ? 1 : 0);
+		handleCreateSubcategory(newSubcategory);
 	}
 	const handleDeleteSubcategoryClick = (subcategoryID: string) => {
 		const updatedSubcategories = subcategories.filter((subcategory) => subcategory.id !== subcategoryID);

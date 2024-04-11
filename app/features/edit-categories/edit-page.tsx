@@ -12,11 +12,13 @@ import { handleCategoryChanges } from "@/utils/handleCategoryChanges";
 export type EditPagePropsType = {
 	userID: string;
 	budgetID: string;
-	categoryData: Category[];
+	categories: Category[];
 	subcategories: Subcategory[];
+	isShowingCategoryTemplate: boolean;
+	handleCreateCategory: (category: Category) => void;
+	handleCreateSubcategory: (subcategory: Subcategory) => void;
 	handleDeleteSubcategory: (subcategoryID: string) => void;
 	handleCancelEditCategoriesClick: () => void;
-	handleFinishEditsClick: (deletedCategoriesByID: string[], newCategories: Category[], deletedSubcategoriesByID: string[], newSubcategories: Subcategory[], movedSubcategories: MovedSubcategoryMap[]) => void;
 };
 
 export interface EditDataMap {
@@ -33,33 +35,27 @@ export interface MovedSubcategoryMap {
 }
 
 export function EditPage(props: EditPagePropsType) {
-	const { subcategories, handleDeleteSubcategory } = props;
-	const [categories, setCategories] = useState<Category[]>(props.categoryData);
-	
+	const { categoryData, subcategories, isShowingCategoryTemplate, handleCreateCategory, handleDeleteSubcategory, handleCreateSubcategory } = props;
+	const [categories, setCategories] = useState<Category[]>(props.categories);
 	const [selectedSubcategory, setSelectedSubcategory] = useState<Subcategory | null>(null);
-	const [isShowingEmptyCategory, setIsShowingEmptyCategory] = useState<boolean>(false);
-	const [isLoadingChanges, setIsLoadingChanges] = useState<boolean>(false);
-	const [mainKey, setMainKey] = useState<number>(0);
+	const [renderKey, setRenderKey] = useState<number>(0);
 
-	// Re-renders and alphabetically sorts categories whenever they are changed.
+	// Alphabetically ordering categories
 	useEffect(() => {
-		categories.sort((a, b) => {
-			if (a.name < b.name) {
+		console.log("use effect called");
+		const sortedCategories = [...categories];
+		sortedCategories.sort((a: Category, b: Category) => {
+			if (a.name.toLowerCase() < b.name.toLowerCase()) {
 				return -1;
-			} else if (a.name > b.name) {
+			} else if (a.name.toLowerCase() > b.name.toLowerCase()) {
 				return 1;
 			} else {
 				return 0;
 			}
 		});
-		setMainKey(mainKey === 0 ? 1 : 0);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [categories]);
-
-
+	}, [categories])
 
 	// Updates edit data whenever edits are made.
-
 	const handleDeleteCategoryClick = (targetCategoryID: string) => {
 		if (!deletedCategoriesByID.includes(targetCategoryID)) {
 			// Removing the category
@@ -80,38 +76,29 @@ export function EditPage(props: EditPagePropsType) {
 			setSubcategories(newSubcategories);
 		}
 	};
-	const handleAddCategory = (newCategory: Category) => {
-		if (!addedCategories.includes(newCategory)) {
-			addedCategories.push(newCategory);
-			const newCategories = [...categories];
-			newCategories.push(newCategory);
-			setCategories(newCategories);
-		}
-	};
+	const handleCreateCategoryClick = (name: string) => {
+		const newCategory = new Category(uuidv4(), name);
+		const updatedCategories: Category[] = [...categories, newCategory];
+		setCategories(updatedCategories);
+		handleCreateCategory(newCategory);
+	}
 	const handleEnterKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
 		if (event.key === "Enter") {
 			const inputValue = event.currentTarget.value;
 			if (inputValue) {
-				handleAddCategory(new Category(uuidv4(), inputValue));
-				setIsShowingEmptyCategory(false);
+				handleCreateCategoryClick(inputValue);
 			} else {
-				setIsShowingEmptyCategory(false);
+				alert("A category name must be inputted");
 			}
 		}
 	};
 
-	const handleAddSubcategoryClick = (subcategory: Subcategory) => {
-		if (!addedSubcategories.includes(subcategory)) {
-			addedSubcategories.push(subcategory);
-			const newSubcategories = [...subcategories];
-			newSubcategories.push(subcategory);
-			setSubcategories(newSubcategories);
-		}
-	};
+	console.log("rendered categories", categories);
+
 	const handleSelectSubcategoryClick = (subcategory: Subcategory) => {
 		console.log("Selected:", subcategory);
 		setSelectedSubcategory(subcategory);
-		setMainKey(mainKey === 0 ? 1 : 0);
+		setRenderKey(renderKey === 0 ? 1 : 0);
 	};
 
 	const handleSelectCategoryClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -124,7 +111,7 @@ export function EditPage(props: EditPagePropsType) {
 			subcategories[targetSubcategoryIndex].categoryID = newCategoryID;
 
 			setSelectedSubcategory(null);
-			setMainKey(mainKey === 0 ? 1 : 0);
+			setRenderKey(renderKey === 0 ? 1 : 0);
 		}
 	};
 
@@ -155,15 +142,20 @@ export function EditPage(props: EditPagePropsType) {
 		const filteredSubcategories = subcategories.filter((subcategory) => {
 			return subcategory.categoryID === category.id;
 		});
-		editContent.push(
+		const itemToRender = (
 			<EditCategoryItem
 				key={i}
 				category={category}
 				subcategories={filteredSubcategories}
+				handleCreateSubcategory={handleCreateSubcategory}
 				handleDeleteSubcategory={handleDeleteSubcategory}
 				handleDeleteCategoryClick={handleDeleteCategoryClick}
 				handleSelectSubcategoryClick={handleSelectSubcategoryClick}
 			/>
+		)
+		console.log(`Item ${i}`, itemToRender)
+		editContent.push(
+			itemToRender
 		);
 		categorySelectionContent.push(
 			<button key={i} id={category.id} onClick={handleSelectCategoryClick} className={styles.categoryOption}>
@@ -174,18 +166,15 @@ export function EditPage(props: EditPagePropsType) {
 
 	return (
 		<>
-			{isLoadingChanges ? <div className={styles.loading}>Loading</div> : null}
-			{isShowingEmptyCategory ? (
+			{isShowingCategoryTemplate ? (
 				<div className={styles.emptyCategory}>
 					<input type="text" onKeyDown={handleEnterKeyDown} />
 					<IconButton
 						button={{
-							onClick: () => {
-								setIsShowingEmptyCategory(false);
-							},
+							onClick: () => {},
 						}}
 						src={"/icons/circled-minus.svg"}
-						altText={"Button to cancel new subcategory"}
+						altText={"Button to cancel new category"}
 					/>
 				</div>
 			) : null}

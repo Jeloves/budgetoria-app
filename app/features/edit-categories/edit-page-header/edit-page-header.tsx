@@ -6,12 +6,12 @@ import { useState } from "react";
 export type EditPageHeaderPropsType = {
 	handleCancelEdits: () => void;
 	handleConfirmEdits: () => void;
-	handleShowNewCategory: () => void;
+	handleShowCategoryTemplate: () => void;
+	isShowingCategoryTemplate: boolean;
 };
 
 export function EditPageHeader(props: EditPageHeaderPropsType) {
-	const { handleConfirmEdits, handleCancelEdits, handleShowNewCategory } = props;
-	const [isShowingNewCategory, setIsShowingNewCategory] = useState<boolean>(false);
+	const { handleConfirmEdits, handleCancelEdits, handleShowCategoryTemplate, isShowingCategoryTemplate } = props;
 
 	return (
 		<>
@@ -25,11 +25,10 @@ export function EditPageHeader(props: EditPageHeaderPropsType) {
 				<IconButton
 					button={{
 						onClick: () => {
-							setIsShowingNewCategory(!isShowingNewCategory);
-							handleShowNewCategory;
+							handleShowCategoryTemplate();
 						},
 					}}
-					src={isShowingNewCategory ? "/icons/delete-folder.svg" : "/icons/add-folder.svg"}
+					src={isShowingCategoryTemplate ? "/icons/delete-folder.svg" : "/icons/add-folder.svg"}
 					altText="Button to add new category"
 				/>
 				<button className={styles.confirm} onClick={handleConfirmEdits}>

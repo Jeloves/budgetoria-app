@@ -74,6 +74,8 @@ export default function BudgetPage() {
 	};
 
 	// EditPage
+	const [editPageRenderKey, setEditPageRenderKey] = useState<number>(0);
+	const [isShowingCategoryTemplate, setIsShowingCategoryTemplate] = useState<boolean>(false);
 	const newCategories = useRef<Category[]>([]);
 	const newSubcategories = useRef<Subcategory[]>([]);
 	const deletedCategoryIDs = useRef<string[]>([]);
@@ -91,10 +93,18 @@ export default function BudgetPage() {
 		setOnEditPage(false);
 		resetEditData();
 	};
+	const handleShowCategoryTemplate = () => {
+		setIsShowingCategoryTemplate(!isShowingCategoryTemplate);
+	}
+	const handleCreateCategory = (category: Category) => {
+		newCategories.current.push(category)
+		setIsShowingCategoryTemplate(false);
+	}
+	const handleCreateSubcategory = (subcategory: Subcategory) => {
+		newSubcategories.current.push(subcategory);
+	}
 	const handleDeleteSubcategory = (subcategoryID: string) => {
-		if (!deletedSubcategoryIDs.current.includes(subcategoryID)) {
-			deletedSubcategoryIDs.current.push(subcategoryID);
-		}
+		deletedSubcategoryIDs.current.push(subcategoryID);
 	};
 	const handleConfirmEdits = () => {
 		handleCategoryChanges(
@@ -245,20 +255,21 @@ export default function BudgetPage() {
 			<EditPageHeader
 				handleCancelEdits={navigateToBudgetPage}
 				handleConfirmEdits={handleConfirmEdits}
-				handleShowNewCategory={function (): void {
-					console.log("Function not implemented.");
-				}}
+				handleShowCategoryTemplate={handleShowCategoryTemplate}
+				isShowingCategoryTemplate={isShowingCategoryTemplate}
 			/>
 		) &&
 		mainContent.push(
 			<EditPage
 				userID={user ? user.uid : ""}
 				budgetID={budget ? budget.id : ""}
-				categoryData={[...categories]}
+				categories={[...categories]}
 				subcategories={[...subcategories]}
+				isShowingCategoryTemplate={isShowingCategoryTemplate}
+				handleCreateCategory={handleCreateCategory}
+				handleCreateSubcategory={handleCreateSubcategory}
 				handleDeleteSubcategory={handleDeleteSubcategory}
 				handleCancelEditCategoriesClick={handleCancelEditCategoriesClick}
-				handleFinishEditsClick={handleConfirmEdits}
 			/>
 		);
 
