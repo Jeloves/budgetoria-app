@@ -1,0 +1,21 @@
+@use "@styles/color";
+@use "@styles/font";
+@use "@styles/space";
+
+.button {
+    display: flex;
+    color: white;
+    font: font.$button-regular;
+
+    img {
+        width: space.$s5;
+        height: space.$s5;
+    }
+}
+
+.content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}

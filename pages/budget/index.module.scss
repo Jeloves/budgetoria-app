@@ -60,6 +60,48 @@
 	top: calc(space.$s15 + space.$s20);
 }
 
+.subpage {
+	background-color: color.$secondary-dark;
+	width: 0;
+	height: 100vh;
+	position: absolute;
+	z-index: 200;
+	top: 0;
+	right: 0;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.showSubpage {
+	animation: slideInAnimation 0.5s forwards;
+	& header {
+		animation: slideInAnimation 0.5s forwards;
+	}
+	@keyframes slideInAnimation {
+		0% {
+			width: 0;
+		}
+		100% {
+			width: 100vw;
+		}
+	}
+}
+
+.hideSubpage {
+	animation: slideOutAnimation 0.5s forwards;
+	& header {
+		animation: slideOutAnimation 0.5s forwards;
+	}
+	@keyframes slideOutAnimation {
+		0% {
+			width: 100vw;
+		}
+		100% {
+			width: 0%;
+		}
+	}
+}
+
 .loading {
 	width: 100vw;
 	height: 100vh;

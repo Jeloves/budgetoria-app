@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { EditCategoryItem } from "@/features/edit-categories";
+import { EditCategoryItem } from "@/features/edit-page";
 import { Category, Subcategory } from "@/firebase/models";
 import { NIL as NIL_UUID } from "uuid";
 import { IconButton } from "../ui";
@@ -20,6 +20,7 @@ export type EditPagePropsType = {
 	handleCreateSubcategory: (subcategory: Subcategory) => void;
 	handleDeleteSubcategory: (subcategoryID: string) => void;
 	handleCancelEditCategoriesClick: () => void;
+	navigateToMoveSubcategorySubpage: (subcategory: Subcategory, categories: Category[]) => void;
 };
 
 export interface EditDataMap {
@@ -36,7 +37,7 @@ export interface MovedSubcategoryMap {
 }
 
 export function EditPage(props: EditPagePropsType) {
-	const { subcategories, isShowingCategoryTemplate, handleCreateCategory, handleDeleteCategory, handleDeleteSubcategory, handleCreateSubcategory } = props;
+	const { subcategories, isShowingCategoryTemplate, handleCreateCategory, handleDeleteCategory, handleDeleteSubcategory, handleCreateSubcategory, navigateToMoveSubcategorySubpage } = props;
 	const [categories, setCategories] = useState<Category[]>(props.categories);
 	const [selectedSubcategory, setSelectedSubcategory] = useState<Subcategory | null>(null);
 	const [renderKey, setRenderKey] = useState<number>(0);
@@ -76,8 +77,7 @@ export function EditPage(props: EditPagePropsType) {
 	};
 
 	const handleSelectSubcategoryClick = (subcategory: Subcategory) => {
-		setSelectedSubcategory(subcategory);
-		setRenderKey(renderKey === 0 ? 1 : 0);
+		navigateToMoveSubcategorySubpage(subcategory, categories);
 	};
 
 	const handleSelectCategoryClick = (event: React.MouseEvent<HTMLButtonElement>) => {};

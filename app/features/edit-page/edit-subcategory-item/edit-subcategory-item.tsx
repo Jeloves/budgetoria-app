@@ -1,7 +1,6 @@
-import classNames from "classnames";
 import { IconButton } from "../../ui";
 import styles from "./edit-subcategory-item.module.scss";
-import { Subcategory } from "@/firebase/models";
+import { Category, Subcategory } from "@/firebase/models";
 
 export type EditSubcategoryItemPropsType = {
 	subcategory: Subcategory;
@@ -28,7 +27,7 @@ export function EditSubcategoryItem(props: EditSubcategoryItemPropsType) {
 				<IconButton
 					button={{
 						onClick: () => {
-							handleSelectSubcategoryClick(subcategory);
+							handleSelectSubcategoryClick(subcategory)
 						},
 					}}
 					src={"/icons/reorder.svg"}
