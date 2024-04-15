@@ -186,7 +186,7 @@ export default function BudgetPage() {
 		}
 	};
 	const handleCreateSubcategory = (subcategory: Subcategory) => {
-		setNewSubcategories([...newSubcategories, subcategory])
+		setNewSubcategories([...newSubcategories, subcategory]);
 	};
 	const handleDeleteSubcategory = (subcategoryID: string) => {
 		// Checks if the targeted subcategory has been created in the same edit-session.
@@ -201,11 +201,13 @@ export default function BudgetPage() {
 			setDeletedSubcategoryIDs(updatedDeletedSubcategoryIDs);
 		}
 	};
-	const handleMoveSubcategory = (category: Category, subcategory: Subcategory) => {
+	const handleMoveSubcategory = (newCategory: Category, subcategory: Subcategory) => {
 		const oldCategoryID = subcategory.categoryID;
-		const newCategoryID = category.id;
+		const newCategoryID = newCategory.id;
 		const subcategoryID = subcategory.id;
-		movedSubcategories.current.push({ oldCategoryID: oldCategoryID, newCategoryID: newCategoryID, subcategoryID: subcategoryID });
+		const updatedMovedSubcategories = [...movedSubcategories, { oldCategoryID: oldCategoryID, newCategoryID: newCategoryID, subcategoryID: subcategoryID }];
+		setMovedSubcategories(updatedMovedSubcategories);
+		hideSubpage();
 	};
 	const handleConfirmEdits = () => {
 		handleCategoryChanges(
