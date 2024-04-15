@@ -65,10 +65,8 @@ export function EditPage(props: EditPagePropsType) {
 
 	// Updates edit data whenever edits are made.
 	const handleDeleteCategoryClick = (targetCategoryID: string) => {
-		const updatedCategories = categories.filter((category) => category.id !== targetCategoryID);
-		setCategories(updatedCategories);
-		setRenderKey(renderKey === 0 ? 1 : 0);
 		handleDeleteCategory(targetCategoryID);
+		setRenderKey(renderKey === 0 ? 1 :0)
 	};
 	const handleCreateCategoryClick = (name: string) => {
 		const newCategory = new Category(uuidv4(), name);

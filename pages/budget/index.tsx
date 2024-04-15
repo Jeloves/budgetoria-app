@@ -118,7 +118,6 @@ export default function BudgetPage() {
 		for (let newCategory of newCategories) {
 			updatedCategories.push(newCategory);
 		}
-
 		// Deleting categories
 		for (let categoryID of deletedCategoryIDs) {
 			const targetIndex = updatedCategories.findIndex((category) => category.id === categoryID);
@@ -128,7 +127,6 @@ export default function BudgetPage() {
 		}
 		setEditedCategories(updatedCategories);
 	}, [newCategories, categories, deletedCategoryIDs]);
-
 	// Updates editedSubcategories to pass to EditPage
 	useEffect(() => {
 		const updatedSubcategories: Subcategory[] = [...subcategories];
@@ -164,8 +162,8 @@ export default function BudgetPage() {
 		setMovedSubcategories([]);
 	};
 	const handleCancelEditCategoriesClick = () => {
-		resetEditData()
-		navigateToBudgetPage()
+		resetEditData();
+		navigateToBudgetPage();
 	};
 	const handleShowCategoryTemplate = () => {
 		setIsShowingCategoryTemplate(!isShowingCategoryTemplate);
@@ -176,14 +174,15 @@ export default function BudgetPage() {
 	};
 	const handleDeleteCategory = (categoryID: string) => {
 		// Checks if the targeted category has been created in the same edit-session.
-		let isNewCategory = newCategories.current.some((category) => category.id === categoryID);
-		if (isNewCategory) {
+		let isFromCurrentSession = newCategories.some((category) => category.id === categoryID);
+		if (isFromCurrentSession) {
 			// If it was created in the same edit-session, it only needs to be removed from the newCategories array.
-			const targetIndex = newCategories.current.findIndex((category) => category.id === categoryID);
-			newCategories.current.splice(targetIndex, 1);
+			const updatedNewCategories = newCategories.filter((category) => category.id !== categoryID);
+			setNewCategories(updatedNewCategories);
 		} else {
 			// Else, it is an existing category in Firebase that must be deleted.
-			deletedCategoryIDs.current.push(categoryID);
+			const updatedDeletedCategoryIDs = [...deletedCategoryIDs, categoryID];
+			setDeletedCategoryIDs(updatedDeletedCategoryIDs);
 		}
 	};
 	const handleCreateSubcategory = (subcategory: Subcategory) => {
