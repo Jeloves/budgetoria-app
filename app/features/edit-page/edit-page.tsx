@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { EditCategoryItem } from "@/features/edit-categories";
+import { EditCategoryItem } from "@/features/edit-page";
 import { Category, Subcategory } from "@/firebase/models";
 import { NIL as NIL_UUID } from "uuid";
 import { IconButton } from "../ui";
@@ -20,6 +20,7 @@ export type EditPagePropsType = {
 	handleCreateSubcategory: (subcategory: Subcategory) => void;
 	handleDeleteSubcategory: (subcategoryID: string) => void;
 	handleCancelEditCategoriesClick: () => void;
+	navigateToMoveSubcategorySubpage: (subcategory: Subcategory, categories: Category[]) => void;
 };
 
 export interface EditDataMap {
@@ -36,32 +37,39 @@ export interface MovedSubcategoryMap {
 }
 
 export function EditPage(props: EditPagePropsType) {
-	const { subcategories, isShowingCategoryTemplate, handleCreateCategory, handleDeleteCategory, handleDeleteSubcategory, handleCreateSubcategory } = props;
-	const [categories, setCategories] = useState<Category[]>(props.categories);
-	const [selectedSubcategory, setSelectedSubcategory] = useState<Subcategory | null>(null);
+	const {
+		categories,
+		subcategories,
+		isShowingCategoryTemplate,
+		handleCreateCategory,
+		handleDeleteCategory,
+		handleDeleteSubcategory,
+		handleCreateSubcategory,
+		navigateToMoveSubcategorySubpage,
+	} = props;
 	const [renderKey, setRenderKey] = useState<number>(0);
+	const [sortedCategories, setSortedCategories] = useState<Category[]>([]);
+	const [sortedSubcategories, setSortedSubcategories] = useState<Subcategory[]>([]);
+
+	// Sorting categories and subcategories alphabetically
+	useEffect(() => {
+		const sorted = [...categories].sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
+		setSortedCategories(sorted);
+		setRenderKey(renderKey === 0 ? 1 :0)
+	}, [categories]);
+	useEffect(() => {
+		const sorted = [...subcategories].sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
+		setSortedSubcategories(sorted);
+		setRenderKey(renderKey === 0 ? 1 :0)
+	}, [subcategories]);
 
 	// Updates edit data whenever edits are made.
 	const handleDeleteCategoryClick = (targetCategoryID: string) => {
-		const updatedCategories = categories.filter((category) => category.id !== targetCategoryID);;
-		setCategories(updatedCategories);
-		setRenderKey(renderKey === 0 ? 1 : 0);
 		handleDeleteCategory(targetCategoryID);
+		setRenderKey(renderKey === 0 ? 1 :0)
 	};
 	const handleCreateCategoryClick = (name: string) => {
 		const newCategory = new Category(uuidv4(), name);
-		const updatedCategories = [...categories, newCategory];
-		updatedCategories.sort((a, b) => {
-			if (a.name.toLowerCase() < b.name.toLowerCase()) {
-				return -1;
-			} else if (a.name.toLowerCase() > b.name.toLowerCase()) {
-				return 1;
-			} else {
-				return 0;
-			}
-		});
-		setCategories(updatedCategories);
-		setRenderKey(renderKey === 0 ? 1 : 0);
 		handleCreateCategory(newCategory);
 	};
 	const handleEnterKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -76,37 +84,13 @@ export function EditPage(props: EditPagePropsType) {
 	};
 
 	const handleSelectSubcategoryClick = (subcategory: Subcategory) => {
-		setSelectedSubcategory(subcategory);
-		setRenderKey(renderKey === 0 ? 1 : 0);
+		navigateToMoveSubcategorySubpage(subcategory, categories);
 	};
 
-	const handleSelectCategoryClick = (event: React.MouseEvent<HTMLButtonElement>) => {};
-
-	const categorySelectionHeader = (
-		<header className={classNames(styles.header, styles.selectionHeader)}>
-			<button
-				className={classNames(styles.textButton, styles.cancel)}
-				onClick={() => {
-					setSelectedSubcategory(null);
-				}}
-			>
-				Cancel
-			</button>
-			Moving Subcategory: {selectedSubcategory ? selectedSubcategory.name : ""}
-			<button className={classNames(styles.textButton, styles.empty)}>Cancel</button>
-		</header>
-	);
-
 	let editContent: JSX.Element[] = [];
-	let categorySelectionContent: JSX.Element[] = [
-		<h1 key={-1} className={classNames(styles.categoryOption, styles.categoryOptionHeading)}>
-			Select New Category
-		</h1>,
-	];
-
-	for (let i = 0; i < categories.length; i++) {
-		const category = categories[i];
-		const filteredSubcategories = subcategories.filter((subcategory) => {
+	for (let i = 0; i < sortedCategories.length; i++) {
+		const category = sortedCategories[i];
+		const filteredSubcategories = sortedSubcategories.filter((subcategory) => {
 			return subcategory.categoryID === category.id;
 		});
 		const itemToRender = (
@@ -122,11 +106,6 @@ export function EditPage(props: EditPagePropsType) {
 		);
 
 		editContent.push(itemToRender);
-		categorySelectionContent.push(
-			<button key={i} id={category.id} onClick={handleSelectCategoryClick} className={styles.categoryOption}>
-				{category.name}
-			</button>
-		);
 	}
 
 	return (
@@ -143,7 +122,7 @@ export function EditPage(props: EditPagePropsType) {
 					/>
 				</div>
 			) : null}
-			<div key={renderKey}>{selectedSubcategory ? categorySelectionContent : editContent}</div>
+			<div key={renderKey}>{editContent}</div>
 		</>
 	);
 }

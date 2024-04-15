@@ -1,10 +1,10 @@
-import { MovedSubcategoryMap } from "@/features/edit-categories/edit-page";
+import { MovedSubcategoryMap } from "@/features/edit-page/edit-page";
 import { deleteAllocation } from "@/firebase/allocations";
 import { updateUnassignedBalance } from "@/firebase/budgets";
 import { createCategory, createSubcategory, deleteCategory, deleteSubcategory } from "@/firebase/categories";
 import { Allocation, Category, Subcategory, Transaction } from "@/firebase/models";
 import { updateTransaction } from "@/firebase/transactions";
-import { EditDataMap } from "@/features/edit-categories/edit-page";
+import { EditDataMap } from "@/features/edit-page/edit-page";
 
 export async function handleCategoryChanges(
 	userID: string,

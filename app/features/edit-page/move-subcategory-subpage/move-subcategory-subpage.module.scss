@@ -1,0 +1,35 @@
+@use "@styles/space";
+@use "@styles/color";
+@use "@styles/font";
+
+.categoryItem {
+    height: space.$s15;
+    box-sizing: border-box;
+	padding: space.$s2 space.$s2;   
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: space.$s0-1 solid color.$gray-500;
+    color: white;
+    font: font.$text-medium;
+    position: relative;
+
+    & .current {
+        display: none;
+    }
+
+    & .name {
+        position: absolute;
+    }
+}
+
+.selected {
+
+    & .current {
+        display: flex;
+        justify-content: flex-end;
+        width: 100%;
+        font: font.$label-small;
+        text-transform: uppercase;
+    }
+}
