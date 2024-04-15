@@ -59,7 +59,6 @@ export default function BudgetPage() {
 	const [subpageHeader, setSubpageHeader] = useState<JSX.Element | null>(null);
 	const [subpageMain, setSubpageMain] = useState<JSX.Element | null>(null);
 	const [onMoveSubcategorySubpage, setOnMoveSubcategorySubpage] = useState<boolean>(false);
-	
 
 	// Navigation Functions
 	const navigateToBudgetPage = () => {
@@ -85,10 +84,10 @@ export default function BudgetPage() {
 		setSubpageClassNames([styles.subpage, styles.hideSubpage]);
 	};
 	const navigateToMoveSubcategorySubpage = (subcategory: Subcategory, categories: Category[]) => {
-		setSubpageHeader(<MoveSubcategoryHeader subcategory={subcategory} handleBackClick={hideSubpage}/>);
-		setSubpageMain(<MoveSubcategorySubpage subcategory={subcategory} categories={categories} handleMoveSubcategory={handleMoveSubcategory}/>);
+		setSubpageHeader(<MoveSubcategoryHeader subcategory={subcategory} handleBackClick={hideSubpage} />);
+		setSubpageMain(<MoveSubcategorySubpage subcategory={subcategory} categories={categories} handleMoveSubcategory={handleMoveSubcategory} />);
 		showSubpage();
-	}
+	};
 
 	// Passed to DatePicker
 	const handleDateChangeOnClick = (monthIndex: number, newYear: number) => {
@@ -102,30 +101,77 @@ export default function BudgetPage() {
 	};
 
 	// EditPage
-	const [editPageRenderKey, setEditPageRenderKey] = useState<number>(0);
 	const [isShowingCategoryTemplate, setIsShowingCategoryTemplate] = useState<boolean>(false);
-	const newCategories = useRef<Category[]>([]);
-	const newSubcategories = useRef<Subcategory[]>([]);
-	const deletedCategoryIDs = useRef<string[]>([]);
-	const deletedSubcategoryIDs = useRef<string[]>([]);
-	const movedSubcategories = useRef<MovedSubcategoryMap[]>([]);
+	const [newCategories, setNewCategories] = useState<Category[]>([]);
+	const [newSubcategories, setNewSubcategories] = useState<Subcategory[]>([]);
+	const [deletedCategoryIDs, setDeletedCategoryIDs] = useState<string[]>([]);
+	const [deletedSubcategoryIDs, setDeletedSubcategoryIDs] = useState<string[]>([]);
+	const [movedSubcategories, setMovedSubcategories] = useState<MovedSubcategoryMap[]>([]);
+
+	const [editedCategories, setEditedCategories] = useState<Category[]>([]);
+	const [editedSubcategories, setEditedSubcategories] = useState<Subcategory[]>([]);
+
+	// Updates editedCategories to pass to EditPage
+	useEffect(() => {
+		const updatedCategories: Category[] = [...categories];
+		// Adding new categories
+		for (let newCategory of newCategories) {
+			updatedCategories.push(newCategory);
+		}
+
+		// Deleting categories
+		for (let categoryID of deletedCategoryIDs) {
+			const targetIndex = updatedCategories.findIndex((category) => category.id === categoryID);
+			if (targetIndex !== -1) {
+				updatedCategories.splice(targetIndex, 1);
+			}
+		}
+		setEditedCategories(updatedCategories);
+	}, [newCategories, categories, deletedCategoryIDs]);
+
+	// Updates editedSubcategories to pass to EditPage
+	useEffect(() => {
+		const updatedSubcategories: Subcategory[] = [...subcategories];
+		// Adding new subcategories
+		for (let newSubcategory of newSubcategories) {
+			updatedSubcategories.push(newSubcategory);
+		}
+		// Deleting subcategories
+		for (let subcategoryID of deletedSubcategoryIDs) {
+			const targetIndex = updatedSubcategories.findIndex((subcategory) => subcategory.id === subcategoryID);
+			if (targetIndex !== -1) {
+				updatedSubcategories.splice(targetIndex, 1);
+			}
+		}
+		// Moving subcategories
+		for (let editMap of movedSubcategories) {
+			for (let subcategory of updatedSubcategories) {
+				if (subcategory.id === editMap.subcategoryID) {
+					subcategory.categoryID = editMap.newCategoryID;
+				}
+			}
+		}
+		// Sorting subcategories alphabetically
+		updatedSubcategories.sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
+		setEditedSubcategories(updatedSubcategories);
+	}, [deletedSubcategoryIDs, movedSubcategories, newSubcategories, subcategories]);
 
 	const resetEditData = () => {
-		newCategories.current.length = 0;
-		newSubcategories.current.length = 0;
-		deletedCategoryIDs.current.length = 0;
-		deletedSubcategoryIDs.current.length = 0;
-		movedSubcategories.current.length = 0;
+		setNewCategories([]);
+		setNewSubcategories([]);
+		setDeletedCategoryIDs([]);
+		setDeletedSubcategoryIDs([]);
+		setMovedSubcategories([]);
 	};
 	const handleCancelEditCategoriesClick = () => {
-		resetEditData();
-		setOnEditPage(false);
+		resetEditData()
+		navigateToBudgetPage()
 	};
 	const handleShowCategoryTemplate = () => {
 		setIsShowingCategoryTemplate(!isShowingCategoryTemplate);
 	};
 	const handleCreateCategory = (category: Category) => {
-		newCategories.current.push(category);
+		setNewCategories([...newCategories, category]);
 		setIsShowingCategoryTemplate(false);
 	};
 	const handleDeleteCategory = (categoryID: string) => {
@@ -150,8 +196,8 @@ export default function BudgetPage() {
 		const oldCategoryID = subcategory.categoryID;
 		const newCategoryID = category.id;
 		const subcategoryID = subcategory.id;
-		movedSubcategories.current.push({oldCategoryID: oldCategoryID, newCategoryID: newCategoryID, subcategoryID: subcategoryID});
-	}
+		movedSubcategories.current.push({ oldCategoryID: oldCategoryID, newCategoryID: newCategoryID, subcategoryID: subcategoryID });
+	};
 	const handleConfirmEdits = () => {
 		handleCategoryChanges(
 			user!.uid,
@@ -299,13 +345,13 @@ export default function BudgetPage() {
 
 	// User is on Edit Page
 	onEditPage &&
-		pageHeader.push(<EditPageHeader handleCancelEdits={navigateToBudgetPage} handleConfirmEdits={handleConfirmEdits} handleShowCategoryTemplate={handleShowCategoryTemplate} isShowingCategoryTemplate={isShowingCategoryTemplate} />) &&
+		pageHeader.push(<EditPageHeader handleCancelEdits={handleCancelEditCategoriesClick} handleConfirmEdits={handleConfirmEdits} handleShowCategoryTemplate={handleShowCategoryTemplate} isShowingCategoryTemplate={isShowingCategoryTemplate} />) &&
 		pageMain.push(
 			<EditPage
 				userID={user ? user.uid : ""}
 				budgetID={budget ? budget.id : ""}
-				categories={[...categories]}
-				subcategories={[...subcategories]}
+				categories={editedCategories}
+				subcategories={editedSubcategories}
 				isShowingCategoryTemplate={isShowingCategoryTemplate}
 				handleCreateCategory={handleCreateCategory}
 				handleDeleteCategory={handleDeleteCategory}
@@ -315,7 +361,6 @@ export default function BudgetPage() {
 				navigateToMoveSubcategorySubpage={navigateToMoveSubcategorySubpage}
 			/>
 		);
-
 
 	if (isLoading) {
 		return (
