@@ -205,8 +205,11 @@ export default function BudgetPage() {
 		const oldCategoryID = subcategory.categoryID;
 		const newCategoryID = newCategory.id;
 		const subcategoryID = subcategory.id;
-		const updatedMovedSubcategories = [...movedSubcategories, { oldCategoryID: oldCategoryID, newCategoryID: newCategoryID, subcategoryID: subcategoryID }];
-		setMovedSubcategories(updatedMovedSubcategories);
+		if (oldCategoryID !== newCategoryID) {
+			const newMap = { oldCategoryID: oldCategoryID, newCategoryID: newCategoryID, subcategoryID: subcategoryID };
+			const updatedMovedSubcategories = [...movedSubcategories, newMap];
+			setMovedSubcategories(updatedMovedSubcategories);
+		}
 		hideSubpage();
 	};
 	const handleConfirmEdits = () => {
@@ -215,11 +218,11 @@ export default function BudgetPage() {
 			budget!.id,
 			allocations,
 			clearedTransactions.concat(unclearedTransactions),
-			newCategories.current,
-			newSubcategories.current,
-			deletedCategoryIDs.current,
-			deletedSubcategoryIDs.current,
-			movedSubcategories.current
+			newCategories,
+			newSubcategories,
+			deletedCategoryIDs,
+			deletedSubcategoryIDs,
+			movedSubcategories
 		).then(() => {
 			resetEditData();
 			setDataListenerKey(!dataListenerKey);
