@@ -87,8 +87,6 @@ export function EditPage(props: EditPagePropsType) {
 		navigateToMoveSubcategorySubpage(subcategory, categories);
 	};
 
-	const handleSelectCategoryClick = (event: React.MouseEvent<HTMLButtonElement>) => {};
-
 	let editContent: JSX.Element[] = [];
 	for (let i = 0; i < sortedCategories.length; i++) {
 		const category = sortedCategories[i];

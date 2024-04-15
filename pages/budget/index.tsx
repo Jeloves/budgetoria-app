@@ -186,10 +186,20 @@ export default function BudgetPage() {
 		}
 	};
 	const handleCreateSubcategory = (subcategory: Subcategory) => {
-		newSubcategories.current.push(subcategory);
+		setNewSubcategories([...newSubcategories, subcategory])
 	};
 	const handleDeleteSubcategory = (subcategoryID: string) => {
-		deletedSubcategoryIDs.current.push(subcategoryID);
+		// Checks if the targeted subcategory has been created in the same edit-session.
+		let isFromCurrentSession = newSubcategories.some((subcategory) => subcategory.id === subcategoryID);
+		if (isFromCurrentSession) {
+			// If it was created in the same edit-session, it only needs to be removed from the newSubcategories array.
+			const updatedNewSubcategories = newSubcategories.filter((subcategory) => subcategory.id !== subcategoryID);
+			setNewSubcategories(updatedNewSubcategories);
+		} else {
+			// Else, it is an existing subcategory in Firebase that must be deleted.
+			const updatedDeletedSubcategoryIDs = [...deletedSubcategoryIDs, subcategoryID];
+			setDeletedSubcategoryIDs(updatedDeletedSubcategoryIDs);
+		}
 	};
 	const handleMoveSubcategory = (category: Category, subcategory: Subcategory) => {
 		const oldCategoryID = subcategory.categoryID;
