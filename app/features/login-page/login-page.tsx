@@ -3,7 +3,7 @@ import "../../../pages/reset.css";
 import styles from "./login-page.module.scss";
 import { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { signInUser, createUser } from "@/firebase/auth";
+import { signInUser, createUser, signInWithGoogle } from "@/firebase/auth";
 import { createInitialBudget } from "@/firebase/initial-budget";
 
 type LoginFormData = {
@@ -77,7 +77,7 @@ export function LoginPage() {
 	const socialLoginElement = (
 		<>
 			<div className={styles.socialSignIn}>
-				<button data-test-id="google-signin-button">
+				<button data-test-id="google-signin-button" onClick={() => {signInWithGoogle()}}>
 					{/* eslint-disable-next-line @next/next/no-img-element */}
 					<img src="/icons/google-logo.svg" alt="Button to sign in with Google" />
 					Continue with Google
