@@ -3,7 +3,7 @@ import "../../../pages/reset.css";
 import styles from "./login-page.module.scss";
 import { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { signInUser, createUser } from "@/firebase/auth";
+import { signInUser, createUser, signInWithGoogle } from "@/firebase/auth";
 import { createInitialBudget } from "@/firebase/initial-budget";
 
 type LoginFormData = {
@@ -70,19 +70,19 @@ export function LoginPage() {
 				await createInitialBudget(userID);
 				router.push("/budget");
 			}
-		}
+		};
 		initializeBudgetData();
-	}, [router, userID])
+	}, [router, userID]);
 
 	const socialLoginElement = (
 		<>
 			<div className={styles.socialSignIn}>
-				<button>
+				<button data-test-id="google-signin-button" onClick={() => {signInWithGoogle()}}>
 					{/* eslint-disable-next-line @next/next/no-img-element */}
 					<img src="/icons/google-logo.svg" alt="Button to sign in with Google" />
 					Continue with Google
 				</button>
-				<button>
+				<button data-test-id="apple-signin-button">
 					{/* eslint-disable-next-line @next/next/no-img-element */}
 					<img src="/icons/apple-logo.svg" alt="Button to sign in with Apple" />
 					Continue with Apple
@@ -107,7 +107,7 @@ export function LoginPage() {
 
 	return (
 		<section key={renderKey} className={styles.loginContainer}>
-			<div className={styles.logoContainer}>
+			<div data-test-id="logo-container" className={styles.logoContainer}>
 				{/* eslint-disable-next-line @next/next/no-img-element */}
 				<img src="/icons/budgetoria-logo.svg" alt="Budgetoria logo" />
 			</div>
@@ -115,14 +115,14 @@ export function LoginPage() {
 			{isUserLoggingIn ? socialLoginElement : signupHeaderElement}
 
 			<form className={styles.nativeSignIn} onSubmit={handleFormSubmit}>
-				<input id="email" type="email" name="email" placeholder="Email address" required value={formData.email} onChange={handleInputChange} />
-				<input id="password" type="password" name="password" placeholder="Password" required value={formData.password} onChange={handleInputChange} />
+				<input data-test-id="input-email" id="email" type="email" name="email" placeholder="Email address" required value={formData.email} onChange={handleInputChange} />
+				<input data-test-id="input-password" id="password" type="password" name="password" placeholder="Password" required value={formData.password} onChange={handleInputChange} />
 
 				{isUserLoggingIn ? (
 					<div>
-						<a className="forgot_password">Forgot password?</a>
+						<a data-test-id="forgot-password-button">Forgot password?</a>
 						<a
-							className="forgot_password"
+							data-test-id="signup-button"
 							onClick={() => {
 								setIsUserLoggingIn(false);
 							}}
@@ -133,7 +133,7 @@ export function LoginPage() {
 				) : (
 					<div>
 						<a
-							className="forgot_password"
+							data-test-id="existing-user-button"
 							onClick={() => {
 								setIsUserLoggingIn(true);
 							}}
@@ -143,7 +143,7 @@ export function LoginPage() {
 					</div>
 				)}
 
-				<button className={isUserLoggingIn ? "" : styles.signupConfirm} type="submit">
+				<button data-test-id="submit-button" className={isUserLoggingIn ? "" : styles.signupConfirm} type="submit">
 					{isUserLoggingIn ? "Log In" : "Sign Up"}
 				</button>
 			</form>

@@ -1,6 +1,6 @@
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { app, collectionLabel, firestore } from "@/firebase/firebase.config";
-import { createInitialBudget } from "@/firebase/initial-budget";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, getRedirectResult, signInWithRedirect, signInWithPopup } from "firebase/auth";
+import { app } from "@/firebase/firebase.config";
+import { GoogleAuthProvider } from "firebase/auth";
 
 // https://firebase.google.com/docs/reference/js/auth#autherrorcodes <-- list of error codes for firebase auth
 
@@ -8,19 +8,19 @@ const firebaseApp = app;
 export const auth = getAuth();
 
 const errorMessages = [
-    {errorCode: "auth/email-already-in-use", message: "Email is already in use."},
-    {errorCode: "auth/invalid-credential", message: "Email or password is incorrect."},
+	{ errorCode: "auth/email-already-in-use", message: "Email is already in use." },
+	{ errorCode: "auth/invalid-credential", message: "Email or password is incorrect." },
 ];
 
 function getErrorMessage(error: string): string {
-    let errorMessage = error;
-    for (const errorMapObject of errorMessages) {
-        if (error.includes(errorMapObject.errorCode)) {
-            errorMessage = errorMapObject.message;
-            break;
-        }
-    }
-    return errorMessage;
+	let errorMessage = error;
+	for (const errorMapObject of errorMessages) {
+		if (error.includes(errorMapObject.errorCode)) {
+			errorMessage = errorMapObject.message;
+			break;
+		}
+	}
+	return errorMessage;
 }
 
 export function createUser(email: string, password: string) {
@@ -30,8 +30,8 @@ export function createUser(email: string, password: string) {
 				return resolve(userCredential.user.uid as string);
 			})
 			.catch((error) => {
-                console.error("Error Code", error.code);
-                return reject(getErrorMessage(error.code));
+				console.error("Error Code", error.code);
+				return reject(getErrorMessage(error.code));
 			});
 	});
 }
@@ -43,10 +43,45 @@ export function signInUser(email: string, password: string) {
 				return resolve(userCredential.user);
 			})
 			.catch((error) => {
-                console.error("Error Code", error.code);
+				console.error("Error Code", error.code);
 				return reject(getErrorMessage(error.code));
 			});
 	});
+}
+
+export function signInWithGoogle() {
+	const googleProvider = new GoogleAuthProvider();
+	signInWithPopup(auth, googleProvider)
+		.then((result) => {
+			// This gives you a Google Access Token. You can use it to access the Google API.
+			const credential = GoogleAuthProvider.credentialFromResult(result);
+			// The signed-in user info.
+			const user = result.user;
+			// IdP data available using getAdditionalUserInfo(result)
+			// ...
+			console.log("user", user)
+		})
+		.catch((error) => {
+			// Handle Errors here.
+			const errorCode = error.code;
+			const errorMessage = error.message;
+			// The email of the user's account used.
+			const email = error.customData.email;
+			// The AuthCredential type that was used.
+			const credential = GoogleAuthProvider.credentialFromError(error);
+			console.error(errorMessage)
+			// ...
+		});
+}
+
+export function deleteCurrentUser() {
+	const user = getUser();
+	if (user) {
+		user!.delete;
+		console.log("User deleted", user);
+	} else {
+		console.log("Cannot delete user - no user logged in.");
+	}
 }
 
 export function getUser() {
