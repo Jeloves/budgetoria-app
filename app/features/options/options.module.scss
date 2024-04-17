@@ -1,0 +1,31 @@
+@use "@styles/space";
+@use "@styles/color";
+@use "@styles/font";
+
+.optionsContainer {
+    background-color: color.$secondary-dark;
+    width: 75%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+
+    img {
+        width: 20px;
+        height: 20px;
+    }
+
+    button:first-of-type {
+        height: space.$s15;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding: space.$s3-1 space.$s2-1;
+    }
+
+    button {
+        border-bottom: space.$s0-1 solid color.$gray-500;
+        color: color.$gray-100;
+        font: font.$button-regular;
+        padding: space.$s2;
+    }
+}

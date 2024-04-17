@@ -72,7 +72,7 @@
 	white-space: nowrap;
 }
 
-.showSubpage {
+.show {
 	animation: slideInAnimation 0.5s forwards;
 	& header {
 		animation: slideInAnimation 0.5s forwards;
@@ -87,7 +87,7 @@
 	}
 }
 
-.hideSubpage {
+.hide {
 	animation: slideOutAnimation 0.5s forwards;
 	& header {
 		animation: slideOutAnimation 0.5s forwards;
@@ -123,4 +123,16 @@
 		  transform: rotate(360deg);
 		}
 	  }
+}
+
+.options {
+	background-color: color.$secondary-dark-transparent;
+	height: 100vh;
+	width: 0;
+	position: absolute;
+	z-index: 300;
+	top: 0;
+	left: 0;
+	overflow: hidden;
+	white-space: nowrap;
 }

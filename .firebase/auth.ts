@@ -1,4 +1,4 @@
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, getRedirectResult, signInWithRedirect, signInWithPopup } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, getRedirectResult, signInWithRedirect, signInWithPopup, signOut } from "firebase/auth";
 import { app } from "@/firebase/firebase.config";
 import { GoogleAuthProvider } from "firebase/auth";
 
@@ -82,6 +82,18 @@ export function deleteCurrentUser() {
 	} else {
 		console.log("Cannot delete user - no user logged in.");
 	}
+}
+
+export function signOutUser() {
+	return new Promise<void>((resolve, reject) => {
+		signOut(auth)
+			.then(() => {
+				return resolve();
+			})
+			.catch((error) => {
+				return reject(error);
+			});
+	});
 }
 
 export function getUser() {
