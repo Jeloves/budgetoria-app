@@ -1,4 +1,4 @@
-import { getUser, signOutUser } from "@/firebase/auth";
+import { deleteCurrentUser, getUser, signOutUser } from "@/firebase/auth";
 import styles from "./options.module.scss";
 import { useRouter } from "next/navigation";
 
@@ -24,7 +24,17 @@ export function Options(props: OptionsPropsType) {
 			}
 		);
 	};
-	const handleDeleteUser = () => {};
+	const handleDeleteUser = () => {
+        deleteCurrentUser().then(
+			() => {
+				alert("User account successfully deleted.")
+                router.push("/");
+			},
+			(error) => {
+				console.error("Failed to delete user", error);
+			}
+		);
+    };
 
 	return (
 		<div className={styles.optionsContainer}>
