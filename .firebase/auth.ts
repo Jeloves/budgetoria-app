@@ -1,4 +1,4 @@
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, getRedirectResult, signInWithRedirect, signInWithPopup } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, getRedirectResult, signInWithRedirect, signInWithPopup, signOut, deleteUser } from "firebase/auth";
 import { app } from "@/firebase/firebase.config";
 import { GoogleAuthProvider } from "firebase/auth";
 
@@ -59,7 +59,7 @@ export function signInWithGoogle() {
 			const user = result.user;
 			// IdP data available using getAdditionalUserInfo(result)
 			// ...
-			console.log("user", user)
+			console.log("user", user);
 		})
 		.catch((error) => {
 			// Handle Errors here.
@@ -69,19 +69,33 @@ export function signInWithGoogle() {
 			const email = error.customData.email;
 			// The AuthCredential type that was used.
 			const credential = GoogleAuthProvider.credentialFromError(error);
-			console.error(errorMessage)
+			console.error(errorMessage);
 			// ...
 		});
 }
 
 export function deleteCurrentUser() {
-	const user = getUser();
-	if (user) {
-		user!.delete;
-		console.log("User deleted", user);
-	} else {
-		console.log("Cannot delete user - no user logged in.");
-	}
+	return new Promise<void>((resolve, reject) => {
+		deleteUser(auth.currentUser!)
+			.then(() => {
+				return resolve();
+			})
+			.catch((error) => {
+				return reject(error);
+			});
+	});
+}
+
+export function signOutUser() {
+	return new Promise<void>((resolve, reject) => {
+		signOut(auth)
+			.then(() => {
+				return resolve();
+			})
+			.catch((error) => {
+				return reject(error);
+			});
+	});
 }
 
 export function getUser() {

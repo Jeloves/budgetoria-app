@@ -25,6 +25,7 @@ import { getDateInterval } from "@/utils/getDateInterval";
 import { DateIntervalType } from "@/features/date-picker/date-picker";
 import { MoveSubcategoryHeader } from "@/features/edit-page/move-subcategory-subpage/move-subcategory-header";
 import { MoveSubcategorySubpage } from "@/features/edit-page/move-subcategory-subpage/move-subcategory-subpage";
+import { Options } from "@/features/options";
 
 export default function BudgetPage() {
 	const [user, setUser] = useState<User | null>(null);
@@ -48,6 +49,8 @@ export default function BudgetPage() {
 
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 
+	const [optionsClassNames, setOptionsClassNames] = useState<string[]>([styles.options]);
+
 	// Pages
 	const [onBudgetPage, setOnBudgetPage] = useState<boolean>(true);
 	const [onEditPage, setOnEditPage] = useState<boolean>(false);
@@ -61,6 +64,12 @@ export default function BudgetPage() {
 	const [onMoveSubcategorySubpage, setOnMoveSubcategorySubpage] = useState<boolean>(false);
 
 	// Navigation Functions
+	const showOptions = () => {
+		setOptionsClassNames([styles.options, styles.show])
+	}
+	const hideOptions = () => {
+		setOptionsClassNames([styles.options, styles.hide])
+	}
 	const navigateToBudgetPage = () => {
 		setOnBudgetPage(true);
 		setOnEditPage(false);
@@ -77,11 +86,11 @@ export default function BudgetPage() {
 		setOnAccountsPage(false);
 	};
 	const showSubpage = () => {
-		setSubpageClassNames([styles.subpage, styles.showSubpage]);
+		setSubpageClassNames([styles.subpage, styles.show]);
 		setOnSubpage(true);
 	};
 	const hideSubpage = () => {
-		setSubpageClassNames([styles.subpage, styles.hideSubpage]);
+		setSubpageClassNames([styles.subpage, styles.hide]);
 	};
 	const navigateToMoveSubcategorySubpage = (subcategory: Subcategory, categories: Category[]) => {
 		setSubpageHeader(<MoveSubcategoryHeader subcategory={subcategory} handleBackClick={hideSubpage} />);
@@ -348,7 +357,7 @@ export default function BudgetPage() {
 	onBudgetPage &&
 		pageHeader.push(
 			<>
-				<Topbar month={month} year={year} dateInterval={dateInterval} handleDateChangeOnClick={handleDateChangeOnClick} handleEditCategoriesClick={handleEditCategoriesClick} />
+				<Topbar month={month} year={year} dateInterval={dateInterval} handleDateChangeOnClick={handleDateChangeOnClick} handleEditCategoriesClick={handleEditCategoriesClick} handleShowOptions={showOptions}/>
 				<Unassigned currency={budget ? budget.currency : "USD"} unassignedBalance={budget ? budget.unassignedBalance : 0} key={unassignedKey} />
 			</>
 		) &&
@@ -386,6 +395,9 @@ export default function BudgetPage() {
 	} else {
 		return (
 			<>
+				<section className={classNames(optionsClassNames)}>
+					<Options handleHideOptions={hideOptions}/>
+				</section>
 				<header className={classNames(onBudgetPage ? styles.budgetPageHeader : styles.header)}>{pageHeader}</header>
 				<main className={classNames(styles.main, onBudgetPage && styles.budgetPageContent)}>{pageMain}</main>
 				<NavigationBar

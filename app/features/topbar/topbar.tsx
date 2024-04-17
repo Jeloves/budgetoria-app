@@ -11,12 +11,13 @@ export type TopbarPropsType = {
 	dateInterval: DateIntervalType;
 	handleDateChangeOnClick: (monthIndex: number, newYear: number) => void;
 	handleEditCategoriesClick: () => void;
+	handleShowOptions: () => void;
 };
 
 const monthAcronyms = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 export function Topbar(props: TopbarPropsType) {
-	const { month, year, dateInterval, handleDateChangeOnClick, handleEditCategoriesClick } = props;
+	const { month, year, dateInterval, handleDateChangeOnClick, handleEditCategoriesClick, handleShowOptions } = props;
 	const [isDatePickerShowing, setIsDatePickerShowing] = useState(false);
 
 	const handleDateDisplayOnClick = () => {
@@ -50,7 +51,7 @@ export function Topbar(props: TopbarPropsType) {
 	return (
 		<>
 			<section className={styles.topbarContainer}>
-				<IconButton button={{ onClick: handleSideNavigationOnClick }} src="/icons/ellipsis.svg" altText="Button to open Side Navigation" />
+				<IconButton button={{ onClick: handleShowOptions }} src="/icons/ellipsis.svg" altText="Button to open Side Navigation" />
 				{dateDisplay}
 				<IconButton button={{ onClick: handleEditCategoriesClick }} src="/icons/edit.svg" altText="Button to edit categories" />
 			</section>
