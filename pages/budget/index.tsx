@@ -65,11 +65,11 @@ export default function BudgetPage() {
 
 	// Navigation Functions
 	const showOptions = () => {
-		setOptionsClassNames([styles.options, styles.show])
-	}
+		setOptionsClassNames([styles.options, styles.show]);
+	};
 	const hideOptions = () => {
-		setOptionsClassNames([styles.options, styles.hide])
-	}
+		setOptionsClassNames([styles.options, styles.hide]);
+	};
 	const navigateToBudgetPage = () => {
 		setOnBudgetPage(true);
 		setOnEditPage(false);
@@ -192,6 +192,16 @@ export default function BudgetPage() {
 			// Else, it is an existing category in Firebase that must be deleted.
 			const updatedDeletedCategoryIDs = [...deletedCategoryIDs, categoryID];
 			setDeletedCategoryIDs(updatedDeletedCategoryIDs);
+			// It must also delete its subcategories.
+			const filteredSubcategories = subcategories.filter((subcategory) => subcategory.categoryID === categoryID);
+			const updatedDeletedSubcategoryIDs = [...deletedSubcategoryIDs];
+			for (let subcategory of filteredSubcategories) {
+				// Checks if the current subcategory has already been selected for deletion.
+				if (!deletedSubcategoryIDs.includes(subcategory.id)) {
+					updatedDeletedSubcategoryIDs.push(subcategory.id)
+				}
+			}
+			setDeletedSubcategoryIDs(updatedDeletedSubcategoryIDs);
 		}
 	};
 	const handleCreateSubcategory = (subcategory: Subcategory) => {
@@ -222,17 +232,7 @@ export default function BudgetPage() {
 		hideSubpage();
 	};
 	const handleConfirmEdits = () => {
-		handleCategoryChanges(
-			user!.uid,
-			budget!.id,
-			allocations,
-			clearedTransactions.concat(unclearedTransactions),
-			newCategories,
-			newSubcategories,
-			deletedCategoryIDs,
-			deletedSubcategoryIDs,
-			movedSubcategories
-		).then(() => {
+		handleCategoryChanges(user!.uid, budget!.id, allocations, clearedTransactions.concat(unclearedTransactions), newCategories, newSubcategories, deletedCategoryIDs, deletedSubcategoryIDs, movedSubcategories).then(() => {
 			resetEditData();
 			setDataListenerKey(!dataListenerKey);
 		});
@@ -357,7 +357,7 @@ export default function BudgetPage() {
 	onBudgetPage &&
 		pageHeader.push(
 			<>
-				<Topbar month={month} year={year} dateInterval={dateInterval} handleDateChangeOnClick={handleDateChangeOnClick} handleEditCategoriesClick={handleEditCategoriesClick} handleShowOptions={showOptions}/>
+				<Topbar month={month} year={year} dateInterval={dateInterval} handleDateChangeOnClick={handleDateChangeOnClick} handleEditCategoriesClick={handleEditCategoriesClick} handleShowOptions={showOptions} />
 				<Unassigned currency={budget ? budget.currency : "USD"} unassignedBalance={budget ? budget.unassignedBalance : 0} key={unassignedKey} />
 			</>
 		) &&
@@ -396,7 +396,7 @@ export default function BudgetPage() {
 		return (
 			<>
 				<section className={classNames(optionsClassNames)}>
-					<Options handleHideOptions={hideOptions}/>
+					<Options handleHideOptions={hideOptions} />
 				</section>
 				<header className={classNames(onBudgetPage ? styles.budgetPageHeader : styles.header)}>{pageHeader}</header>
 				<main className={classNames(styles.main, onBudgetPage && styles.budgetPageContent)}>{pageMain}</main>
