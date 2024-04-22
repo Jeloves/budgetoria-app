@@ -13,10 +13,11 @@ export type EditCategoryItemPropsType = {
 	handleDeleteSubcategory: (subcategoryID: string) => void;
 	handleDeleteCategoryClick: (categoryID: string) => void;
 	handleSelectSubcategoryClick: (subcategory: Subcategory) => void;
+	handleUpdateCategoryName: (category: Category, newName: string) => void;
 };
 
 export function EditCategoryItem(props: EditCategoryItemPropsType) {
-	const { handleCreateSubcategory, handleDeleteSubcategory, handleDeleteCategoryClick, handleSelectSubcategoryClick } = props;
+	const { handleCreateSubcategory, handleDeleteSubcategory, handleDeleteCategoryClick, handleSelectSubcategoryClick, handleUpdateCategoryName } = props;
 
 	const [category, setCategory] = useState<Category>(props.category);
 	const [subcategories, setSubcategories] = useState<Subcategory[]>(props.subcategories);
@@ -50,8 +51,7 @@ export function EditCategoryItem(props: EditCategoryItemPropsType) {
 		setMainKey(mainKey === 0 ? 1 : 0);
 		handleDeleteSubcategory(subcategoryID);
 	}
-
-	const handleEnterKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+	const handleCreateSubcategoryEnterKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
 		if (event.key === "Enter") {
 			const inputValue = event.currentTarget.value;
 			if (inputValue) {
@@ -61,6 +61,15 @@ export function EditCategoryItem(props: EditCategoryItemPropsType) {
 		}
 	};
 
+	const handleUpdateCategoryNameEnterKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+		if (event.key === "Enter") {
+			const inputValue = event.currentTarget.value;
+			if (inputValue) {
+				handleUpdateCategoryName(category, inputValue);
+			}
+		}
+	}
+
 	let subcategoryEditItems: JSX.Element[] = [];
 	for (let i = 0; i < subcategories.length; i++) {
 		const subcategory = subcategories[i];
@@ -69,7 +78,7 @@ export function EditCategoryItem(props: EditCategoryItemPropsType) {
 
 	let newSubcategoryItem: JSX.Element = (
 		<div className={styles.emptySubcategory}>
-			<input type="text" onKeyDown={handleEnterKeyDown} />
+			<input type="text" onKeyDown={handleCreateSubcategoryEnterKeyDown} />
 			<IconButton
 				button={{
 					onClick: () => {
@@ -85,7 +94,7 @@ export function EditCategoryItem(props: EditCategoryItemPropsType) {
 	return (
 		<>
 			<div className={styles.editCategoryItem}>
-				<input type="text" defaultValue={category.name} />
+				<input type="text" onKeyDown={handleUpdateCategoryNameEnterKeyDown} defaultValue={category.name} />
 				<IconButton
 					button={{
 						onClick: () => {

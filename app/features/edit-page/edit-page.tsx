@@ -17,6 +17,7 @@ export type EditPagePropsType = {
 	isShowingCategoryTemplate: boolean;
 	handleCreateCategory: (category: Category) => void;
 	handleDeleteCategory: (categoryID: string) => void;
+	handleUpdateCategoryName: (category: Category, newName: string) => void;
 	handleCreateSubcategory: (subcategory: Subcategory) => void;
 	handleDeleteSubcategory: (subcategoryID: string) => void;
 	handleCancelEditCategoriesClick: () => void;
@@ -36,6 +37,12 @@ export interface MovedSubcategoryMap {
 	subcategoryID: string;
 }
 
+export interface UpdatedCategoryNames {
+	id: string;
+	oldName: string;
+	newName: string;
+}
+
 export function EditPage(props: EditPagePropsType) {
 	const {
 		categories,
@@ -43,6 +50,7 @@ export function EditPage(props: EditPagePropsType) {
 		isShowingCategoryTemplate,
 		handleCreateCategory,
 		handleDeleteCategory,
+		handleUpdateCategoryName,
 		handleDeleteSubcategory,
 		handleCreateSubcategory,
 		navigateToMoveSubcategorySubpage,
@@ -72,7 +80,7 @@ export function EditPage(props: EditPagePropsType) {
 		const newCategory = new Category(uuidv4(), name);
 		handleCreateCategory(newCategory);
 	};
-	const handleEnterKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+	const handleCreateCategoryEnterKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
 		if (event.key === "Enter") {
 			const inputValue = event.currentTarget.value;
 			if (inputValue) {
@@ -102,6 +110,7 @@ export function EditPage(props: EditPagePropsType) {
 				handleDeleteSubcategory={handleDeleteSubcategory}
 				handleDeleteCategoryClick={handleDeleteCategoryClick}
 				handleSelectSubcategoryClick={handleSelectSubcategoryClick}
+				handleUpdateCategoryName={handleUpdateCategoryName}
 			/>
 		);
 
@@ -112,7 +121,7 @@ export function EditPage(props: EditPagePropsType) {
 		<>
 			{isShowingCategoryTemplate ? (
 				<div className={styles.emptyCategory}>
-					<input type="text" onKeyDown={handleEnterKeyDown} />
+					<input type="text" onKeyDown={handleCreateCategoryEnterKeyDown} />
 					<IconButton
 						button={{
 							onClick: () => {},

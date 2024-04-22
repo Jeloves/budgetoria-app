@@ -13,7 +13,7 @@ import { Topbar } from "@/features/topbar/topbar";
 import { Unassigned } from "@/features/unassigned";
 import { CategoryItem } from "@/features/category-item";
 import { EditPage } from "@/features/edit-page";
-import { EditDataMap, MovedSubcategoryMap } from "@/features/edit-page/edit-page";
+import { MovedSubcategoryMap, UpdatedCategoryNames } from "@/features/edit-page/edit-page";
 import { handleCategoryChanges } from "@/utils/handleCategoryChanges";
 import { AccountsPage } from "@/features/accounts-page";
 import classNames from "classnames";
@@ -61,7 +61,6 @@ export default function BudgetPage() {
 	const [subpageClassNames, setSubpageClassNames] = useState<string[]>([styles.subpage]);
 	const [subpageHeader, setSubpageHeader] = useState<JSX.Element | null>(null);
 	const [subpageMain, setSubpageMain] = useState<JSX.Element | null>(null);
-	const [onMoveSubcategorySubpage, setOnMoveSubcategorySubpage] = useState<boolean>(false);
 
 	// Navigation Functions
 	const showOptions = () => {
@@ -115,6 +114,8 @@ export default function BudgetPage() {
 	const [newSubcategories, setNewSubcategories] = useState<Subcategory[]>([]);
 	const [deletedCategoryIDs, setDeletedCategoryIDs] = useState<string[]>([]);
 	const [deletedSubcategoryIDs, setDeletedSubcategoryIDs] = useState<string[]>([]);
+	const [updatedCategoryNames, setUpdatedCategoryNames] = useState<UpdatedCategoryNames[]>([]);
+	const [updatedSubcategoryNames, setUpdatedSubcategoryNames] = useState<UpdatedCategoryNames[]>([]);
 	const [movedSubcategories, setMovedSubcategories] = useState<MovedSubcategoryMap[]>([]);
 
 	const [editedCategories, setEditedCategories] = useState<Category[]>([]);
@@ -134,8 +135,14 @@ export default function BudgetPage() {
 				updatedCategories.splice(targetIndex, 1);
 			}
 		}
+		// Updating category names
+		for (let map of updatedCategoryNames) {
+			const targetIndex = updatedCategories.findIndex((category) => category.id === map.id);
+			updatedCategories[targetIndex].name = map.newName;
+		}
+
 		setEditedCategories(updatedCategories);
-	}, [newCategories, categories, deletedCategoryIDs]);
+	}, [newCategories, categories, deletedCategoryIDs, updatedCategoryNames]);
 	// Updates editedSubcategories to pass to EditPage
 	useEffect(() => {
 		const updatedSubcategories: Subcategory[] = [...subcategories];
@@ -204,6 +211,15 @@ export default function BudgetPage() {
 			setDeletedSubcategoryIDs(updatedDeletedSubcategoryIDs);
 		}
 	};
+	const handleUpdateCategoryName = (category: Category, newName: string | null) => {
+		if (category.name !== newName || newName === null) {
+			const newMap: UpdatedCategoryNames = {id: category.id, oldName: category.name, newName: newName!}
+			const updatedArray: UpdatedCategoryNames[] = updatedCategoryNames.filter((map) => map.id !== newMap.id);
+			updatedArray.push(newMap);
+			console.log(newMap)
+			setUpdatedCategoryNames(updatedArray);
+		}
+	}
 	const handleCreateSubcategory = (subcategory: Subcategory) => {
 		setNewSubcategories([...newSubcategories, subcategory]);
 	};
@@ -220,6 +236,9 @@ export default function BudgetPage() {
 			setDeletedSubcategoryIDs(updatedDeletedSubcategoryIDs);
 		}
 	};
+	const handleUpdateSubcategoryName = (subcategory: Subcategory, newName: string | null) => {
+
+	}
 	const handleMoveSubcategory = (newCategory: Category, subcategory: Subcategory) => {
 		const oldCategoryID = subcategory.categoryID;
 		const newCategoryID = newCategory.id;
@@ -378,6 +397,7 @@ export default function BudgetPage() {
 				isShowingCategoryTemplate={isShowingCategoryTemplate}
 				handleCreateCategory={handleCreateCategory}
 				handleDeleteCategory={handleDeleteCategory}
+				handleUpdateCategoryName={handleUpdateCategoryName}
 				handleCreateSubcategory={handleCreateSubcategory}
 				handleDeleteSubcategory={handleDeleteSubcategory}
 				handleCancelEditCategoriesClick={handleCancelEditCategoriesClick}
