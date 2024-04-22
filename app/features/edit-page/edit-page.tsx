@@ -8,13 +8,13 @@ import { useEffect, useState } from "react";
 import classNames from "classnames";
 import { v4 as uuidv4 } from "uuid";
 import { handleCategoryChanges } from "@/utils/handleCategoryChanges";
+import { EditPageHeader } from "./edit-page-header/edit-page-header";
 
 export type EditPagePropsType = {
 	userID: string;
 	budgetID: string;
 	categories: Category[];
 	subcategories: Subcategory[];
-	isShowingCategoryTemplate: boolean;
 	handleCreateCategory: (category: Category) => void;
 	handleDeleteCategory: (categoryID: string) => void;
 	handleUpdateCategoryName: (category: Category, newName: string) => void;
@@ -22,6 +22,9 @@ export type EditPagePropsType = {
 	handleDeleteSubcategory: (subcategoryID: string) => void;
 	handleCancelEditCategoriesClick: () => void;
 	navigateToMoveSubcategorySubpage: (subcategory: Subcategory, categories: Category[]) => void;
+
+	handleCancelEdits: () => void;
+	handleConfirmEdits: () => void;
 };
 
 export interface EditDataMap {
@@ -44,37 +47,32 @@ export interface UpdatedCategoryNames {
 }
 
 export function EditPage(props: EditPagePropsType) {
-	const {
-		categories,
-		subcategories,
-		isShowingCategoryTemplate,
-		handleCreateCategory,
-		handleDeleteCategory,
-		handleUpdateCategoryName,
-		handleDeleteSubcategory,
-		handleCreateSubcategory,
-		navigateToMoveSubcategorySubpage,
-	} = props;
+	const { categories, subcategories, handleCancelEdits, handleConfirmEdits, handleCreateCategory, handleDeleteCategory, handleUpdateCategoryName, handleDeleteSubcategory, handleCreateSubcategory, navigateToMoveSubcategorySubpage } = props;
 	const [renderKey, setRenderKey] = useState<number>(0);
 	const [sortedCategories, setSortedCategories] = useState<Category[]>([]);
 	const [sortedSubcategories, setSortedSubcategories] = useState<Subcategory[]>([]);
+
+	const [isShowingCategoryTemplate, setIsShowingCategoryTemplate] = useState<boolean>(false);
+	const handleShowCategoryTemplate = () => {
+		setIsShowingCategoryTemplate(!isShowingCategoryTemplate);
+	}
 
 	// Sorting categories and subcategories alphabetically
 	useEffect(() => {
 		const sorted = [...categories].sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
 		setSortedCategories(sorted);
-		setRenderKey(renderKey === 0 ? 1 :0)
+		setRenderKey(renderKey === 0 ? 1 : 0);
 	}, [categories]);
 	useEffect(() => {
 		const sorted = [...subcategories].sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
 		setSortedSubcategories(sorted);
-		setRenderKey(renderKey === 0 ? 1 :0)
+		setRenderKey(renderKey === 0 ? 1 : 0);
 	}, [subcategories]);
 
 	// Updates edit data whenever edits are made.
 	const handleDeleteCategoryClick = (targetCategoryID: string) => {
 		handleDeleteCategory(targetCategoryID);
-		setRenderKey(renderKey === 0 ? 1 :0)
+		setRenderKey(renderKey === 0 ? 1 : 0);
 	};
 	const handleCreateCategoryClick = (name: string) => {
 		const newCategory = new Category(uuidv4(), name);
@@ -95,7 +93,7 @@ export function EditPage(props: EditPagePropsType) {
 		navigateToMoveSubcategorySubpage(subcategory, categories);
 	};
 
-	let editContent: JSX.Element[] = [];
+	const editContent: JSX.Element[] = [];
 	for (let i = 0; i < sortedCategories.length; i++) {
 		const category = sortedCategories[i];
 		const filteredSubcategories = sortedSubcategories.filter((subcategory) => {
@@ -117,21 +115,28 @@ export function EditPage(props: EditPagePropsType) {
 		editContent.push(itemToRender);
 	}
 
+	const categoryTemplate = (
+		<div className={styles.emptyCategory}>
+			<input type="text" onKeyDown={handleCreateCategoryEnterKeyDown} />
+			<IconButton
+				button={{
+					onClick: () => {},
+				}}
+				src={"/icons/circled-minus.svg"}
+				altText={"Button to cancel new category"}
+			/>
+		</div>
+	);
+
 	return (
 		<>
-			{isShowingCategoryTemplate ? (
-				<div className={styles.emptyCategory}>
-					<input type="text" onKeyDown={handleCreateCategoryEnterKeyDown} />
-					<IconButton
-						button={{
-							onClick: () => {},
-						}}
-						src={"/icons/circled-minus.svg"}
-						altText={"Button to cancel new category"}
-					/>
-				</div>
-			) : null}
-			<div key={renderKey}>{editContent}</div>
+			<header className={styles.header}>
+				<EditPageHeader handleCancelEdits={handleCancelEdits} handleConfirmEdits={handleConfirmEdits} handleShowCategoryTemplate={handleShowCategoryTemplate} isShowingCategoryTemplate={isShowingCategoryTemplate} />
+			</header>
+			<main className={styles.main}>
+				{isShowingCategoryTemplate && categoryTemplate}
+				<div key={renderKey}>{editContent}</div>
+			</main>
 		</>
 	);
 }

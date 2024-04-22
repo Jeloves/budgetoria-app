@@ -26,6 +26,7 @@ import { DateIntervalType } from "@/features/date-picker/date-picker";
 import { MoveSubcategoryHeader } from "@/features/edit-page/move-subcategory-subpage/move-subcategory-header";
 import { MoveSubcategorySubpage } from "@/features/edit-page/move-subcategory-subpage/move-subcategory-subpage";
 import { Options } from "@/features/options";
+import { cloneDeep, cloneDeepWith } from "lodash";
 
 export default function BudgetPage() {
 	const [user, setUser] = useState<User | null>(null);
@@ -123,7 +124,7 @@ export default function BudgetPage() {
 
 	// Updates editedCategories to pass to EditPage
 	useEffect(() => {
-		const updatedCategories: Category[] = [...categories];
+		const updatedCategories: Category[] = cloneDeep(categories);
 		// Adding new categories
 		for (let newCategory of newCategories) {
 			updatedCategories.push(newCategory);
@@ -169,7 +170,7 @@ export default function BudgetPage() {
 		updatedSubcategories.sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
 		setEditedSubcategories(updatedSubcategories);
 	}, [deletedSubcategoryIDs, movedSubcategories, newSubcategories, subcategories]);
-
+	console.log(categories);
 	const resetEditData = () => {
 		setNewCategories([]);
 		setNewSubcategories([]);
@@ -205,7 +206,7 @@ export default function BudgetPage() {
 			for (let subcategory of filteredSubcategories) {
 				// Checks if the current subcategory has already been selected for deletion.
 				if (!deletedSubcategoryIDs.includes(subcategory.id)) {
-					updatedDeletedSubcategoryIDs.push(subcategory.id)
+					updatedDeletedSubcategoryIDs.push(subcategory.id);
 				}
 			}
 			setDeletedSubcategoryIDs(updatedDeletedSubcategoryIDs);
@@ -213,13 +214,13 @@ export default function BudgetPage() {
 	};
 	const handleUpdateCategoryName = (category: Category, newName: string | null) => {
 		if (category.name !== newName || newName === null) {
-			const newMap: UpdatedCategoryNames = {id: category.id, oldName: category.name, newName: newName!}
+			const newMap: UpdatedCategoryNames = { id: category.id, oldName: category.name, newName: newName! };
 			const updatedArray: UpdatedCategoryNames[] = updatedCategoryNames.filter((map) => map.id !== newMap.id);
 			updatedArray.push(newMap);
-			console.log(newMap)
+			console.log(newMap);
 			setUpdatedCategoryNames(updatedArray);
 		}
-	}
+	};
 	const handleCreateSubcategory = (subcategory: Subcategory) => {
 		setNewSubcategories([...newSubcategories, subcategory]);
 	};
@@ -236,16 +237,15 @@ export default function BudgetPage() {
 			setDeletedSubcategoryIDs(updatedDeletedSubcategoryIDs);
 		}
 	};
-	const handleUpdateSubcategoryName = (subcategory: Subcategory, newName: string | null) => {
-
-	}
+	const handleUpdateSubcategoryName = (subcategory: Subcategory, newName: string | null) => {};
 	const handleMoveSubcategory = (newCategory: Category, subcategory: Subcategory) => {
 		const oldCategoryID = subcategory.categoryID;
 		const newCategoryID = newCategory.id;
 		const subcategoryID = subcategory.id;
 		if (oldCategoryID !== newCategoryID) {
 			const newMap = { oldCategoryID: oldCategoryID, newCategoryID: newCategoryID, subcategoryID: subcategoryID };
-			const updatedMovedSubcategories = [...movedSubcategories, newMap];
+			const updatedMovedSubcategories = cloneDeep(movedSubcategories);
+			updatedMovedSubcategories.push(newMap);
 			setMovedSubcategories(updatedMovedSubcategories);
 		}
 		hideSubpage();
@@ -372,37 +372,41 @@ export default function BudgetPage() {
 	const pageHeader: JSX.Element[] = [];
 	const pageMain: JSX.Element[] = [];
 
+	const pageContent: JSX.Element[] = [];
+
 	// User is on Budget Page
 	onBudgetPage &&
-		pageHeader.push(
-			<>
+		pageContent.push(
+			<header className={styles.budgetPageHeader}>
 				<Topbar month={month} year={year} dateInterval={dateInterval} handleDateChangeOnClick={handleDateChangeOnClick} handleEditCategoriesClick={handleEditCategoriesClick} handleShowOptions={showOptions} />
 				<Unassigned currency={budget ? budget.currency : "USD"} unassignedBalance={budget ? budget.unassignedBalance : 0} key={unassignedKey} />
-			</>
+			</header>
 		) &&
-		pageMain.push(<>{categoryItems}</>);
+		pageContent.push(<main className={classNames(styles.main, styles.budgetPageContent)}>{categoryItems}</main>);
 
 	// User is on Accounts Page
 	onAccountsPage && pageHeader.push(<AccountsHeader />) && pageMain.push(<AccountsPage accounts={accounts} handleConfirmNewAccount={handleConfirmNewAccount} />);
 
 	// User is on Edit Page
 	onEditPage &&
-		pageHeader.push(<EditPageHeader handleCancelEdits={handleCancelEditCategoriesClick} handleConfirmEdits={handleConfirmEdits} handleShowCategoryTemplate={handleShowCategoryTemplate} isShowingCategoryTemplate={isShowingCategoryTemplate} />) &&
-		pageMain.push(
-			<EditPage
-				userID={user ? user.uid : ""}
-				budgetID={budget ? budget.id : ""}
-				categories={editedCategories}
-				subcategories={editedSubcategories}
-				isShowingCategoryTemplate={isShowingCategoryTemplate}
-				handleCreateCategory={handleCreateCategory}
-				handleDeleteCategory={handleDeleteCategory}
-				handleUpdateCategoryName={handleUpdateCategoryName}
-				handleCreateSubcategory={handleCreateSubcategory}
-				handleDeleteSubcategory={handleDeleteSubcategory}
-				handleCancelEditCategoriesClick={handleCancelEditCategoriesClick}
-				navigateToMoveSubcategorySubpage={navigateToMoveSubcategorySubpage}
-			/>
+		pageContent.push(
+			<main className={styles.main}>
+				<EditPage
+					userID={user ? user.uid : ""}
+					budgetID={budget ? budget.id : ""}
+					categories={editedCategories}
+					subcategories={editedSubcategories}
+					handleCancelEdits={navigateToBudgetPage}
+					handleConfirmEdits={() => {}}
+					handleCreateCategory={handleCreateCategory}
+					handleDeleteCategory={handleDeleteCategory}
+					handleUpdateCategoryName={handleUpdateCategoryName}
+					handleCreateSubcategory={handleCreateSubcategory}
+					handleDeleteSubcategory={handleDeleteSubcategory}
+					handleCancelEditCategoriesClick={handleCancelEditCategoriesClick}
+					navigateToMoveSubcategorySubpage={navigateToMoveSubcategorySubpage}
+				/>
+			</main>
 		);
 
 	if (isLoading) {
@@ -418,8 +422,7 @@ export default function BudgetPage() {
 				<section className={classNames(optionsClassNames)}>
 					<Options handleHideOptions={hideOptions} />
 				</section>
-				<header className={classNames(onBudgetPage ? styles.budgetPageHeader : styles.header)}>{pageHeader}</header>
-				<main className={classNames(styles.main, onBudgetPage && styles.budgetPageContent)}>{pageMain}</main>
+				{pageContent}
 				<NavigationBar
 					navigateToBudget={navigateToBudgetPage}
 					navigateToCreateTransaction={() => {
