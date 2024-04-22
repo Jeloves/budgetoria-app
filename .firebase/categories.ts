@@ -71,3 +71,15 @@ export async function deleteSubcategory(userID: string, budgetID: string, subcat
 		console.error("Failed to delete subcategory", error);
 	}
 }
+
+export async function updateSubcategory(userID: string, budgetID: string, subcategory: Subcategory) {
+	try {
+		await setDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.subcategories, subcategory.id), {
+			name: subcategory.name,
+			categoryID: subcategory.categoryID,
+		});
+	} catch (error) {
+		console.error("Failed to update subcategory parent", error);
+		throw error;
+	}
+}

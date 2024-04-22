@@ -232,7 +232,7 @@ export default function BudgetPage() {
 		hideSubpage();
 	};
 	const handleConfirmEdits = () => {
-		handleCategoryChanges(user!.uid, budget!.id, allocations, clearedTransactions.concat(unclearedTransactions), newCategories, newSubcategories, deletedCategoryIDs, deletedSubcategoryIDs, movedSubcategories).then(() => {
+		handleCategoryChanges(user!.uid, budget!.id, allocations, subcategories, clearedTransactions.concat(unclearedTransactions), newCategories, newSubcategories, deletedCategoryIDs, deletedSubcategoryIDs, movedSubcategories).then(() => {
 			resetEditData();
 			setDataListenerKey(!dataListenerKey);
 		});
