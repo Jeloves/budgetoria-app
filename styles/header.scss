@@ -1,0 +1,29 @@
+@use "@styles/color";
+@use "@styles/font";
+@use "@styles/space";
+
+.header {
+	background-color: color.$secondary-dark;
+	height: space.$s15;
+	width: 100vw;
+	position: absolute;
+	top: 0;
+
+	box-sizing: border-box;
+	padding: space.$s2 space.$s2;
+
+	display: flex;
+	align-items: center;
+	color: white;
+
+	& > {
+		height: 100%;
+	}
+
+	& button {
+        padding: 0;
+        border: none;
+        background: none;
+		box-sizing: border-box;
+    }
+}

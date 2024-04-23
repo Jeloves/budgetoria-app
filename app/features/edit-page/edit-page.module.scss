@@ -1,6 +1,9 @@
 @use "@styles/color";
 @use "@styles/font";
 @use "@styles/space";
+@use "@styles/header";
+@use "@styles/main";
+@use "@styles/subpage";
 
 .loading {
 	width: 100%;
@@ -17,6 +20,9 @@
 	padding-bottom: space.$s15;
 }
 
+.header {
+	justify-content: space-between;
+}
 
 .categoryOption {
 	color: white;
@@ -51,5 +57,35 @@
 		font: inherit;
 		color: white;
         flex: 1;
+	}
+}
+
+.show {
+	animation: slideInAnimation 0.5s forwards;
+	& header {
+		animation: slideInAnimation 0.5s forwards;
+	}
+	@keyframes slideInAnimation {
+		0% {
+			width: 0;
+		}
+		100% {
+			width: 100vw;
+		}
+	}
+}
+
+.hide {
+	animation: slideOutAnimation 0.5s forwards;
+	& header {
+		animation: slideOutAnimation 0.5s forwards;
+	}
+	@keyframes slideOutAnimation {
+		0% {
+			width: 100vw;
+		}
+		100% {
+			width: 0%;
+		}
 	}
 }

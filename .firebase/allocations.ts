@@ -1,4 +1,4 @@
-import { getDocs, collection, doc, setDoc, deleteDoc, getDoc } from "firebase/firestore";
+import { getDocs, collection, doc, setDoc, deleteDoc, getDoc, query, where } from "firebase/firestore";
 import { collectionLabel } from "./firebase.config";
 import { firestore } from "./firebase.config";
 import { Allocation } from "./models";
@@ -49,6 +49,22 @@ export async function updateAssignedAllocation(userID: string, budgetID: string,
 export async function deleteAllocation(userID: string, budgetID: string, allocationID: string) {
 	try {
 		await deleteDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.allocations, allocationID));
+	} catch (error) {
+		console.error("Failed to delete allocation", error);
+	}
+}
+
+export async function deleteAllocationsBySubcategory(userID: string, budgetID: string, subcategoryID: string) {
+	try {
+		// Reading all allocation docs
+		const allocationsReference = collection(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.allocations);
+		// Querying allocation docs with target subcategoryID
+		const q = query(allocationsReference, where("subcategoryID", "==", subcategoryID));
+		const querySnapshot = await getDocs(q);
+		// Deleting all queried docs
+		querySnapshot.forEach((doc) => {
+			console.log("hello", doc.data())
+		})
 	} catch (error) {
 		console.error("Failed to delete allocation", error);
 	}

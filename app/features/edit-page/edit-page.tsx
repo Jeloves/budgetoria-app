@@ -8,19 +8,19 @@ import { useEffect, useState } from "react";
 import classNames from "classnames";
 import { v4 as uuidv4 } from "uuid";
 import { handleCategoryChanges } from "@/utils/handleCategoryChanges";
+import { EditPageHeader } from "./edit-page-header/edit-page-header";
+import { createCategory, createSubcategory, deleteCategory, deleteSubcategory, updateCategory, updateSubcategory } from "@/firebase/categories";
+import { cloneDeep } from "lodash";
+import { deleteAllocationsBySubcategory } from "@/firebase/allocations";
+import { MoveSubcategoryHeader } from "./move-subcategory-subpage/move-subcategory-header";
+import { MoveSubcategorySubpage } from "./move-subcategory-subpage/move-subcategory-subpage";
 
 export type EditPagePropsType = {
 	userID: string;
 	budgetID: string;
 	categories: Category[];
 	subcategories: Subcategory[];
-	isShowingCategoryTemplate: boolean;
-	handleCreateCategory: (category: Category) => void;
-	handleDeleteCategory: (categoryID: string) => void;
-	handleCreateSubcategory: (subcategory: Subcategory) => void;
-	handleDeleteSubcategory: (subcategoryID: string) => void;
-	handleCancelEditCategoriesClick: () => void;
-	navigateToMoveSubcategorySubpage: (subcategory: Subcategory, categories: Category[]) => void;
+	handleFinishEdits: () => void;
 };
 
 export interface EditDataMap {
@@ -36,61 +36,147 @@ export interface MovedSubcategoryMap {
 	subcategoryID: string;
 }
 
+export interface UpdatedCategoryNames {
+	id: string;
+	oldName: string;
+	newName: string;
+}
+
 export function EditPage(props: EditPagePropsType) {
-	const {
-		categories,
-		subcategories,
-		isShowingCategoryTemplate,
-		handleCreateCategory,
-		handleDeleteCategory,
-		handleDeleteSubcategory,
-		handleCreateSubcategory,
-		navigateToMoveSubcategorySubpage,
-	} = props;
+	const { userID, budgetID, handleFinishEdits } = props;
 	const [renderKey, setRenderKey] = useState<number>(0);
-	const [sortedCategories, setSortedCategories] = useState<Category[]>([]);
-	const [sortedSubcategories, setSortedSubcategories] = useState<Subcategory[]>([]);
+	const [isShowingCategoryTemplate, setIsShowingCategoryTemplate] = useState<boolean>(false);
+	const [categories, setCategories] = useState<Category[]>(props.categories);
+	const [subcategories, setSubcategories] = useState<Subcategory[]>(props.subcategories);
+	const [subcategoryToMove, setSubcategoryToMove] = useState<Subcategory | null>(null);
+	const [subpageClasses, setSubpageClasses] = useState<string[]>([styles.subpage]);
 
-	// Sorting categories and subcategories alphabetically
+	// Re-renders categories and subcategories when edits are made.
 	useEffect(() => {
-		const sorted = [...categories].sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
-		setSortedCategories(sorted);
-		setRenderKey(renderKey === 0 ? 1 :0)
-	}, [categories]);
-	useEffect(() => {
-		const sorted = [...subcategories].sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
-		setSortedSubcategories(sorted);
-		setRenderKey(renderKey === 0 ? 1 :0)
-	}, [subcategories]);
+		setRenderKey(renderKey === 0 ? 1 : 0);
+	}, [categories, subcategories]);
 
-	// Updates edit data whenever edits are made.
-	const handleDeleteCategoryClick = (targetCategoryID: string) => {
-		handleDeleteCategory(targetCategoryID);
-		setRenderKey(renderKey === 0 ? 1 :0)
+	// Category Edits
+	const handleShowCategoryTemplate = () => {
+		setIsShowingCategoryTemplate(!isShowingCategoryTemplate);
 	};
-	const handleCreateCategoryClick = (name: string) => {
-		const newCategory = new Category(uuidv4(), name);
-		handleCreateCategory(newCategory);
-	};
-	const handleEnterKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+	const handleCreateCategory = (event: React.KeyboardEvent<HTMLInputElement>) => {
 		if (event.key === "Enter") {
-			const inputValue = event.currentTarget.value;
-			if (inputValue) {
-				handleCreateCategoryClick(inputValue);
+			const name = event.currentTarget.value;
+			if (name) {
+				const newCategory = new Category(uuidv4(), name);
+				// Updates and sorts categories useState
+				const updatedCategories = cloneDeep(categories);
+				updatedCategories.push(newCategory);
+				updatedCategories.sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
+				setCategories(updatedCategories);
+				// Creates new category doc in firebase
+				createCategory(userID, budgetID, newCategory);
+				// Hides category template
+				handleShowCategoryTemplate();
 			} else {
-				alert("A category name must be inputted");
+				alert("A name must be inputted");
 			}
 		}
 	};
+	const handleDeleteCategory = (targetCategoryID: string) => {
+		// Deleting the target category
+		const updatedCategories = [...categories].filter((category) => category.id !== targetCategoryID);
+		setCategories(updatedCategories);
+		// Deleting category doc from firebase
+		deleteCategory(userID, budgetID, targetCategoryID);
 
-	const handleSelectSubcategoryClick = (subcategory: Subcategory) => {
-		navigateToMoveSubcategorySubpage(subcategory, categories);
+		// Deleting subcategories
+		const deletedSubcategories: Subcategory[] = [];
+		const updatedSubcategories: Subcategory[] = [];
+		for (let subcategory of subcategories) {
+			if (subcategory.categoryID === targetCategoryID) {
+				deletedSubcategories.push(subcategory);
+			} else {
+				updatedSubcategories.push(subcategory);
+			}
+		}
+		setSubcategories(updatedSubcategories);
+
+		for (let subcategory of deletedSubcategories) {
+			// Deleting subcategory docs from firebase
+			deleteSubcategory(userID, budgetID, subcategory.id);
+			// Deleting allocation docs with target subcategoryID
+			deleteAllocationsBySubcategory(userID, budgetID, subcategory.id);
+		}
+	};
+	const handleUpdateCategoryName = (targetCategory: Category, newName: string) => {
+		// Updating the target category
+		const updatedCategories = cloneDeep(categories);
+		const targetIndex = updatedCategories.findIndex((category) => category.id === targetCategory.id);
+		if (updatedCategories[targetIndex].name !== newName) {
+			updatedCategories[targetIndex].name = newName;
+			// Updating category doc in firebase
+			updateCategory(userID, budgetID, updatedCategories[targetIndex]);
+			// Sorting and re-rendering categories
+			updatedCategories.sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
+			setCategories(updatedCategories);
+		}
 	};
 
-	let editContent: JSX.Element[] = [];
-	for (let i = 0; i < sortedCategories.length; i++) {
-		const category = sortedCategories[i];
-		const filteredSubcategories = sortedSubcategories.filter((subcategory) => {
+	// Subcategory Edits
+	const handleCreateSubcategory = (name: string, categoryID: string) => {
+		const newSubcategory = new Subcategory(uuidv4(), name, categoryID);
+		// Updates and sorts subcategories useState
+		const updatedSubcategories = cloneDeep(subcategories);
+		updatedSubcategories.push(newSubcategory);
+		updatedSubcategories.sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
+		setSubcategories(updatedSubcategories);
+		// Creates new subcategory doc in firebase
+		createSubcategory(userID, budgetID, newSubcategory);
+	};
+	const handleDeleteSubcategory = (targetSubcategoryID: string) => {
+		// Deleting the target subcategory
+		const updatedSubcategories = [...subcategories].filter((subcategory) => subcategory.id !== targetSubcategoryID);
+		setSubcategories(updatedSubcategories);
+		deleteSubcategory(userID, budgetID, targetSubcategoryID);
+
+		// Deleting allocations of the target subcategory
+	};
+	const handleUpdateSubcategoryName = (targetSubcategory: Subcategory, newName: string) => {
+		// Updating the target category
+		const updatedSubcategories = cloneDeep(subcategories);
+		const targetIndex = updatedSubcategories.findIndex((subcategory) => subcategory.id === targetSubcategory.id);
+		if (updatedSubcategories[targetIndex].name !== newName) {
+			updatedSubcategories[targetIndex].name = newName;
+			// Updating subcategory doc in firebase
+			updateSubcategory(userID, budgetID, updatedSubcategories[targetIndex]);
+			// Sorting and re-rendering categories
+			updatedSubcategories.sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
+			setSubcategories(updatedSubcategories);
+		}
+	};
+
+	// MoveSubcategory Subpage
+	const showSubpage = (targetSubcategory: Subcategory) => {
+		setSubcategoryToMove(targetSubcategory);
+		setSubpageClasses([styles.subpage, styles.show]);
+	}
+	const hideSubpage = () => {
+		setSubcategoryToMove(null);
+		setSubpageClasses([styles.subpage, styles.hide]);
+	}
+	const handleMoveSubcategory = (targetSubcategory: Subcategory, newCategory: Category) => {
+		// Updating subcategories useState
+		const updatedSubcategories = cloneDeep(subcategories);
+		const targetIndex = updatedSubcategories.findIndex((subcategory) => subcategory.id === targetSubcategory.id);
+		updatedSubcategories[targetIndex].categoryID = newCategory.id;
+		setSubcategories(updatedSubcategories);
+		// Updating subcategory doc in firebase
+		updateSubcategory(userID, budgetID, updatedSubcategories[targetIndex]);
+		hideSubpage();
+	};
+
+	// Elements for categories and subcategories
+	const editContent: JSX.Element[] = [];
+	for (let i = 0; i < categories.length; i++) {
+		const category = categories[i];
+		const filteredSubcategories = subcategories.filter((subcategory) => {
 			return subcategory.categoryID === category.id;
 		});
 		const itemToRender = (
@@ -100,29 +186,64 @@ export function EditPage(props: EditPagePropsType) {
 				subcategories={filteredSubcategories}
 				handleCreateSubcategory={handleCreateSubcategory}
 				handleDeleteSubcategory={handleDeleteSubcategory}
-				handleDeleteCategoryClick={handleDeleteCategoryClick}
-				handleSelectSubcategoryClick={handleSelectSubcategoryClick}
+				handleDeleteCategory={handleDeleteCategory}
+				handleSelectSubcategoryClick={showSubpage}
+				handleUpdateCategoryName={handleUpdateCategoryName}
+				handleUpdateSubcategoryName={handleUpdateSubcategoryName}
 			/>
 		);
 
 		editContent.push(itemToRender);
 	}
 
+	// Element for adding new category
+	const categoryTemplate = (
+		<div className={styles.emptyCategory}>
+			<input type="text" onKeyDown={handleCreateCategory} />
+			<IconButton
+				button={{
+					onClick: () => {},
+				}}
+				src={"/icons/circled-minus.svg"}
+				altText={"Button to cancel new category"}
+			/>
+		</div>
+	);
+
+	// Element for MoveSubcategory subpage
+	const moveSubcategorySubpage = (
+		<section className={classNames(subpageClasses)}>
+			{/* Will only render content if a subcategory has been selected */}
+			{subcategoryToMove && (
+				<>
+					<header className={styles.header}>
+						<MoveSubcategoryHeader
+							subcategory={subcategoryToMove!}
+							handleBackClick={hideSubpage}
+						/>
+					</header>
+					<main className={styles.main}>
+						<MoveSubcategorySubpage
+							subcategory={subcategoryToMove!}
+							categories={categories}
+							handleMoveSubcategory={handleMoveSubcategory}
+						/>
+					</main>
+				</>
+			)}
+		</section>
+	);
+
 	return (
 		<>
-			{isShowingCategoryTemplate ? (
-				<div className={styles.emptyCategory}>
-					<input type="text" onKeyDown={handleEnterKeyDown} />
-					<IconButton
-						button={{
-							onClick: () => {},
-						}}
-						src={"/icons/circled-minus.svg"}
-						altText={"Button to cancel new category"}
-					/>
-				</div>
-			) : null}
-			<div key={renderKey}>{editContent}</div>
+			<header className={styles.header}>
+				<EditPageHeader handleFinishEdits={handleFinishEdits} handleShowCategoryTemplate={handleShowCategoryTemplate} isShowingCategoryTemplate={isShowingCategoryTemplate} />
+			</header>
+			<main className={styles.main}>
+				{isShowingCategoryTemplate && categoryTemplate}
+				<div key={renderKey}>{editContent}</div>
+			</main>
+			{moveSubcategorySubpage}
 		</>
 	);
 }
