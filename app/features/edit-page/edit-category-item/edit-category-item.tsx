@@ -9,76 +9,66 @@ import { v4 as uuidv4 } from "uuid";
 export type EditCategoryItemPropsType = {
 	category: Category;
 	subcategories: Subcategory[];
-	handleCreateSubcategory: (subcategory: Subcategory) => void;
+	handleCreateSubcategory: (name: string, categoryID: string) => void;
 	handleDeleteSubcategory: (subcategoryID: string) => void;
-	handleDeleteCategoryClick: (categoryID: string) => void;
+	handleDeleteCategory: (categoryID: string) => void;
 	handleSelectSubcategoryClick: (subcategory: Subcategory) => void;
-	handleUpdateCategoryName: (category: Category, newName: string) => void;
+	handleUpdateCategoryName: (targetCategory: Category, newName: string) => void;
+	handleUpdateSubcategoryName: (targetSubcategory: Subcategory, newName: string) => void;
 };
 
 export function EditCategoryItem(props: EditCategoryItemPropsType) {
-	const { handleCreateSubcategory, handleDeleteSubcategory, handleDeleteCategoryClick, handleSelectSubcategoryClick, handleUpdateCategoryName } = props;
+	const { handleCreateSubcategory, handleDeleteSubcategory, handleDeleteCategory, handleSelectSubcategoryClick, handleUpdateCategoryName, handleUpdateSubcategoryName } = props;
 
 	const [category, setCategory] = useState<Category>(props.category);
 	const [subcategories, setSubcategories] = useState<Subcategory[]>(props.subcategories);
 	const [isShowingEmptySubcategory, setIsShowingEmptySubcategory] = useState<boolean>(false);
 	const [mainKey, setMainKey] = useState<number>(0);
 
-
 	const handleDisplayNewSubcategory = () => {
 		setIsShowingEmptySubcategory(!isShowingEmptySubcategory);
 	};
 
-	const handleCreateSubcategoryClick = (name: string) => {
-		const newSubcategory = new Subcategory(uuidv4(), name, category.id)
-		const updatedSubcategories = [...subcategories, newSubcategory];
-		updatedSubcategories.sort((a, b) => {
-			if ((a.name).toLowerCase() < (b.name).toLowerCase()) {
-				return -1;
-			} else if ((a.name).toLowerCase() > (b.name).toLowerCase()) {
-				return 1;
-			} else {	
-				return 0;
-			}
-		});
-		setSubcategories(updatedSubcategories);
-		setMainKey(mainKey === 0 ? 1 : 0);
-		handleCreateSubcategory(newSubcategory);
-	}
 	const handleDeleteSubcategoryClick = (subcategoryID: string) => {
 		const updatedSubcategories = subcategories.filter((subcategory) => subcategory.id !== subcategoryID);
 		setSubcategories(updatedSubcategories);
 		setMainKey(mainKey === 0 ? 1 : 0);
 		handleDeleteSubcategory(subcategoryID);
-	}
-	const handleCreateSubcategoryEnterKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+	};
+	const handleCreateSubcategoryKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
 		if (event.key === "Enter") {
-			const inputValue = event.currentTarget.value;
-			if (inputValue) {
-				handleCreateSubcategoryClick(inputValue);
+			const name = event.currentTarget.value;
+			if (name) {
+				handleCreateSubcategory(name, category.id);
+				handleDisplayNewSubcategory();
+			} else {
+				alert("A name must be inputted");
 			}
-			setIsShowingEmptySubcategory(false);
 		}
 	};
 
-	const handleUpdateCategoryNameEnterKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+	const handleUpdateCategoryNameKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
 		if (event.key === "Enter") {
-			const inputValue = event.currentTarget.value;
-			if (inputValue) {
-				handleUpdateCategoryName(category, inputValue);
+			const newName = event.currentTarget.value;
+			if (newName) {
+				handleUpdateCategoryName(category, newName);
+			} else {
+				alert("A name must be inputted");
 			}
 		}
-	}
+	};
 
 	let subcategoryEditItems: JSX.Element[] = [];
 	for (let i = 0; i < subcategories.length; i++) {
 		const subcategory = subcategories[i];
-		subcategoryEditItems.push(<EditSubcategoryItem key={i} subcategory={subcategory} handleDeleteSubcategoryClick={handleDeleteSubcategoryClick} handleSelectSubcategoryClick={handleSelectSubcategoryClick} />);
+		subcategoryEditItems.push(
+			<EditSubcategoryItem key={i} subcategory={subcategory} handleDeleteSubcategoryClick={handleDeleteSubcategoryClick} handleSelectSubcategoryClick={handleSelectSubcategoryClick} handleUpdateSubcategoryName={handleUpdateSubcategoryName} />
+		);
 	}
 
 	let newSubcategoryItem: JSX.Element = (
 		<div className={styles.emptySubcategory}>
-			<input type="text" onKeyDown={handleCreateSubcategoryEnterKeyDown} />
+			<input type="text" onKeyDown={handleCreateSubcategoryKeyDown} />
 			<IconButton
 				button={{
 					onClick: () => {
@@ -94,11 +84,11 @@ export function EditCategoryItem(props: EditCategoryItemPropsType) {
 	return (
 		<>
 			<div className={styles.editCategoryItem}>
-				<input type="text" onKeyDown={handleUpdateCategoryNameEnterKeyDown} defaultValue={category.name} />
+				<input type="text" onKeyDown={handleUpdateCategoryNameKeyDown} defaultValue={category.name} />
 				<IconButton
 					button={{
 						onClick: () => {
-							handleDeleteCategoryClick(category.id);
+							handleDeleteCategory(category.id);
 						},
 					}}
 					src={"/icons/circled-minus.svg"}

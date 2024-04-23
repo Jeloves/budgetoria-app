@@ -79,7 +79,19 @@ export async function updateSubcategory(userID: string, budgetID: string, subcat
 			categoryID: subcategory.categoryID,
 		});
 	} catch (error) {
-		console.error("Failed to update subcategory parent", error);
+		console.error("Failed to update subcategory", error);
+		throw error;
+	}
+}
+
+export async function updateCategory(userID: string, budgetID: string, category: Category) {
+	try {
+		console.log("Working", category)
+		await setDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.categories, category.id), {
+			name: category.name,
+		});
+	} catch (error) {
+		console.error("Failed to update category", error);
 		throw error;
 	}
 }

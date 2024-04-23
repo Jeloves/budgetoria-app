@@ -6,15 +6,25 @@ export type EditSubcategoryItemPropsType = {
 	subcategory: Subcategory;
 	handleDeleteSubcategoryClick: (subcategoryID: string) => void;
 	handleSelectSubcategoryClick: (subcategory: Subcategory) => void;
+	handleUpdateSubcategoryName: (targetSubcategory: Subcategory, newName: string) => void;
 };
 
 export function EditSubcategoryItem(props: EditSubcategoryItemPropsType) {
-	const { subcategory, handleSelectSubcategoryClick, handleDeleteSubcategoryClick } = props;
+	const { subcategory, handleSelectSubcategoryClick, handleDeleteSubcategoryClick, handleUpdateSubcategoryName} = props;
+
+	const handleUpdateSubcategoryNameKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+		if (event.key === "Enter") {
+			const newName = event.currentTarget.value;
+			if (newName) {
+				handleUpdateSubcategoryName(subcategory, newName);
+			}
+		}
+	}
 
 	return (
 		<>
 			<div className={styles.editSubcategoryItem}>
-				<input type="text" defaultValue={subcategory.name} />
+				<input type="text" onKeyDown={handleUpdateSubcategoryNameKeyDown} defaultValue={subcategory.name} />
 				<IconButton
 					button={{
 						onClick: () => {

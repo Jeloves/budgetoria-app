@@ -85,18 +85,6 @@ export default function BudgetPage() {
 		setOnEditPage(true);
 		setOnAccountsPage(false);
 	};
-	const showSubpage = () => {
-		setSubpageClassNames([styles.subpage, styles.show]);
-		setOnSubpage(true);
-	};
-	const hideSubpage = () => {
-		setSubpageClassNames([styles.subpage, styles.hide]);
-	};
-	const navigateToMoveSubcategorySubpage = (subcategory: Subcategory, categories: Category[]) => {
-		setSubpageHeader(<MoveSubcategoryHeader subcategory={subcategory} handleBackClick={hideSubpage} />);
-		setSubpageMain(<MoveSubcategorySubpage subcategory={subcategory} categories={categories} handleMoveSubcategory={handleMoveSubcategory} />);
-		showSubpage();
-	};
 
 	// Passed to DatePicker
 	const handleDateChangeOnClick = (monthIndex: number, newYear: number) => {
@@ -109,153 +97,11 @@ export default function BudgetPage() {
 		navigateToEditPage();
 	};
 
-	// EditPage
-	const [isShowingCategoryTemplate, setIsShowingCategoryTemplate] = useState<boolean>(false);
-	const [newCategories, setNewCategories] = useState<Category[]>([]);
-	const [newSubcategories, setNewSubcategories] = useState<Subcategory[]>([]);
-	const [deletedCategoryIDs, setDeletedCategoryIDs] = useState<string[]>([]);
-	const [deletedSubcategoryIDs, setDeletedSubcategoryIDs] = useState<string[]>([]);
-	const [updatedCategoryNames, setUpdatedCategoryNames] = useState<UpdatedCategoryNames[]>([]);
-	const [updatedSubcategoryNames, setUpdatedSubcategoryNames] = useState<UpdatedCategoryNames[]>([]);
-	const [movedSubcategories, setMovedSubcategories] = useState<MovedSubcategoryMap[]>([]);
-
-	const [editedCategories, setEditedCategories] = useState<Category[]>([]);
-	const [editedSubcategories, setEditedSubcategories] = useState<Subcategory[]>([]);
-
-	// Updates editedCategories to pass to EditPage
-	useEffect(() => {
-		const updatedCategories: Category[] = cloneDeep(categories);
-		// Adding new categories
-		for (let newCategory of newCategories) {
-			updatedCategories.push(newCategory);
-		}
-		// Deleting categories
-		for (let categoryID of deletedCategoryIDs) {
-			const targetIndex = updatedCategories.findIndex((category) => category.id === categoryID);
-			if (targetIndex !== -1) {
-				updatedCategories.splice(targetIndex, 1);
-			}
-		}
-		// Updating category names
-		for (let map of updatedCategoryNames) {
-			const targetIndex = updatedCategories.findIndex((category) => category.id === map.id);
-			updatedCategories[targetIndex].name = map.newName;
-		}
-
-		setEditedCategories(updatedCategories);
-	}, [newCategories, categories, deletedCategoryIDs, updatedCategoryNames]);
-	// Updates editedSubcategories to pass to EditPage
-	useEffect(() => {
-		const updatedSubcategories: Subcategory[] = [...subcategories];
-		// Adding new subcategories
-		for (let newSubcategory of newSubcategories) {
-			updatedSubcategories.push(newSubcategory);
-		}
-		// Deleting subcategories
-		for (let subcategoryID of deletedSubcategoryIDs) {
-			const targetIndex = updatedSubcategories.findIndex((subcategory) => subcategory.id === subcategoryID);
-			if (targetIndex !== -1) {
-				updatedSubcategories.splice(targetIndex, 1);
-			}
-		}
-		// Moving subcategories
-		for (let editMap of movedSubcategories) {
-			for (let subcategory of updatedSubcategories) {
-				if (subcategory.id === editMap.subcategoryID) {
-					subcategory.categoryID = editMap.newCategoryID;
-				}
-			}
-		}
-		// Sorting subcategories alphabetically
-		updatedSubcategories.sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
-		setEditedSubcategories(updatedSubcategories);
-	}, [deletedSubcategoryIDs, movedSubcategories, newSubcategories, subcategories]);
-	console.log(categories);
-	const resetEditData = () => {
-		setNewCategories([]);
-		setNewSubcategories([]);
-		setDeletedCategoryIDs([]);
-		setDeletedSubcategoryIDs([]);
-		setMovedSubcategories([]);
-	};
-	const handleCancelEditCategoriesClick = () => {
-		resetEditData();
+	// Passed to EditPage
+	const handleFinishEdits = () => {
+		setDataListenerKey(!dataListenerKey);
 		navigateToBudgetPage();
-	};
-	const handleShowCategoryTemplate = () => {
-		setIsShowingCategoryTemplate(!isShowingCategoryTemplate);
-	};
-	const handleCreateCategory = (category: Category) => {
-		setNewCategories([...newCategories, category]);
-		setIsShowingCategoryTemplate(false);
-	};
-	const handleDeleteCategory = (categoryID: string) => {
-		// Checks if the targeted category has been created in the same edit-session.
-		let isFromCurrentSession = newCategories.some((category) => category.id === categoryID);
-		if (isFromCurrentSession) {
-			// If it was created in the same edit-session, it only needs to be removed from the newCategories array.
-			const updatedNewCategories = newCategories.filter((category) => category.id !== categoryID);
-			setNewCategories(updatedNewCategories);
-		} else {
-			// Else, it is an existing category in Firebase that must be deleted.
-			const updatedDeletedCategoryIDs = [...deletedCategoryIDs, categoryID];
-			setDeletedCategoryIDs(updatedDeletedCategoryIDs);
-			// It must also delete its subcategories.
-			const filteredSubcategories = subcategories.filter((subcategory) => subcategory.categoryID === categoryID);
-			const updatedDeletedSubcategoryIDs = [...deletedSubcategoryIDs];
-			for (let subcategory of filteredSubcategories) {
-				// Checks if the current subcategory has already been selected for deletion.
-				if (!deletedSubcategoryIDs.includes(subcategory.id)) {
-					updatedDeletedSubcategoryIDs.push(subcategory.id);
-				}
-			}
-			setDeletedSubcategoryIDs(updatedDeletedSubcategoryIDs);
-		}
-	};
-	const handleUpdateCategoryName = (category: Category, newName: string | null) => {
-		if (category.name !== newName || newName === null) {
-			const newMap: UpdatedCategoryNames = { id: category.id, oldName: category.name, newName: newName! };
-			const updatedArray: UpdatedCategoryNames[] = updatedCategoryNames.filter((map) => map.id !== newMap.id);
-			updatedArray.push(newMap);
-			console.log(newMap);
-			setUpdatedCategoryNames(updatedArray);
-		}
-	};
-	const handleCreateSubcategory = (subcategory: Subcategory) => {
-		setNewSubcategories([...newSubcategories, subcategory]);
-	};
-	const handleDeleteSubcategory = (subcategoryID: string) => {
-		// Checks if the targeted subcategory has been created in the same edit-session.
-		let isFromCurrentSession = newSubcategories.some((subcategory) => subcategory.id === subcategoryID);
-		if (isFromCurrentSession) {
-			// If it was created in the same edit-session, it only needs to be removed from the newSubcategories array.
-			const updatedNewSubcategories = newSubcategories.filter((subcategory) => subcategory.id !== subcategoryID);
-			setNewSubcategories(updatedNewSubcategories);
-		} else {
-			// Else, it is an existing subcategory in Firebase that must be deleted.
-			const updatedDeletedSubcategoryIDs = [...deletedSubcategoryIDs, subcategoryID];
-			setDeletedSubcategoryIDs(updatedDeletedSubcategoryIDs);
-		}
-	};
-	const handleUpdateSubcategoryName = (subcategory: Subcategory, newName: string | null) => {};
-	const handleMoveSubcategory = (newCategory: Category, subcategory: Subcategory) => {
-		const oldCategoryID = subcategory.categoryID;
-		const newCategoryID = newCategory.id;
-		const subcategoryID = subcategory.id;
-		if (oldCategoryID !== newCategoryID) {
-			const newMap = { oldCategoryID: oldCategoryID, newCategoryID: newCategoryID, subcategoryID: subcategoryID };
-			const updatedMovedSubcategories = cloneDeep(movedSubcategories);
-			updatedMovedSubcategories.push(newMap);
-			setMovedSubcategories(updatedMovedSubcategories);
-		}
-		hideSubpage();
-	};
-	const handleConfirmEdits = () => {
-		handleCategoryChanges(user!.uid, budget!.id, allocations, subcategories, clearedTransactions.concat(unclearedTransactions), newCategories, newSubcategories, deletedCategoryIDs, deletedSubcategoryIDs, movedSubcategories).then(() => {
-			resetEditData();
-			setDataListenerKey(!dataListenerKey);
-		});
-	};
+	}
 
 	// Passed to AccountsPage
 	const handleConfirmNewAccount = async (newAccount: Account) => {
@@ -394,17 +240,9 @@ export default function BudgetPage() {
 				<EditPage
 					userID={user ? user.uid : ""}
 					budgetID={budget ? budget.id : ""}
-					categories={editedCategories}
-					subcategories={editedSubcategories}
-					handleCancelEdits={navigateToBudgetPage}
-					handleConfirmEdits={() => {}}
-					handleCreateCategory={handleCreateCategory}
-					handleDeleteCategory={handleDeleteCategory}
-					handleUpdateCategoryName={handleUpdateCategoryName}
-					handleCreateSubcategory={handleCreateSubcategory}
-					handleDeleteSubcategory={handleDeleteSubcategory}
-					handleCancelEditCategoriesClick={handleCancelEditCategoriesClick}
-					navigateToMoveSubcategorySubpage={navigateToMoveSubcategorySubpage}
+					categories={categories}
+					subcategories={subcategories}
+					handleFinishEdits={handleFinishEdits}
 				/>
 			</main>
 		);

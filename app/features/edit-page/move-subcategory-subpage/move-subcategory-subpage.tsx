@@ -5,7 +5,7 @@ import classNames from "classnames";
 export type MoveSubcategorySubpagePropsType = {
 	subcategory: Subcategory;
 	categories: Category[];
-    handleMoveSubcategory: (category: Category, subcategory: Subcategory) => void;
+	handleMoveSubcategory: (subcategory: Subcategory, newCategory: Category) => void;
 };
 export function MoveSubcategorySubpage(props: MoveSubcategorySubpagePropsType) {
 	const { subcategory, categories, handleMoveSubcategory } = props;
@@ -18,9 +18,15 @@ export function MoveSubcategorySubpage(props: MoveSubcategorySubpagePropsType) {
 		category.id === subcategory.categoryID && categoryItemClasses.push(styles.selected);
 
 		categoryItems.push(
-			<div key={i} className={classNames(categoryItemClasses)} onClick={() => {handleMoveSubcategory(category, subcategory)}}>
-                <span className={styles.name}>{category.name}</span>
-                <span className={styles.current}>Current</span>
+			<div
+				key={i}
+				className={classNames(categoryItemClasses)}
+				onClick={() => {
+					handleMoveSubcategory(subcategory, category);
+				}}
+			>
+				<span className={styles.name}>{category.name}</span>
+				<span className={styles.current}>Current</span>
 			</div>
 		);
 	}

@@ -1,0 +1,15 @@
+@use "@styles/color";
+@use "@styles/font";
+@use "@styles/space";
+
+.subpage {
+	background-color: color.$secondary-dark;
+	width: 0;
+	height: 100vh;
+	position: absolute;
+	z-index: 200;
+	top: 0;
+	right: 0;
+	overflow: hidden;
+	white-space: nowrap;
+}

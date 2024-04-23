@@ -4,37 +4,29 @@ import styles from "./edit-page-header.module.scss";
 import { useState } from "react";
 
 export type EditPageHeaderPropsType = {
-	handleCancelEdits: () => void;
-	handleConfirmEdits: () => void;
+	handleFinishEdits: () => void;
 	handleShowCategoryTemplate: () => void;
 	isShowingCategoryTemplate: boolean;
 };
 
 export function EditPageHeader(props: EditPageHeaderPropsType) {
-	const { handleConfirmEdits, handleCancelEdits, handleShowCategoryTemplate, isShowingCategoryTemplate } = props;
+	const { handleFinishEdits, handleShowCategoryTemplate, isShowingCategoryTemplate } = props;
 
 	return (
 		<>
-			<div className={styles.headerLeft}>
-				<button className={styles.cancel} onClick={handleCancelEdits}>
-					Cancel
-				</button>
-			</div>
+			<IconButton
+				button={{
+					onClick: () => {
+						handleShowCategoryTemplate();
+					},
+				}}
+				src={isShowingCategoryTemplate ? "/icons/delete-folder.svg" : "/icons/add-folder.svg"}
+				altText="Button to add new category"
+			/>
 			Edit Categories
-			<div className={styles.headerRight}>
-				<IconButton
-					button={{
-						onClick: () => {
-							handleShowCategoryTemplate();
-						},
-					}}
-					src={isShowingCategoryTemplate ? "/icons/delete-folder.svg" : "/icons/add-folder.svg"}
-					altText="Button to add new category"
-				/>
-				<button className={styles.confirm} onClick={handleConfirmEdits}>
-					Done
-				</button>
-			</div>
+			<button className={styles.confirm} onClick={handleFinishEdits}>
+				Done
+			</button>
 		</>
 	);
 }
