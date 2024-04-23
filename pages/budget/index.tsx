@@ -20,6 +20,9 @@ import { NavigationBar } from "@/features/navigation-bar";
 import { getDateInterval } from "@/utils/getDateInterval";
 import { DateIntervalType } from "@/features/date-picker/date-picker";
 import { Options } from "@/features/options";
+import { TransactionPage } from "@/features/transaction-page/transaction-page";
+import { v4 as uuidv4 } from "uuid";
+import { Timestamp } from "firebase/firestore";
 
 export default function BudgetPage() {
 	const [user, setUser] = useState<User | null>(null);
@@ -46,6 +49,7 @@ export default function BudgetPage() {
 	const [optionsClassNames, setOptionsClassNames] = useState<string[]>([styles.options]);
 
 	// Pages
+	const [page, setPage] = useState<"Budget" | "Edit" | "Accounts" | "Create Transaction">("Budget")
 	const [onBudgetPage, setOnBudgetPage] = useState<boolean>(true);
 	const [onEditPage, setOnEditPage] = useState<boolean>(false);
 	const [onAccountsPage, setOnAccountsPage] = useState<boolean>(false);
@@ -58,19 +62,16 @@ export default function BudgetPage() {
 		setOptionsClassNames([styles.options, styles.hide]);
 	};
 	const navigateToBudgetPage = () => {
-		setOnBudgetPage(true);
-		setOnEditPage(false);
-		setOnAccountsPage(false);
+		setPage("Budget")
 	};
 	const navigateToAccountsPage = () => {
-		setOnBudgetPage(false);
-		setOnEditPage(false);
-		setOnAccountsPage(true);
+		setPage("Accounts")
 	};
 	const navigateToEditPage = () => {
-		setOnBudgetPage(false);
-		setOnEditPage(true);
-		setOnAccountsPage(false);
+		setPage("Edit")
+	};
+	const navigateToCreateTransactionPage = () => {
+		setPage("Create Transaction")
 	};
 
 	// Passed to DatePicker
@@ -202,13 +203,10 @@ export default function BudgetPage() {
 		}
 	}
 
-	const pageHeader: JSX.Element[] = [];
-	const pageMain: JSX.Element[] = [];
-
 	const pageContent: JSX.Element[] = [];
 
 	// User is on Budget Page
-	onBudgetPage &&
+ 	(page === "Budget") &&
 		pageContent.push(
 			<header className={styles.budgetPageHeader}>
 				<Topbar month={month} year={year} dateInterval={dateInterval} handleDateChangeOnClick={handleDateChangeOnClick} handleEditCategoriesClick={handleEditCategoriesClick} handleShowOptions={showOptions} />
@@ -218,7 +216,7 @@ export default function BudgetPage() {
 		pageContent.push(<main className={classNames(styles.main, styles.budgetPageContent)}>{categoryItems}</main>);
 
 	// User is on Accounts Page
-	onAccountsPage &&
+	(page === "Accounts") &&
 		pageContent.push(
 			<>
 				<AccountsPage accounts={accounts} handleConfirmNewAccount={handleConfirmNewAccount} />
@@ -226,12 +224,20 @@ export default function BudgetPage() {
 		);
 
 	// User is on Edit Page
-	onEditPage &&
+	(page === "Edit") &&
 		pageContent.push(
 			<>
 				<EditPage userID={user ? user.uid : ""} budgetID={budget ? budget.id : ""} categories={categories} subcategories={subcategories} handleFinishEdits={handleFinishEdits} />
 			</>
 		);
+
+	// User is on Create Transaction Page
+	(page === "Create Transaction") &&
+		pageContent.push(
+			<>
+				<TransactionPage payees={[]} categories={categories} subcategories={subcategories} accounts={accounts} transaction={new Transaction(uuidv4(), Timestamp.fromDate(new Date()), "", "", true, 0, false, "", "", "")}				/>
+			</>
+		)
 
 	if (isLoading) {
 		return (
@@ -249,9 +255,7 @@ export default function BudgetPage() {
 				{pageContent}
 				<NavigationBar
 					navigateToBudget={navigateToBudgetPage}
-					navigateToCreateTransaction={() => {
-						alert("Creating new transaction");
-					}}
+					navigateToCreateTransaction={navigateToCreateTransactionPage}
 					navigateToAccounts={navigateToAccountsPage}
 				/>
 			</>
