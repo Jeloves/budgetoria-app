@@ -86,7 +86,6 @@ export async function updateSubcategory(userID: string, budgetID: string, subcat
 
 export async function updateCategory(userID: string, budgetID: string, category: Category) {
 	try {
-		console.log("Working", category)
 		await setDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.categories, category.id), {
 			name: category.name,
 		});

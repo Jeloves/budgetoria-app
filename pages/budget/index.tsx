@@ -57,12 +57,6 @@ export default function BudgetPage() {
 	const [onEditPage, setOnEditPage] = useState<boolean>(false);
 	const [onAccountsPage, setOnAccountsPage] = useState<boolean>(false);
 
-	// Sub Pages
-	const [onSubpage, setOnSubpage] = useState<boolean>(false);
-	const [subpageClassNames, setSubpageClassNames] = useState<string[]>([styles.subpage]);
-	const [subpageHeader, setSubpageHeader] = useState<JSX.Element | null>(null);
-	const [subpageMain, setSubpageMain] = useState<JSX.Element | null>(null);
-
 	// Navigation Functions
 	const showOptions = () => {
 		setOptionsClassNames([styles.options, styles.show]);
@@ -268,13 +262,6 @@ export default function BudgetPage() {
 					}}
 					navigateToAccounts={navigateToAccountsPage}
 				/>
-
-				{onSubpage && (
-					<section className={classNames(subpageClassNames)}>
-						<header className={styles.header}>{subpageHeader}</header>
-						<main className={styles.main}>{subpageMain}</main>
-					</section>
-				)}
 			</>
 		);
 	}
