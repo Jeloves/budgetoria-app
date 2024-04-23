@@ -1,8 +1,8 @@
 "use client";
 import "../reset.css";
 import styles from "./index.module.scss";
-import { useEffect, useRef, useState } from "react";
-import { auth, getUser } from "@/firebase/auth";
+import { useEffect, useState } from "react";
+import { auth } from "@/firebase/auth";
 import { User } from "firebase/auth/cordova";
 import { getSelectedBudget, getUnassignedBalance, updateUnassignedBalance } from "@/firebase/budgets";
 import { getAllocations, updateAssignedAllocation } from "@/firebase/allocations";
@@ -13,20 +13,14 @@ import { Topbar } from "@/features/topbar/topbar";
 import { Unassigned } from "@/features/unassigned";
 import { CategoryItem } from "@/features/category-item";
 import { EditPage } from "@/features/edit-page";
-import { MovedSubcategoryMap, UpdatedCategoryNames } from "@/features/edit-page/edit-page";
-import { handleCategoryChanges } from "@/utils/handleCategoryChanges";
 import { AccountsPage } from "@/features/accounts-page";
 import classNames from "classnames";
 import { AccountsHeader } from "@/features/accounts-page/accounts-header";
 import { createAccount, getAccounts } from "@/firebase/accounts";
 import { NavigationBar } from "@/features/navigation-bar";
-import { EditPageHeader } from "@/features/edit-page/edit-page-header/edit-page-header";
 import { getDateInterval } from "@/utils/getDateInterval";
 import { DateIntervalType } from "@/features/date-picker/date-picker";
-import { MoveSubcategoryHeader } from "@/features/edit-page/move-subcategory-subpage/move-subcategory-header";
-import { MoveSubcategorySubpage } from "@/features/edit-page/move-subcategory-subpage/move-subcategory-subpage";
 import { Options } from "@/features/options";
-import { cloneDeep, cloneDeepWith } from "lodash";
 
 export default function BudgetPage() {
 	const [user, setUser] = useState<User | null>(null);
