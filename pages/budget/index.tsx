@@ -15,7 +15,6 @@ import { CategoryItem } from "@/features/category-item";
 import { EditPage } from "@/features/edit-page";
 import { AccountsPage } from "@/features/accounts-page";
 import classNames from "classnames";
-import { AccountsHeader } from "@/features/accounts-page/accounts-header";
 import { createAccount, getAccounts } from "@/firebase/accounts";
 import { NavigationBar } from "@/features/navigation-bar";
 import { getDateInterval } from "@/utils/getDateInterval";

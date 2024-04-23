@@ -76,8 +76,8 @@ export function AccountsPage(props: AccountsPagePropsType) {
 			const newAccount = new Account(uuidv4(), newAccountData.name, newAccountData.initialBalance, newAccountData.initialBalance);
 			handleConfirmNewAccount(newAccount);
 			handleHideAddAccountElement();
-            accounts.push(newAccount);
-            setAccountsPageRenderKey(accountsPageRenderKey === 0 ? 1 : 0);
+			accounts.push(newAccount);
+			setAccountsPageRenderKey(accountsPageRenderKey === 0 ? 1 : 0);
 		}
 	};
 
@@ -121,21 +121,24 @@ export function AccountsPage(props: AccountsPagePropsType) {
 	);
 
 	return (
-		<section key={accountsPageRenderKey} className={styles.accountsPage}>
-			{addAccountElement}
-			{accountItems}
-			<div className={styles.accountButtons}>
-				<button onClick={handleShowAddAccountElement}>
-					Add Accounts
-					{/*eslint-disable-next-line @next/next/no-img-element*/}
-					<img src="/icons/arrow-right.svg" alt="Button to add accounts" />
-				</button>
-				<button>
-					Closed Accounts
-					{/*eslint-disable-next-line @next/next/no-img-element*/}
-					<img src="/icons/arrow-right.svg" alt="Button to show closed accounts" />
-				</button>
-			</div>
-		</section>
+		<>
+			<header className={styles.header}>Accounts</header>
+			<main key={accountsPageRenderKey} className={styles.main}>
+				{addAccountElement}
+				{accountItems}
+				<div className={styles.accountButtons}>
+					<button onClick={handleShowAddAccountElement}>
+						Add Accounts
+						{/*eslint-disable-next-line @next/next/no-img-element*/}
+						<img src="/icons/arrow-right.svg" alt="Button to add accounts" />
+					</button>
+					<button>
+						Closed Accounts
+						{/*eslint-disable-next-line @next/next/no-img-element*/}
+						<img src="/icons/arrow-right.svg" alt="Button to show closed accounts" />
+					</button>
+				</div>
+			</main>
+		</>
 	);
 }

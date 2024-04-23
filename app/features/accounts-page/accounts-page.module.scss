@@ -1,11 +1,11 @@
 @use "@styles/color";
 @use "@styles/font";
 @use "@styles/space";
+@use "@styles/header";
+@use "@styles/main";
 
-.accountsPage {
-	height: inherit;
-	display: flex;
-	flex-direction: column;
+.header {
+	justify-content: center;
 }
 
 .accountItem {
