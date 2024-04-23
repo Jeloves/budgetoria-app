@@ -89,7 +89,7 @@ export default function BudgetPage() {
 	const handleFinishEdits = () => {
 		setDataListenerKey(!dataListenerKey);
 		navigateToBudgetPage();
-	}
+	};
 
 	// Passed to AccountsPage
 	const handleConfirmNewAccount = async (newAccount: Account) => {
@@ -219,20 +219,19 @@ export default function BudgetPage() {
 		pageContent.push(<main className={classNames(styles.main, styles.budgetPageContent)}>{categoryItems}</main>);
 
 	// User is on Accounts Page
-	onAccountsPage && pageHeader.push(<AccountsHeader />) && pageMain.push(<AccountsPage accounts={accounts} handleConfirmNewAccount={handleConfirmNewAccount} />);
+	onAccountsPage &&
+		pageContent.push(
+			<>
+				<AccountsPage accounts={accounts} handleConfirmNewAccount={handleConfirmNewAccount} />
+			</>
+		);
 
 	// User is on Edit Page
 	onEditPage &&
 		pageContent.push(
-			<main className={styles.main}>
-				<EditPage
-					userID={user ? user.uid : ""}
-					budgetID={budget ? budget.id : ""}
-					categories={categories}
-					subcategories={subcategories}
-					handleFinishEdits={handleFinishEdits}
-				/>
-			</main>
+			<>
+				<EditPage userID={user ? user.uid : ""} budgetID={budget ? budget.id : ""} categories={categories} subcategories={subcategories} handleFinishEdits={handleFinishEdits} />
+			</>
 		);
 
 	if (isLoading) {
