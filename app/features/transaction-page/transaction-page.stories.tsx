@@ -20,7 +20,8 @@ export const Default = Template.bind({});
 const timestamp = new Timestamp(1704114488, 745000000); // Jan 1, 2024 at 8:08:08AM UTC-5
 
 Default.args = {
-	payees: ["Crunchyroll", "Royal Farms", "Steam", "Amazon", "Spotify", "Dave's Hot Chicken", "Ebay", "FAFSA", "Weis Market", "Netflix"],
+    userID: "",
+    budgetID: "",
 	categories: [
         new Category("categoryID1", "Essential"), 
         new Category("categoryID2", "Nonessential"), 
