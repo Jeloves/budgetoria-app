@@ -1,0 +1,88 @@
+@use "@styles/color";
+@use "@styles/font";
+@use "@styles/space";
+@use "@styles/header";
+@use "@styles/main";
+
+.header {
+	position: relative;
+
+	& :first-child {
+		position: absolute;
+		left: 0;
+		transform: translateY(-50%);
+		color: color.$green-500;
+		padding-right: space.$s2;
+	}
+
+	& span {
+		position: absolute;
+		left: 50%;
+		transform: translateX(-50%);
+	}
+}
+
+.main {
+	background-color: color.$secondary-dark;
+	color: color.$gray-100;
+	box-sizing: border-box;
+	padding: space.$s2;
+}
+
+.category {
+	box-sizing: border-box;
+	padding: space.$s4 0 space.$s2 0;
+}
+
+.subcategoryContainer {
+	background-color: color.$primary-dark;
+	box-sizing: border-box;
+	padding: space.$s2 space.$s4;
+	border-radius: space.$s2;
+	display: flex;
+	flex-direction: column;
+	gap: space.$s2;
+}
+
+.subcategory {
+	font: font.$text-medium;
+	display: flex;
+	align-items: center;
+	gap: space.$s2;
+
+	& .selected {
+		width: 25px;
+		height: 25px;
+
+		& img {
+			visibility: hidden;
+		}
+
+		& .icon {
+			visibility: visible;
+		}
+	}
+
+	& span {
+		flex: 1;
+		text-align: end;
+		color: color.$gray-500;
+	}
+	& .positive {
+		color: color.$green-500;
+	}
+
+	& .negative {
+		color: color.$red-500;
+	}
+}
+
+.border {
+	height: space.$s0-1;
+	padding: 0;
+	margin: 0;
+	grid-area: border;
+	background-color: color.$gray-500;
+	border: none;
+	box-sizing: border-box;
+}
