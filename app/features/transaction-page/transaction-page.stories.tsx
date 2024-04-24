@@ -6,7 +6,7 @@ import { Timestamp } from "firebase/firestore";
 import { time } from "console";
 
 export default {
-	title: "Pages/TransactionPage",
+	title: "Transaction/TransactionPage",
 	component: TransactionPage,
 	parameters: {
 		layout: "fullscreen",

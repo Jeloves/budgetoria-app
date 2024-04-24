@@ -2,7 +2,6 @@ import { getDocs, collection, doc, updateDoc, getDoc } from "firebase/firestore"
 import { collectionLabel } from "./firebase.config";
 import { firestore } from "./firebase.config";
 import { Budget } from "./models";
-import { v4 as uuidv4 } from "uuid";
 
 export async function getBudgets(userID: string): Promise<Budget[]> {
 	try {

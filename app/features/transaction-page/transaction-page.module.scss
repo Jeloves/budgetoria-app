@@ -1,9 +1,28 @@
 @use "@styles/color";
 @use "@styles/font";
 @use "@styles/space";
+@use "@styles/header";
+@use "@styles/main";
+@use "@styles/subpage";
 
-.transaction {	
+.header {
+	position: relative;
 
+	& span {
+		position: absolute;
+		left: 50%;
+		transform: translateX(-50%);
+	}
+
+	& button {
+		position: absolute;
+		right: 0;
+		color: color.$green-500;
+		padding-right: space.$s2;
+	}
+}
+
+.main {
 	// Button Reset
 	& button {
 		border: none;
@@ -15,8 +34,6 @@
 		text-align: start;
 		margin: 0;
 		padding: 0;
-		font-size: inherit;
-		font-weight: inherit;
 	}
 
 	& input {
@@ -53,6 +70,7 @@
 	}
 
 	& input[type="text"] {
+		width: 100%;
 		text-align: center;
 		font: font.$text-large;
 		color: white;
@@ -66,98 +84,33 @@
 }
 
 .content {
+	box-sizing: border-box;
 	margin-top: calc(0rem - space.$s4);
-	width: 80%;
+	width: 85%;
 	background-color: color.$primary-dark;
-	border-radius: 4px;
+	border-radius: space.$s1;
+	display: flex;
+	flex-direction: column;
+}
+
+.otherTransactionData {
+	width: 100%;
+	height: space.$s16;
+	display: flex;
+	align-items: center;
+	color: white;
+	padding: 0;
+	padding-right: space.$s3;
 
 	& img {
 		width: space.$s5;
 		height: space.$s5;
+		padding: 0 space.$s3;
 	}
 
-	& .transactionData {
-		width: 100%;
-		min-height: space.$s16;
-		box-sizing: border-box;
-		display: grid;
-		align-items: center;
-		color: white;
-		padding: 0;
-		padding-top: space.$s2;
-		grid-template-rows: 1fr 1fr auto;
-		grid-template-columns: auto 1fr auto;
-		grid-template-areas:
-			"icon label arrow"
-			"icon selected arrow"
-			"icon border border";
-
-		& .iconContainer {
-			grid-area: icon;
-			height: 100%;
-			padding: 0 space.$s3;
-			margin-bottom: space.$s2;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-		}
-
-		& h1 {
-			grid-area: label;
-			font: font.$label-small;
-			color: color.$gray-100;
-		}
-
-		& h2 {
-			grid-area: selected;
-			font: font.$text-regular;
-		}
-
-		& .arrow {
-			grid-area: arrow;
-			width: space.$s5;
-			height: space.$s5;
-			padding-right: space.$s1;
-		}
-
-		& .border {
-			grid-area: border;
-			padding: 0;
-			margin: 0;
-			margin-top: space.$s2;
-			grid-area: border;
-			background-color: color.$gray-500;
-			height: space.$s0-1;
-			border: none;
-			box-sizing: border-box;
-		}
-	}
-
-	& .approval {
-		width: 100%;
-		height: space.$s16;
-		display: flex;
-		align-items: center;
-		color: white;
-		padding: 0;
-		padding-right: space.$s3;
-
-		& img {
-			padding: 0 space.$s3;
-		}
-
-		& h2 {
-			flex: 1;
-			font: font.$text-regular;
-		}
-	}
-
-	& input[type="text"] {
-		grid-area: selected;
-		margin-right: space.$s8;
+	& h2 {
+		flex: 1;
 		font: font.$text-regular;
-		color: white;
-        flex: 1;
 	}
 }
 
@@ -207,3 +160,47 @@
 		transform: translateX(space.$s6-1);
 	}
 }
+
+.memo {
+	background-color: color.$primary-dark;
+	min-height: 100px;
+	box-sizing: border-box;
+	margin-right: space.$s3;
+	margin-left: calc(space.$s3 + space.$s5 + space.$s3);
+	margin-top: calc(0rem - space.$s2);
+	margin-bottom: space.$s3;
+	flex: 1;
+	color: color.$gray-100;
+	font: font.$text-regular;
+}
+
+.show {
+	animation: slideInAnimation 0.5s forwards;
+	& header {
+		animation: slideInAnimation 0.5s forwards;
+	}
+	@keyframes slideInAnimation {
+		0% {
+			width: 0;
+		}
+		100% {
+			width: 100vw;
+		}
+	}
+}
+
+.hide {
+	animation: slideOutAnimation 0.5s forwards;
+	& header {
+		animation: slideOutAnimation 0.5s forwards;
+	}
+	@keyframes slideOutAnimation {
+		0% {
+			width: 100vw;
+		}
+		100% {
+			width: 0%;
+		}
+	}
+}
+

@@ -33,6 +33,7 @@ export default function BudgetPage() {
 	const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
 	const [clearedTransactions, setClearedTransactions] = useState<Transaction[]>([]);
 	const [unclearedTransactions, setUnclearedTransactions] = useState<Transaction[]>([]);
+
 	const [dataListenerKey, setDataListenerKey] = useState<boolean>(false);
 
 	const [month, setMonth] = useState<number>(new Date().getMonth());
@@ -49,7 +50,7 @@ export default function BudgetPage() {
 	const [optionsClassNames, setOptionsClassNames] = useState<string[]>([styles.options]);
 
 	// Pages
-	const [page, setPage] = useState<"Budget" | "Edit" | "Accounts" | "Create Transaction">("Budget")
+	const [page, setPage] = useState<"Budget" | "Edit" | "Accounts" | "Create Transaction">("Budget");
 	const [onBudgetPage, setOnBudgetPage] = useState<boolean>(true);
 	const [onEditPage, setOnEditPage] = useState<boolean>(false);
 	const [onAccountsPage, setOnAccountsPage] = useState<boolean>(false);
@@ -62,16 +63,16 @@ export default function BudgetPage() {
 		setOptionsClassNames([styles.options, styles.hide]);
 	};
 	const navigateToBudgetPage = () => {
-		setPage("Budget")
+		setPage("Budget");
 	};
 	const navigateToAccountsPage = () => {
-		setPage("Accounts")
+		setPage("Accounts");
 	};
 	const navigateToEditPage = () => {
-		setPage("Edit")
+		setPage("Edit");
 	};
 	const navigateToCreateTransactionPage = () => {
-		setPage("Create Transaction")
+		setPage("Create Transaction");
 	};
 
 	// Passed to DatePicker
@@ -94,6 +95,12 @@ export default function BudgetPage() {
 	// Passed to AccountsPage
 	const handleConfirmNewAccount = async (newAccount: Account) => {
 		await createAccount(user!.uid, budget!.id, newAccount);
+	};
+
+	// Passed to CreateTransactionPage
+	const handleCreateTransaction = (newTransaction: Transaction) => {
+		console.log("New transaction created");
+		navigateToBudgetPage();
 	};
 
 	// Sets user
@@ -206,7 +213,7 @@ export default function BudgetPage() {
 	const pageContent: JSX.Element[] = [];
 
 	// User is on Budget Page
- 	(page === "Budget") &&
+	page === "Budget" &&
 		pageContent.push(
 			<header className={styles.budgetPageHeader}>
 				<Topbar month={month} year={year} dateInterval={dateInterval} handleDateChangeOnClick={handleDateChangeOnClick} handleEditCategoriesClick={handleEditCategoriesClick} handleShowOptions={showOptions} />
@@ -216,7 +223,7 @@ export default function BudgetPage() {
 		pageContent.push(<main className={classNames(styles.main, styles.budgetPageContent)}>{categoryItems}</main>);
 
 	// User is on Accounts Page
-	(page === "Accounts") &&
+	page === "Accounts" &&
 		pageContent.push(
 			<>
 				<AccountsPage accounts={accounts} handleConfirmNewAccount={handleConfirmNewAccount} />
@@ -224,7 +231,7 @@ export default function BudgetPage() {
 		);
 
 	// User is on Edit Page
-	(page === "Edit") &&
+	page === "Edit" &&
 		pageContent.push(
 			<>
 				<EditPage userID={user ? user.uid : ""} budgetID={budget ? budget.id : ""} categories={categories} subcategories={subcategories} handleFinishEdits={handleFinishEdits} />
@@ -232,12 +239,25 @@ export default function BudgetPage() {
 		);
 
 	// User is on Create Transaction Page
-	(page === "Create Transaction") &&
+	const newTrans = new Transaction(uuidv4(), Timestamp.fromDate(new Date()), "", "", true, 0, false, "", "", "");
+	const testTrans = new Transaction(
+		uuidv4(),
+		Timestamp.fromDate(new Date()),
+		"Weis Markets",
+		"Eggs, milk, cheese, bread",
+		true,
+		210.57,
+		true,
+		"0b6014d2-64f6-44d7-8fad-de0b5fda5470",
+		"95d402f0-0c53-4573-82a4-a6f273d71e6d",
+		"29b23f08-60f5-4a78-a8a0-baebe9802e05"
+	);
+	page === "Create Transaction" &&
 		pageContent.push(
 			<>
-				<TransactionPage payees={[]} categories={categories} subcategories={subcategories} accounts={accounts} transaction={new Transaction(uuidv4(), Timestamp.fromDate(new Date()), "", "", true, 0, false, "", "", "")}				/>
+				<TransactionPage userID={user ? user.uid : ""} budgetID={budget ? budget.id : ""} categories={categories} subcategories={subcategories} accounts={accounts} transaction={testTrans} handleCreateTransaction={handleCreateTransaction} />
 			</>
-		)
+		);
 
 	if (isLoading) {
 		return (
@@ -253,11 +273,7 @@ export default function BudgetPage() {
 					<Options handleHideOptions={hideOptions} />
 				</section>
 				{pageContent}
-				<NavigationBar
-					navigateToBudget={navigateToBudgetPage}
-					navigateToCreateTransaction={navigateToCreateTransactionPage}
-					navigateToAccounts={navigateToAccountsPage}
-				/>
+				<NavigationBar selectedPage={page} navigateToBudget={navigateToBudgetPage} navigateToCreateTransaction={navigateToCreateTransactionPage} navigateToAccounts={navigateToAccountsPage} />
 			</>
 		);
 	}
