@@ -2,25 +2,89 @@
 @use "@styles/font";
 @use "@styles/space";
 
-.header {
-    background-color: color.$secondary-dark;
+.container {
+	background-color: color.$primary-dark-transparent;
+	width: 100vw;
+	height: 100vh;
+	box-sizing: border-box;
+	padding: 0 space.$s4;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
 
+.cancel {
+    align-self: flex-start;
+    margin-left: calc(0rem - space.$s1-1);
+}
+
+.header {
+	background-color: color.$secondary-dark;
+	width: 100%;
+    display: flex;
+    justify-content: space-between;
+
+	& .changeDate {
+		background: none;
+		font: font.$button-medium;
+		color: color.$gray-100;
+		border: 0;
+		padding: space.$s3;
+		white-space: nowrap;
+		display: flex;
+		align-items: center;
+
+		& img {
+			width: space.$s5;
+			height: space.$s5;
+		}
+	}
+
+	& .changeCalendar {
+		display: flex;
+        align-items: center;
+		& img {
+			width: space.$s8;
+			height: space.$s8;
+		}
+	}
 }
 
 .main {
-    background-color: color.$secondary-dark;
-    color: color.$gray-100;
-
+	background-color: color.$secondary-dark;
+	color: color.$gray-100;
 }
 
 .calendar {
-    
+	width: 100%;
+
+	& tr {
+		height: space.$s12-1;
+		& td {
+			width: space.$s12-1;
+			text-align: center;
+			font: font.$label-medium;
+
+			& span {
+				box-sizing: border-box;
+				padding: space.$s1;
+				background-color: color.$green-500;
+				border-radius: 50%;
+				text-align: center;
+			}
+		}
+	}
+
+	& .weekdayLabels {
+		height: fit-content;
+		& td {
+			font: font.$label-small;
+			color: color.$gray-400;
+		}
+	}
 }
 
 .weekdays {
-    display: flex;
-
-    & span {
-
-    }
+	display: flex;
 }
