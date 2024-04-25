@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Category, Subcategory } from "@/firebase/models";
 
 export default {
-	title: "Transaction/CategoriesSubpage",
+	title: "Transaction/CategoriesSelectionSubpage",
 	component: CategorySelectionSubpage,
 	parameters: {
 		layout: "fullscreen",
