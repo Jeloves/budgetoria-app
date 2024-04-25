@@ -264,6 +264,7 @@ export default function BudgetPage() {
 					subcategories={subcategories}
 					accounts={accounts}
 					transaction={testTrans}
+					unassignedBalance={budget ? budget.unassignedBalance : 0}
 					handleCreateTransaction={handleCreateTransaction}
 				/>
 			</>

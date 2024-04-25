@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { EditCategoryItem } from "@/features/edit-page";
 import { Category, Subcategory } from "@/firebase/models";
-import { NIL as NIL_UUID } from "uuid";
 import { IconButton } from "../ui";
 import styles from "./edit-page.module.scss";
 import { useEffect, useState } from "react";
