@@ -17,9 +17,8 @@ const Template: StoryFn<DateSelectionSubpagePropsType> = (args) => <DateSelectio
 export const Default = Template.bind({});
 
 const date = new Date(2024, 0, 30);
-const timestamp = Timestamp.fromDate(date);
 Default.args = {
-	timestamp: timestamp,
+	date: date,
 	handleBackClick: () => {
 		alert("Back click");
 	},

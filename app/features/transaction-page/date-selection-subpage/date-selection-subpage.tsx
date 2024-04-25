@@ -5,17 +5,17 @@ import { compareDatesForEquality, getDateStringFromMonthYear, getShortenedDateSt
 import { IconButton } from "@/features/ui";
 
 export type DateSelectionSubpagePropsType = {
-	timestamp: Timestamp;
+	date: Date;
 	handleBackClick: () => void;
 	selectNewDate: (newDate: Date) => void;
 };
 
 export function DateSelectionSubpage(props: DateSelectionSubpagePropsType) {
-	const { timestamp, handleBackClick, selectNewDate } = props;
+	const { date, handleBackClick, selectNewDate } = props;
     const [renderKey, setRenderKey] = useState<1 | 0>(0);
-    const [selectedDate, setSelectedDate] = useState<Date>(timestamp.toDate());
-	const [displayedYear, setDisplayedYear] = useState<number>(timestamp.toDate().getFullYear());
-	const [displayedMonth, setDisplayedMonth] = useState<number>(timestamp.toDate().getMonth());
+
+	const [displayedYear, setDisplayedYear] = useState<number>(date.getFullYear());
+	const [displayedMonth, setDisplayedMonth] = useState<number>(date.getMonth());
     
 
 	const handleShowNextCalendarMonth = () => {
@@ -79,7 +79,7 @@ export function DateSelectionSubpage(props: DateSelectionSubpagePropsType) {
 		const row: JSX.Element[] = [];
 		for (let weekday = 0; weekday < 7; weekday++) {
 			const dayParam = day;
-			const isSelectedDate = compareDatesForEquality(selectedDate, new Date(displayedYear, displayedMonth, dayParam));
+			const isSelectedDate = compareDatesForEquality(date, new Date(displayedYear, displayedMonth, dayParam));
 			const dayCell = isSelectedDate ? (
 				<td key={`week${week}-day${weekday}`} onClick={handleBackClick}>
 					<span>{day}</span>
@@ -125,7 +125,7 @@ export function DateSelectionSubpage(props: DateSelectionSubpagePropsType) {
 		}
 		currentCalendarElement.push(<tr key={`week${week}`}>{row}</tr>);
 	}
-	//{getShortenedDateStringFromTimestamp(timestamp)}
+
 	return (
 		<section key={renderKey} className={styles.container}>
 			<div className={styles.cancel}>
