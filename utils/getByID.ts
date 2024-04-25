@@ -15,10 +15,23 @@ export function getCategoryNameBySubcategoryID(targetSubcategoryID: string, cate
 		return "Unassigned";
 	} else {
 		const targetSubcategory = subcategories.find((subcategory) => subcategory.id === targetSubcategoryID);
-
 		if (targetSubcategory) {
 			const targetCategory = categories.find((category) => category.id === targetSubcategory.categoryID);
 			return targetCategory ? targetCategory!.name : "";
+		} else {
+			return "";
+		}
+	}
+}
+
+export function getCategoryIDBySubcategoryID(targetSubcategoryID: string, categories: Category[], subcategories: Subcategory[]) {
+	if (targetSubcategoryID === NIL_UUID) {
+		return NIL_UUID;
+	} else {
+		const targetSubcategory = subcategories.find((subcategory) => subcategory.id === targetSubcategoryID);
+		if (targetSubcategory) {
+			const targetCategory = categories.find((category) => category.id === targetSubcategory.categoryID);
+			return targetCategory ? targetCategory.id : "";
 		} else {
 			return "";
 		}

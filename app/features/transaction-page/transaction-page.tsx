@@ -6,7 +6,7 @@ import { TransactionData } from "./transaction-data/transaction-data";
 import { Timestamp } from "firebase/firestore";
 import classNames from "classnames";
 import { createPayee, getPayees } from "@/firebase/payee";
-import { getAccountNameByID, getCategoryNameByID, getCategoryNameBySubcategoryID, getSubcategoryNameByID } from "@/utils/getByID";
+import { getAccountNameByID, getCategoryIDBySubcategoryID, getCategoryNameByID, getCategoryNameBySubcategoryID, getSubcategoryNameByID } from "@/utils/getByID";
 import { getDateStringFromTimestamp } from "@/utils/date";
 import { PayeeSelectionSubpage } from "./payee-selection-subpage/payee-selection-subpage";
 import { CategorySelectionSubpage } from "./category-selection-subpage/category-selection-subpage";
@@ -76,6 +76,7 @@ export function TransactionPage(props: TransactionPagePropsType) {
 	const selectSubcategory = (selectedSubcategoryID: string) => {
 		if (selectedSubcategoryID !== subcategoryID) {
 			setSubcategoryID(selectedSubcategoryID);
+			setCategoryID(getCategoryIDBySubcategoryID(selectedSubcategoryID, categories, subcategories));
 		}
 		hideSubpage();
 	};
