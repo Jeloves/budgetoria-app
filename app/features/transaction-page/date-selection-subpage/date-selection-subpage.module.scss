@@ -1,0 +1,26 @@
+@use "@styles/color";
+@use "@styles/font";
+@use "@styles/space";
+
+.header {
+    background-color: color.$secondary-dark;
+
+}
+
+.main {
+    background-color: color.$secondary-dark;
+    color: color.$gray-100;
+
+}
+
+.calendar {
+    
+}
+
+.weekdays {
+    display: flex;
+
+    & span {
+
+    }
+}
