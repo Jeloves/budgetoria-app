@@ -215,18 +215,22 @@ export default function BudgetPage() {
 	// User is on Budget Page
 	page === "Budget" &&
 		pageContent.push(
-			<header className={styles.budgetPageHeader}>
+			<header key={unassignedKey} className={styles.budgetPageHeader}>
 				<Topbar month={month} year={year} dateInterval={dateInterval} handleDateChangeOnClick={handleDateChangeOnClick} handleEditCategoriesClick={handleEditCategoriesClick} handleShowOptions={showOptions} />
-				<Unassigned currency={budget ? budget.currency : "USD"} unassignedBalance={budget ? budget.unassignedBalance : 0} key={unassignedKey} />
+				<Unassigned currency={budget ? budget.currency : "USD"} unassignedBalance={budget ? budget.unassignedBalance : 0} />
 			</header>
 		) &&
-		pageContent.push(<main className={classNames(styles.main, styles.budgetPageContent)}>{categoryItems}</main>);
+		pageContent.push(
+			<main key={"budgetPageMain"} className={classNames(styles.main, styles.budgetPageContent)}>
+				{categoryItems}
+			</main>
+		);
 
 	// User is on Accounts Page
 	page === "Accounts" &&
 		pageContent.push(
 			<>
-				<AccountsPage accounts={accounts} handleConfirmNewAccount={handleConfirmNewAccount} />
+				<AccountsPage key={"accountsPage"} accounts={accounts} handleConfirmNewAccount={handleConfirmNewAccount} />
 			</>
 		);
 
@@ -234,7 +238,7 @@ export default function BudgetPage() {
 	page === "Edit" &&
 		pageContent.push(
 			<>
-				<EditPage userID={user ? user.uid : ""} budgetID={budget ? budget.id : ""} categories={categories} subcategories={subcategories} handleFinishEdits={handleFinishEdits} />
+				<EditPage key={"editPage"} userID={user ? user.uid : ""} budgetID={budget ? budget.id : ""} categories={categories} subcategories={subcategories} handleFinishEdits={handleFinishEdits} />
 			</>
 		);
 
@@ -255,7 +259,16 @@ export default function BudgetPage() {
 	page === "Create Transaction" &&
 		pageContent.push(
 			<>
-				<TransactionPage userID={user ? user.uid : ""} budgetID={budget ? budget.id : ""} categories={categories} subcategories={subcategories} accounts={accounts} transaction={testTrans} handleCreateTransaction={handleCreateTransaction} />
+				<TransactionPage
+					key={"createTransactionPage"}
+					userID={user ? user.uid : ""}
+					budgetID={budget ? budget.id : ""}
+					categories={categories}
+					subcategories={subcategories}
+					accounts={accounts}
+					transaction={testTrans}
+					handleCreateTransaction={handleCreateTransaction}
+				/>
 			</>
 		);
 

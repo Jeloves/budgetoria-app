@@ -9,7 +9,7 @@ import classNames from "classnames";
 import { createPayee, getPayees } from "@/firebase/payee";
 import { getAccountNameByID, getCategoryNameByID, getSubcategoryNameByID } from "@/utils/getByID";
 import { getDateStringFromTimestamp } from "@/utils/date";
-import { CategoriesSubpage } from "./categories-subpage/categories-subpage";
+import { CategorySelectionSubpage } from "./category-selection-subpage/category-selection-subpage";
 
 export type TransactionPagePropsType = {
 	userID: string;
@@ -93,7 +93,7 @@ export function TransactionPage(props: TransactionPagePropsType) {
 		showSubpage(<PayeeSubpage selectedPayee={payee} payees={payees} handleBackClick={hideSubpage} createNewPayee={createNewPayee} selectPayee={selectPayee} />);
 	};
 	const navigateToCategoriesSubpage = () => {
-		showSubpage(<CategoriesSubpage selectedSubcategoryID={subcategoryID} categories={categories} subcategories={subcategories} handleBackClick={hideSubpage} selectSubcategory={selectSubcategory}/>)
+		showSubpage(<CategorySelectionSubpage selectedSubcategoryID={subcategoryID} categories={categories} subcategories={subcategories} handleBackClick={hideSubpage} selectSubcategory={selectSubcategory}/>)
 	};
 	const handleAccountOnClick = () => {};
 	const handleDateOnClick = () => {};

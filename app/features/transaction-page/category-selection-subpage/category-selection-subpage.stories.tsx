@@ -1,18 +1,18 @@
 import React from "react";
 import { Meta, StoryFn } from "@storybook/react";
-import { CategoriesSubpage, CategoriesSubpagePropsType } from "./categories-subpage";
+import { CategorySelectionSubpage, CategorySelectionSubpagePropsType } from "./category-selection-subpage";
 import { v4 as uuidv4 } from "uuid";
 import { Category, Subcategory } from "@/firebase/models";
 
 export default {
 	title: "Transaction/CategoriesSubpage",
-	component: CategoriesSubpage,
+	component: CategorySelectionSubpage,
 	parameters: {
 		layout: "fullscreen",
 	},
-} as Meta<typeof CategoriesSubpage>;
+} as Meta<typeof CategorySelectionSubpage>;
 
-const Template: StoryFn<CategoriesSubpagePropsType> = (args) => <CategoriesSubpage {...args} />;
+const Template: StoryFn<CategorySelectionSubpagePropsType> = (args) => <CategorySelectionSubpage {...args} />;
 
 export const Default = Template.bind({});
 

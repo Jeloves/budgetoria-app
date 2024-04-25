@@ -1,8 +1,8 @@
 import { IconButton } from "@/features/ui";
-import styles from "./categories-subpage.module.scss";
+import styles from "./category-selection-subpage.module.scss";
 import { Category, Subcategory } from "@/firebase/models";
 
-export type CategoriesSubpagePropsType = {
+export type CategorySelectionSubpagePropsType = {
 	selectedSubcategoryID: string;
 	categories: Category[];
 	subcategories: Subcategory[];
@@ -10,15 +10,18 @@ export type CategoriesSubpagePropsType = {
 	selectSubcategory: (selectedSubcategoryID: string) => void;
 };
 
-export function CategoriesSubpage(props: CategoriesSubpagePropsType) {
+export function CategorySelectionSubpage(props: CategorySelectionSubpagePropsType) {
 	const { selectedSubcategoryID, categories, subcategories, handleBackClick, selectSubcategory } = props;
 
 	const categoryElements: JSX.Element[] = [];
-	for (let category of categories) {
-		categoryElements.push(<div className={styles.category}>{category.name}</div>);
+	for (let i=0; i<categories.length; i++) {
+        // Element for category label
+        const category = categories[i];
+		categoryElements.push(<div key={`category${i}`} className={styles.category}>{category.name}</div>);
+
+        // Elements for subcategory labels
 		const filteredSubcategories = subcategories.filter((subcategory) => subcategory.categoryID === category.id);
 		const subcategoryElements: JSX.Element[] = [];
-
 		for (let i = 0; i < filteredSubcategories.length; i++) {
 			const subcategory = filteredSubcategories[i];
 			const isSelected = subcategory.id === selectedSubcategoryID;
@@ -31,6 +34,7 @@ export function CategoriesSubpage(props: CategoriesSubpagePropsType) {
 
 			subcategoryElements.push(
 				<div
+                    key={`subcategory${i}`}
 					className={styles.subcategory}
 					onClick={() => {
 						selectSubcategory(subcategory.id);
@@ -46,11 +50,11 @@ export function CategoriesSubpage(props: CategoriesSubpagePropsType) {
 			);
 
 			if (filteredSubcategories.length > 1 && i < filteredSubcategories.length - 1) {
-				subcategoryElements.push(<hr className={styles.border} />);
+				subcategoryElements.push(<hr key={`border${i}`} className={styles.border} />);
 			}
 		}
 
-		categoryElements.push(<div className={styles.subcategoryContainer}>{subcategoryElements}</div>);
+		categoryElements.push(<div key={`subcategoryContainer${i}`} className={styles.subcategoryContainer}>{subcategoryElements}</div>);
 	}
 
 	return (

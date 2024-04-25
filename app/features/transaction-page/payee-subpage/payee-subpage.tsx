@@ -52,12 +52,17 @@ export function PayeeSubpage(props: PayeeSubpagePropsType) {
 		const payee = sortedPayees[i];
 		if (sortingChar !== payee[0]) {
 			sortingChar = payee[0];
-			payeeElements.push(<div className={styles.sortingChar}>{sortingChar}</div>);
+			payeeElements.push(
+				<div key={`sortingChar${i}`} className={styles.sortingChar}>
+					{sortingChar}
+				</div>
+			);
 		}
 
 		const isSelectedPayee = payee === selectedPayee;
 		payeeElements.push(
 			<div
+				key={`payee${i}`}
 				className={styles.payee}
 				onClick={() => {
 					selectPayee(payee);
