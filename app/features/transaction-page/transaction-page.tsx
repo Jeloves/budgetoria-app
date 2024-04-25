@@ -10,6 +10,7 @@ import { createPayee, getPayees } from "@/firebase/payee";
 import { getAccountNameByID, getCategoryNameByID, getSubcategoryNameByID } from "@/utils/getByID";
 import { getDateStringFromTimestamp } from "@/utils/date";
 import { CategorySelectionSubpage } from "./category-selection-subpage/category-selection-subpage";
+import { AccountSelectionSubpage } from "./account-selection-subpage/account-selection-subpage";
 
 export type TransactionPagePropsType = {
 	userID: string;
@@ -56,7 +57,7 @@ export function TransactionPage(props: TransactionPagePropsType) {
 		setIsApproved(event.target.checked);
 	};
 
-	// Payee Subpage Props
+	// Subpage Props
 	const createNewPayee = (newPayee: string) => {
 		// Creates payee doc in firebase
 		createPayee(userID, budgetID, newPayee);
@@ -72,13 +73,14 @@ export function TransactionPage(props: TransactionPagePropsType) {
 		}
 		hideSubpage();
 	};
-
-	// Categories Subpage Props
 	const selectSubcategory = (selectedSubcategoryID: string) => {
 		if (selectedSubcategoryID !== subcategoryID) {
 			setSubcategoryID(selectedSubcategoryID);
 		}
 		hideSubpage();
+	}
+	const selectAccount = (selectedAccountID: string) => {
+
 	}
 
 	const showSubpage = (selectedSubpage: JSX.Element) => {
@@ -95,7 +97,9 @@ export function TransactionPage(props: TransactionPagePropsType) {
 	const navigateToCategoriesSubpage = () => {
 		showSubpage(<CategorySelectionSubpage selectedSubcategoryID={subcategoryID} categories={categories} subcategories={subcategories} handleBackClick={hideSubpage} selectSubcategory={selectSubcategory}/>)
 	};
-	const handleAccountOnClick = () => {};
+	const handleAccountOnClick = () => {
+		showSubpage(<AccountSelectionSubpage selectedAccountID={accountID} accounts={accounts} handleBackClick={hideSubpage} selectAccount={selectAccount}/>)
+	};
 	const handleDateOnClick = () => {};
 
 	// Formatting the transaction.balance for display
