@@ -1,11 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 import { cloneDeep } from "lodash";
-import styles from "./payee-subpage.module.scss";
+import styles from "./payee-selection-subpage.module.scss";
 import { sortStringsAlphabetically } from "@/utils/sorting";
 import { useEffect, useState } from "react";
 import { IconButton } from "@/features/ui";
 
-export type PayeeSubpagePropsType = {
+export type PayeeSelectionSubpagePropsType = {
 	selectedPayee: string;
 	payees: string[];
 	handleBackClick: () => void;
@@ -13,7 +13,7 @@ export type PayeeSubpagePropsType = {
 	selectPayee: (selectedPayee: string) => void;
 };
 
-export function PayeeSubpage(props: PayeeSubpagePropsType) {
+export function PayeeSelectionSubpage(props: PayeeSelectionSubpagePropsType) {
 	const { selectedPayee, handleBackClick, createNewPayee, selectPayee } = props;
 
 	const [payees, setPayees] = useState<string[]>(props.payees);

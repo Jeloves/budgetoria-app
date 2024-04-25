@@ -1,16 +1,16 @@
 import React from "react";
 import { Meta, StoryFn } from "@storybook/react";
-import { PayeeSubpage, PayeeSubpagePropsType } from "./payee-subpage";
+import { PayeeSelectionSubpage, PayeeSelectionSubpagePropsType } from "./payee-selection-subpage";
 
 export default {
-  title: "Transaction/PayeeSubpage",
-  component: PayeeSubpage,
+  title: "Transaction/PayeeSelectionSubpage",
+  component: PayeeSelectionSubpage,
   parameters: {
     layout: "fullscreen",
   },
-} as Meta<typeof PayeeSubpage>;
+} as Meta<typeof PayeeSelectionSubpage>;
 
-const Template: StoryFn<PayeeSubpagePropsType> = (args) => <PayeeSubpage {...args}/>;
+const Template: StoryFn<PayeeSelectionSubpagePropsType> = (args) => <PayeeSelectionSubpage {...args}/>;
 
 export const Default = Template.bind({});
 
