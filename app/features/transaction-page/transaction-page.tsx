@@ -80,7 +80,10 @@ export function TransactionPage(props: TransactionPagePropsType) {
 		hideSubpage();
 	}
 	const selectAccount = (selectedAccountID: string) => {
-
+		if (selectedAccountID !== accountID) {
+			setAccountID(selectedAccountID);
+		}
+		hideSubpage();
 	}
 
 	const showSubpage = (selectedSubpage: JSX.Element) => {
