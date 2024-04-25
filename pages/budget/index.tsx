@@ -51,9 +51,6 @@ export default function BudgetPage() {
 
 	// Pages
 	const [page, setPage] = useState<"Budget" | "Edit" | "Accounts" | "Create Transaction">("Budget");
-	const [onBudgetPage, setOnBudgetPage] = useState<boolean>(true);
-	const [onEditPage, setOnEditPage] = useState<boolean>(false);
-	const [onAccountsPage, setOnAccountsPage] = useState<boolean>(false);
 
 	// Navigation Functions
 	const showOptions = () => {
