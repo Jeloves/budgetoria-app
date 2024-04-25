@@ -53,10 +53,6 @@ export function TransactionPage(props: TransactionPagePropsType) {
 		fetchPayees();
 	}, [budgetID, dataListenerKey, userID]);
 
-	const handleChangeApprovalState = (event: ChangeEvent<HTMLInputElement>) => {
-		setIsApproved(event.target.checked);
-	};
-
 	// Subpage Props
 	const createNewPayee = (newPayee: string) => {
 		// Creates payee doc in firebase
@@ -105,6 +101,14 @@ export function TransactionPage(props: TransactionPagePropsType) {
 		showSubpage(<AccountSelectionSubpage selectedAccountID={accountID} accounts={accounts} handleBackClick={hideSubpage} selectAccount={selectAccount} />);
 	};
 	const handleDateOnClick = () => {};
+
+
+	const handleChangeApprovalState = (event: ChangeEvent<HTMLInputElement>) => {
+		setIsApproved(event.target.checked);
+	};
+	const handleMemoOnChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+		setMemo(event.currentTarget.value);
+	}
 
 	// Formatting the transaction.balance for display
 	let balanceString = "";
@@ -161,7 +165,7 @@ export function TransactionPage(props: TransactionPagePropsType) {
 							<img src="/icons/memo-grey-100.svg" alt="Memo icon" />
 							<h2>Memo</h2>
 						</div>
-						<textarea className={styles.memo} placeholder="Enter memo..." />
+						<textarea className={styles.memo} placeholder="Enter memo..." onChange={handleMemoOnChange}/>
 					</div>
 				</div>
 			</main>
