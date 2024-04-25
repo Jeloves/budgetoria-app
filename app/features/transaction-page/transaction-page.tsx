@@ -6,7 +6,7 @@ import { TransactionData } from "./transaction-data/transaction-data";
 import { Timestamp } from "firebase/firestore";
 import classNames from "classnames";
 import { createPayee, getPayees } from "@/firebase/payee";
-import { getAccountNameByID, getCategoryNameByID, getSubcategoryNameByID } from "@/utils/getByID";
+import { getAccountNameByID, getCategoryNameByID, getCategoryNameBySubcategoryID, getSubcategoryNameByID } from "@/utils/getByID";
 import { getDateStringFromTimestamp } from "@/utils/date";
 import { PayeeSelectionSubpage } from "./payee-selection-subpage/payee-selection-subpage";
 import { CategorySelectionSubpage } from "./category-selection-subpage/category-selection-subpage";
@@ -78,13 +78,13 @@ export function TransactionPage(props: TransactionPagePropsType) {
 			setSubcategoryID(selectedSubcategoryID);
 		}
 		hideSubpage();
-	}
+	};
 	const selectAccount = (selectedAccountID: string) => {
 		if (selectedAccountID !== accountID) {
 			setAccountID(selectedAccountID);
 		}
 		hideSubpage();
-	}
+	};
 
 	const showSubpage = (selectedSubpage: JSX.Element) => {
 		setSubpage(selectedSubpage);
@@ -98,10 +98,10 @@ export function TransactionPage(props: TransactionPagePropsType) {
 		showSubpage(<PayeeSelectionSubpage selectedPayee={payee} payees={payees} handleBackClick={hideSubpage} createNewPayee={createNewPayee} selectPayee={selectPayee} />);
 	};
 	const navigateToCategorySelectionSubpage = () => {
-		showSubpage(<CategorySelectionSubpage selectedSubcategoryID={subcategoryID} categories={categories} subcategories={subcategories} handleBackClick={hideSubpage} selectSubcategory={selectSubcategory}/>)
+		showSubpage(<CategorySelectionSubpage selectedSubcategoryID={subcategoryID} categories={categories} subcategories={subcategories} handleBackClick={hideSubpage} selectSubcategory={selectSubcategory} />);
 	};
 	const navigateToAccountSelectionSubpage = () => {
-		showSubpage(<AccountSelectionSubpage selectedAccountID={accountID} accounts={accounts} handleBackClick={hideSubpage} selectAccount={selectAccount}/>)
+		showSubpage(<AccountSelectionSubpage selectedAccountID={accountID} accounts={accounts} handleBackClick={hideSubpage} selectAccount={selectAccount} />);
 	};
 	const handleDateOnClick = () => {};
 
@@ -138,10 +138,16 @@ export function TransactionPage(props: TransactionPagePropsType) {
 				</div>
 				<div className={styles.contentContainer}>
 					<div className={styles.content}>
-						<TransactionData key={0} data={payee} type="Payee" handleOnClick={navigateToPayeeSelectionSubpage} />
-						<TransactionData key={1} data={getSubcategoryNameByID(subcategoryID, subcategories)} type="Category" handleOnClick={navigateToCategorySelectionSubpage} />
-						<TransactionData key={2} data={getAccountNameByID(accountID, accounts)} type="Account" handleOnClick={navigateToAccountSelectionSubpage} />
-						<TransactionData key={3} data={getDateStringFromTimestamp(timestamp)} type="Date" handleOnClick={handleDateOnClick} />
+						<TransactionData key={0} data={payee} type="Payee" categoryName="" handleOnClick={navigateToPayeeSelectionSubpage} />
+						<TransactionData
+							key={1}
+							data={getSubcategoryNameByID(subcategoryID, subcategories)}
+							categoryName={getCategoryNameBySubcategoryID(subcategoryID, categories, subcategories)}
+							type="Category"
+							handleOnClick={navigateToCategorySelectionSubpage}
+						/>
+						<TransactionData key={2} data={getAccountNameByID(accountID, accounts)} categoryName="" type="Account" handleOnClick={navigateToAccountSelectionSubpage} />
+						<TransactionData key={3} data={getDateStringFromTimestamp(timestamp)} categoryName="" type="Date" handleOnClick={handleDateOnClick} />
 						<button className={styles.otherTransactionData}>
 							<img src={isApproved ? "/icons/cleared.svg" : "/icons/cleared-grey-100.svg"} alt="Cleared icon" />
 							<h2>Cleared</h2>

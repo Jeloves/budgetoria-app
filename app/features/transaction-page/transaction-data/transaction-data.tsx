@@ -5,11 +5,12 @@ import styles from "./transaction-data.module.scss";
 export type TransactionDataPropsType = {
 	type: "Payee" | "Category" | "Account" | "Date";
 	data: string;
+	categoryName: string;
 	handleOnClick: () => void;
 };
 
 export function TransactionData(props: TransactionDataPropsType) {
-	const { type, data, handleOnClick } = props;
+	const { type, data, categoryName, handleOnClick } = props;
 	const [isApproved, setIsApproved] = useState<boolean>(false);
 
 	// Selecting the correct icon
@@ -29,12 +30,18 @@ export function TransactionData(props: TransactionDataPropsType) {
 			break;
 	}
 
+	// Selecting the correct h1 label
+	let label: string = type;
+	if (type === "Category" && categoryName) {
+		label = categoryName;
+	} 
+
 	return (
 		<button className={styles.transactionData} onClick={handleOnClick}>
 			<div className={styles.iconContainer}>
 				<img src={icon} alt={type + "icon"} />
 			</div>
-			<h1>{type}</h1>
+			<h1>{label}</h1>
 			<h2 className={data ? "" : styles.unselected}>{data ? data : `Select ${type}...`}</h2>
 			<img className={styles.arrow} src="/icons/arrow-right-grey-500.svg" alt="Arrow icon" />
 			<hr className={styles.border} />
