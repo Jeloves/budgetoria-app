@@ -1,9 +1,28 @@
 @use "@styles/color";
 @use "@styles/font";
 @use "@styles/space";
+@use "@styles/header";
+@use "@styles/main";
+@use "@styles/subpage";
 
-.transaction {	
+.header {
+	position: relative;
 
+	& span {
+		position: absolute;
+		left: 50%;
+		transform: translateX(-50%);
+	}
+
+	& button {
+		position: absolute;
+		right: 0;
+		color: color.$green-500;
+		padding-right: space.$s2;
+	}
+}
+
+.main {
 	// Button Reset
 	& button {
 		border: none;
@@ -15,8 +34,6 @@
 		text-align: start;
 		margin: 0;
 		padding: 0;
-		font-size: inherit;
-		font-weight: inherit;
 	}
 
 	& input {
@@ -29,14 +46,14 @@
 
 .balance {
 	background-color: color.$gray-500;
-	padding-top: 16px;
-	padding-right: 16px;
-	padding-bottom: 32px;
-	padding-left: 16px;
+	padding-top: space.$s4;
+	padding-right: space.$s4;
+	padding-bottom: space.$s8;
+	padding-left: space.$s4;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 16px;
+	gap: space.$s4;
 
 	& div {
 		width: 80%;
@@ -44,19 +61,28 @@
 		display: flex;
 		justify-content: center;
 		border: space.$s0-1 solid color.$gray-400;
-		border-radius: 4px;
+		border-radius: space.$s1;
 
 		& button {
 			width: 50%;
 			border: space.$s0-1 solid color.$gray-400;
+			color: color.$gray-100;
+		}
+
+		& .flow {
+			background-color: color.$primary-dark;
 		}
 	}
 
 	& input[type="text"] {
+		width: 100%;
 		text-align: center;
 		font: font.$text-large;
 		color: white;
 	}
+}
+.inflow {
+	background-color: color.$green-500;
 }
 
 .contentContainer {
@@ -66,99 +92,61 @@
 }
 
 .content {
+	box-sizing: border-box;
 	margin-top: calc(0rem - space.$s4);
-	width: 80%;
+	width: 85%;
 	background-color: color.$primary-dark;
-	border-radius: 4px;
+	border-radius: space.$s1;
+	display: flex;
+	flex-direction: column;
+}
+
+.otherTransactionData {
+	width: 100%;
+	height: space.$s16;
+	display: flex;
+	align-items: center;
+	color: white;
+	padding: 0;
+	padding-right: space.$s3;
 
 	& img {
 		width: space.$s5;
 		height: space.$s5;
+		padding: 0 space.$s3;
 	}
 
-	& .transactionData {
-		width: 100%;
-		min-height: space.$s16;
-		box-sizing: border-box;
-		display: grid;
-		align-items: center;
-		color: white;
-		padding: 0;
-		padding-top: space.$s2;
-		grid-template-rows: 1fr 1fr auto;
-		grid-template-columns: auto 1fr auto;
-		grid-template-areas:
-			"icon label arrow"
-			"icon selected arrow"
-			"icon border border";
-
-		& .iconContainer {
-			grid-area: icon;
-			height: 100%;
-			padding: 0 space.$s3;
-			margin-bottom: space.$s2;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-		}
-
-		& h1 {
-			grid-area: label;
-			font: font.$label-small;
-			color: color.$gray-100;
-		}
-
-		& h2 {
-			grid-area: selected;
-			font: font.$text-regular;
-		}
-
-		& .arrow {
-			grid-area: arrow;
-			width: space.$s5;
-			height: space.$s5;
-			padding-right: space.$s1;
-		}
-
-		& .border {
-			grid-area: border;
-			padding: 0;
-			margin: 0;
-			margin-top: space.$s2;
-			grid-area: border;
-			background-color: color.$gray-500;
-			height: space.$s0-1;
-			border: none;
-			box-sizing: border-box;
-		}
-	}
-
-	& .approval {
-		width: 100%;
-		height: space.$s16;
-		display: flex;
-		align-items: center;
-		color: white;
-		padding: 0;
-		padding-right: space.$s3;
-
-		& img {
-			padding: 0 space.$s3;
-		}
-
-		& h2 {
-			flex: 1;
-			font: font.$text-regular;
-		}
-	}
-
-	& input[type="text"] {
-		grid-area: selected;
-		margin-right: space.$s8;
+	& h2 {
+		flex: 1;
 		font: font.$text-regular;
-		color: white;
-        flex: 1;
 	}
+}
+
+.calendar {
+	max-height: 0;
+	overflow: hidden;
+	white-space: nowrap;
+
+	& .border {
+		padding: 0;
+		margin: 0;
+		margin-top: space.$s2;
+		margin-left: calc(space.$s6 + space.$s5); // Width of icon within TransactionData
+		grid-area: border;
+		background-color: color.$gray-500;
+		height: space.$s0-1;
+		border: none;
+		box-sizing: border-box;
+	}
+}
+.showCalendar {
+	max-height: 100%; /* Adjust as needed, a sufficiently large value */
+	transition: max-height 0.5s ease-out;
+}
+
+.hideCalendar {
+	max-height: 0;
+	transition: max-height 0.5s ease-out;
 }
 
 // Custom Input Slider
@@ -206,4 +194,17 @@
 	& input:checked + .slider:before {
 		transform: translateX(space.$s6-1);
 	}
+}
+
+.memo {
+	background-color: color.$primary-dark;
+	min-height: space.$s25;
+	box-sizing: border-box;
+	margin-right: space.$s3;
+	margin-left: calc(space.$s3 + space.$s5 + space.$s3);
+	margin-top: calc(0rem - space.$s2);
+	margin-bottom: space.$s3;
+	flex: 1;
+	color: color.$gray-100;
+	font: font.$text-regular;
 }

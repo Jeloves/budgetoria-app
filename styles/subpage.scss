@@ -13,3 +13,33 @@
 	overflow: hidden;
 	white-space: nowrap;
 }
+
+.show {
+	animation: slideInAnimation 0.5s forwards;
+	& header {
+		animation: slideInAnimation 0.5s forwards;
+	}
+	@keyframes slideInAnimation {
+		0% {
+			width: 0;
+		}
+		100% {
+			width: 100vw;
+		}
+	}
+}
+
+.hide {
+	animation: slideOutAnimation 0.5s forwards;
+	& header {
+		animation: slideOutAnimation 0.5s forwards;
+	}
+	@keyframes slideOutAnimation {
+		0% {
+			width: 100vw;
+		}
+		100% {
+			width: 0%;
+		}
+	}
+}

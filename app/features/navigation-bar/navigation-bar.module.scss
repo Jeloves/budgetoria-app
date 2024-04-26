@@ -16,15 +16,15 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        gap: 4px;
+        gap: space.$s1;
         flex: 1;
         color: color.$gray-400;
         font: font.$button-navigation;
     }
 
     & img {
-        width: 24px;
-        height: 24px;
+        width: space.$s6;
+        height: space.$s6;
     }
 
     & .budgetSelected {

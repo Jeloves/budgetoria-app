@@ -7,7 +7,7 @@ import { User } from "firebase/auth/cordova";
 import { getSelectedBudget, getUnassignedBalance, updateUnassignedBalance } from "@/firebase/budgets";
 import { getAllocations, updateAssignedAllocation } from "@/firebase/allocations";
 import { getCategories, getSubcategories } from "@/firebase/categories";
-import { getTransactions } from "@/firebase/transactions";
+import { createTransaction, getTransactions } from "@/firebase/transactions";
 import { Account, Allocation, Budget, Category, Subcategory, Transaction } from "@/firebase/models";
 import { Topbar } from "@/features/topbar/topbar";
 import { Unassigned } from "@/features/unassigned";
@@ -20,6 +20,9 @@ import { NavigationBar } from "@/features/navigation-bar";
 import { getDateInterval } from "@/utils/getDateInterval";
 import { DateIntervalType } from "@/features/date-picker/date-picker";
 import { Options } from "@/features/options";
+import { TransactionPage } from "@/features/transaction-page/transaction-page";
+import { v4 as uuidv4 } from "uuid";
+import { Timestamp } from "firebase/firestore";
 
 export default function BudgetPage() {
 	const [user, setUser] = useState<User | null>(null);
@@ -30,6 +33,7 @@ export default function BudgetPage() {
 	const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
 	const [clearedTransactions, setClearedTransactions] = useState<Transaction[]>([]);
 	const [unclearedTransactions, setUnclearedTransactions] = useState<Transaction[]>([]);
+
 	const [dataListenerKey, setDataListenerKey] = useState<boolean>(false);
 
 	const [month, setMonth] = useState<number>(new Date().getMonth());
@@ -46,9 +50,7 @@ export default function BudgetPage() {
 	const [optionsClassNames, setOptionsClassNames] = useState<string[]>([styles.options]);
 
 	// Pages
-	const [onBudgetPage, setOnBudgetPage] = useState<boolean>(true);
-	const [onEditPage, setOnEditPage] = useState<boolean>(false);
-	const [onAccountsPage, setOnAccountsPage] = useState<boolean>(false);
+	const [page, setPage] = useState<"Budget" | "Edit" | "Accounts" | "Create Transaction">("Budget");
 
 	// Navigation Functions
 	const showOptions = () => {
@@ -58,19 +60,16 @@ export default function BudgetPage() {
 		setOptionsClassNames([styles.options, styles.hide]);
 	};
 	const navigateToBudgetPage = () => {
-		setOnBudgetPage(true);
-		setOnEditPage(false);
-		setOnAccountsPage(false);
+		setPage("Budget");
 	};
 	const navigateToAccountsPage = () => {
-		setOnBudgetPage(false);
-		setOnEditPage(false);
-		setOnAccountsPage(true);
+		setPage("Accounts");
 	};
 	const navigateToEditPage = () => {
-		setOnBudgetPage(false);
-		setOnEditPage(true);
-		setOnAccountsPage(false);
+		setPage("Edit");
+	};
+	const navigateToCreateTransactionPage = () => {
+		setPage("Create Transaction");
 	};
 
 	// Passed to DatePicker
@@ -93,6 +92,18 @@ export default function BudgetPage() {
 	// Passed to AccountsPage
 	const handleConfirmNewAccount = async (newAccount: Account) => {
 		await createAccount(user!.uid, budget!.id, newAccount);
+		// TODO: update unassigned balance
+	};
+
+	// Passed to CreateTransactionPage
+	const handleCreateTransaction = (newTransaction: Transaction) => {
+		if (newTransaction.categoryID && newTransaction.accountID && newTransaction.date) {
+			createTransaction(user!.uid, budget!.id, newTransaction);
+			// TODO: update unassigned balance
+			navigateToBudgetPage();
+		} else {
+			alert("A transaction requires a selected category, account, and date.")
+		}
 	};
 
 	// Sets user
@@ -202,34 +213,53 @@ export default function BudgetPage() {
 		}
 	}
 
-	const pageHeader: JSX.Element[] = [];
-	const pageMain: JSX.Element[] = [];
-
 	const pageContent: JSX.Element[] = [];
 
 	// User is on Budget Page
-	onBudgetPage &&
+	page === "Budget" &&
 		pageContent.push(
-			<header className={styles.budgetPageHeader}>
+			<header key={unassignedKey} className={styles.budgetPageHeader}>
 				<Topbar month={month} year={year} dateInterval={dateInterval} handleDateChangeOnClick={handleDateChangeOnClick} handleEditCategoriesClick={handleEditCategoriesClick} handleShowOptions={showOptions} />
-				<Unassigned currency={budget ? budget.currency : "USD"} unassignedBalance={budget ? budget.unassignedBalance : 0} key={unassignedKey} />
+				<Unassigned currency={budget ? budget.currency : "USD"} unassignedBalance={budget ? budget.unassignedBalance : 0} />
 			</header>
 		) &&
-		pageContent.push(<main className={classNames(styles.main, styles.budgetPageContent)}>{categoryItems}</main>);
+		pageContent.push(
+			<main key={"budgetPageMain"} className={classNames(styles.main, styles.budgetPageContent)}>
+				{categoryItems}
+			</main>
+		);
 
 	// User is on Accounts Page
-	onAccountsPage &&
+	page === "Accounts" &&
 		pageContent.push(
 			<>
-				<AccountsPage accounts={accounts} handleConfirmNewAccount={handleConfirmNewAccount} />
+				<AccountsPage key={"accountsPage"} accounts={accounts} handleConfirmNewAccount={handleConfirmNewAccount} />
 			</>
 		);
 
 	// User is on Edit Page
-	onEditPage &&
+	page === "Edit" &&
 		pageContent.push(
 			<>
-				<EditPage userID={user ? user.uid : ""} budgetID={budget ? budget.id : ""} categories={categories} subcategories={subcategories} handleFinishEdits={handleFinishEdits} />
+				<EditPage key={"editPage"} userID={user ? user.uid : ""} budgetID={budget ? budget.id : ""} categories={categories} subcategories={subcategories} handleFinishEdits={handleFinishEdits} />
+			</>
+		);
+
+	// User is on Create Transaction Page
+	page === "Create Transaction" &&
+		pageContent.push(
+			<>
+				<TransactionPage
+					key={"createTransactionPage"}
+					userID={user ? user.uid : ""}
+					budgetID={budget ? budget.id : ""}
+					categories={categories}
+					subcategories={subcategories}
+					accounts={accounts}
+					transaction={new Transaction(uuidv4(), Timestamp.fromDate(new Date()), "", "", true, 0, false, "", "", "")}
+					unassignedBalance={budget ? budget.unassignedBalance : 0}
+					handleCreateTransaction={handleCreateTransaction}
+				/>
 			</>
 		);
 
@@ -247,13 +277,7 @@ export default function BudgetPage() {
 					<Options handleHideOptions={hideOptions} />
 				</section>
 				{pageContent}
-				<NavigationBar
-					navigateToBudget={navigateToBudgetPage}
-					navigateToCreateTransaction={() => {
-						alert("Creating new transaction");
-					}}
-					navigateToAccounts={navigateToAccountsPage}
-				/>
+				<NavigationBar selectedPage={page} navigateToBudget={navigateToBudgetPage} navigateToCreateTransaction={navigateToCreateTransactionPage} navigateToAccounts={navigateToAccountsPage} />
 			</>
 		);
 	}

@@ -24,6 +24,7 @@ export const collectionLabel = {
 	subcategories: "subcategories",
 	allocations: "allocations",
 	transactions: "transactions",
+	payees: "payees",
 };
 
 // Initialize Firebase
