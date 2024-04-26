@@ -114,6 +114,33 @@
 	}
 }
 
+.calendar {
+	max-height: 0;
+	overflow: hidden;
+	white-space: nowrap;
+
+	& .border {
+		padding: 0;
+		margin: 0;
+		margin-top: space.$s2;
+		margin-left: calc(24px + 20px); // Width of icon within TransactionData
+		grid-area: border;
+		background-color: color.$gray-500;
+		height: space.$s0-1;
+		border: none;
+		box-sizing: border-box;
+	}
+}
+.showCalendar {
+	max-height: 100%; /* Adjust as needed, a sufficiently large value */
+	transition: max-height 0.5s ease-out;
+}
+
+.hideCalendar {
+	max-height: 0;
+	transition: max-height 0.5s ease-out;
+}
+
 // Custom Input Slider
 .switch {
 	position: relative;
@@ -173,4 +200,3 @@
 	color: color.$gray-100;
 	font: font.$text-regular;
 }
-

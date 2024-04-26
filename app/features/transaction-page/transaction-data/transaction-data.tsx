@@ -43,7 +43,7 @@ export function TransactionData(props: TransactionDataPropsType) {
 			</div>
 			<h1>{label}</h1>
 			<h2 className={data ? "" : styles.unselected}>{data ? data : `Select ${type}...`}</h2>
-			<img className={styles.arrow} src="/icons/arrow-right-grey-500.svg" alt="Arrow icon" />
+			{type !== "Date" && <img className={styles.arrow} src="/icons/arrow-right-grey-500.svg" alt="Arrow icon" />}
 			<hr className={styles.border} />
 		</button>
 	);

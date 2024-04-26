@@ -22,7 +22,7 @@ Default.args = {
 	handleBackClick: () => {
 		alert("Back click");
 	},
-	selectNewDate: (newDate: Date) => {
+	selectDate: (newDate: Date) => {
 		console.log("Selected Date", newDate);
 		console.log("Written as", getDateStringFromTimestamp(Timestamp.fromDate(newDate)));
 	},

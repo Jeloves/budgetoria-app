@@ -7,54 +7,36 @@ import { IconButton } from "@/features/ui";
 export type DateSelectionSubpagePropsType = {
 	date: Date;
 	handleBackClick: () => void;
-	selectNewDate: (newDate: Date) => void;
+	selectDate: (newDate: Date) => void;
 };
 
 export function DateSelectionSubpage(props: DateSelectionSubpagePropsType) {
-	const { date, handleBackClick, selectNewDate } = props;
-    const [renderKey, setRenderKey] = useState<1 | 0>(0);
+	const { date, handleBackClick, selectDate } = props;
+	const [renderKey, setRenderKey] = useState<1 | 0>(0);
 
 	const [displayedYear, setDisplayedYear] = useState<number>(date.getFullYear());
 	const [displayedMonth, setDisplayedMonth] = useState<number>(date.getMonth());
-    
 
 	const handleShowNextCalendarMonth = () => {
-        if (displayedMonth === 11) {
-            setDisplayedYear(displayedYear + 1);
-            setDisplayedMonth(0);
-        } else {
-            setDisplayedMonth(displayedMonth + 1);
-        }
-        setRenderKey(renderKey === 0 ? 1 : 0);
-    };
+		if (displayedMonth === 11) {
+			setDisplayedYear(displayedYear + 1);
+			setDisplayedMonth(0);
+		} else {
+			setDisplayedMonth(displayedMonth + 1);
+		}
+		setRenderKey(renderKey === 0 ? 1 : 0);
+	};
 	const handleShowPreviousCalendarMonth = () => {
 		if (displayedMonth === 1) {
-            setDisplayedYear(displayedYear - 1);
-            setDisplayedMonth(11);
-        } else {
-            setDisplayedMonth(displayedMonth - 1);
-        }
-        setRenderKey(renderKey === 0 ? 1 : 0);
+			setDisplayedYear(displayedYear - 1);
+			setDisplayedMonth(11);
+		} else {
+			setDisplayedMonth(displayedMonth - 1);
+		}
+		setRenderKey(renderKey === 0 ? 1 : 0);
 	};
-
-	const handleSelectNewDate = (newDay: number) => {
-		selectNewDate(new Date(displayedYear, displayedMonth, newDay));
-	};
-
-	const currentCalendarElement: JSX.Element[] = [];
-
-	// Creating weekday labels
-	currentCalendarElement.push(
-		<tr key={"weekdayLabels"} className={styles.weekdayLabels}>
-			<td key={"weekday1"}>SUN</td>
-			<td key={"weekday2"}>MON</td>
-			<td key={"weekday3"}>TUE</td>
-			<td key={"weekday4"}>WED</td>
-			<td key={"weekday5"}>THU</td>
-			<td key={"weekday6"}>FRI</td>
-			<td key={"weekday7"}>SAT</td>
-		</tr>
-	);
+	
+	const currentCalendarElement: JSX.Element[] = []
 
 	// Calculating first weekday of month (0-6, Sun-Sat)
 	const firstDayOfMonth = new Date(displayedYear, displayedMonth, 1);
@@ -88,7 +70,7 @@ export function DateSelectionSubpage(props: DateSelectionSubpagePropsType) {
 				<td
 					key={`week${week}-day${weekday}`}
 					onClick={() => {
-						handleSelectNewDate(dayParam);
+						selectDate(new Date(displayedYear, displayedMonth, dayParam));
 					}}
 				>
 					{day}
@@ -127,15 +109,10 @@ export function DateSelectionSubpage(props: DateSelectionSubpagePropsType) {
 	}
 
 	return (
-		<section key={renderKey} className={styles.container}>
-			<div className={styles.cancel}>
-				<IconButton button={{ onClick: handleBackClick }} src={"/icons/circled-x-grey-100.svg"} altText={"Button to cancel date selection"} />
-			</div>
+		<section key={renderKey}>
 			<header className={styles.header}>
 				<button className={styles.changeDate}>
 					{getDateStringFromMonthYear(displayedYear, displayedMonth)}
-					{/*eslint-disable-next-line @next/next/no-img-element*/}
-					<img src="/icons/arrow-right-grey-100.svg" alt="Button to open date scroll wheel" />
 				</button>
 				<div className={styles.changeCalendar}>
 					<IconButton button={{ onClick: handleShowPreviousCalendarMonth }} src={"/icons/arrow-left-grey-100.svg"} altText={"Button to show previous calendar"} />
@@ -144,8 +121,19 @@ export function DateSelectionSubpage(props: DateSelectionSubpagePropsType) {
 			</header>
 			<main className={styles.main}>
 				<table className={styles.calendar}>
+					<thead>
+						<tr key={"weekdayLabels"} className={styles.weekdayLabels}>
+							<td key={"weekday1"}>SUN</td>
+							<td key={"weekday2"}>MON</td>
+							<td key={"weekday3"}>TUE</td>
+							<td key={"weekday4"}>WED</td>
+							<td key={"weekday5"}>THU</td>
+							<td key={"weekday6"}>FRI</td>
+							<td key={"weekday7"}>SAT</td>
+						</tr>
+					</thead>
 					<tbody>{currentCalendarElement}</tbody>
-				</table>
+				</table>	
 			</main>
 		</section>
 	);

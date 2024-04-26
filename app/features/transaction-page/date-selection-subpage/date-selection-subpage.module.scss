@@ -2,25 +2,13 @@
 @use "@styles/font";
 @use "@styles/space";
 
-.container {
-	background-color: color.$primary-dark-transparent;
-	width: 100vw;
-	height: 100vh;
-	box-sizing: border-box;
-	padding: 0 space.$s4;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-}
-
 .cancel {
     align-self: flex-start;
     margin-left: calc(0rem - space.$s1-1);
 }
 
 .header {
-	background-color: color.$secondary-dark;
+	background-color: color.$primary-dark;
 	width: 100%;
     display: flex;
     justify-content: space-between;
@@ -52,15 +40,16 @@
 }
 
 .main {
-	background-color: color.$secondary-dark;
+	background-color: color.$primary-dark;
 	color: color.$gray-100;
+	position: relative;
 }
 
 .calendar {
 	width: 100%;
 
 	& tr {
-		height: space.$s12-1;
+		height: space.$s10;
 		& td {
 			width: space.$s12-1;
 			text-align: center;
@@ -88,3 +77,4 @@
 .weekdays {
 	display: flex;
 }
+

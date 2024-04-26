@@ -11,6 +11,7 @@ import { getDateStringFromTimestamp } from "@/utils/date";
 import { PayeeSelectionSubpage } from "./payee-selection-subpage/payee-selection-subpage";
 import { CategorySelectionSubpage } from "./category-selection-subpage/category-selection-subpage";
 import { AccountSelectionSubpage } from "./account-selection-subpage/account-selection-subpage";
+import { DateSelectionSubpage } from "./date-selection-subpage/date-selection-subpage";
 
 export type TransactionPagePropsType = {
 	userID: string;
@@ -41,6 +42,8 @@ export function TransactionPage(props: TransactionPagePropsType) {
 
 	const [subpage, setSubpage] = useState<JSX.Element | null>(null);
 	const [subpageClasses, setSubpageClasses] = useState<string[]>([styles.subpage]);
+	const [isCalendarShown, setIsCalendarShown] = useState<boolean>(false);
+	const [calendarClasses, setCalendarClasses] = useState<string[]>([styles.calendar]);
 
 	const [dataListenerKey, setDataListenerKey] = useState<boolean>(false);
 
@@ -82,6 +85,13 @@ export function TransactionPage(props: TransactionPagePropsType) {
 		}
 		hideSubpage();
 	};
+	const selectDate = (newDate: Date) => {
+		const newTimestamp = Timestamp.fromDate(newDate);
+		if (newTimestamp !== timestamp) {
+			setTimestamp(newTimestamp);
+		}
+		hideDateSelection();
+	};
 
 	const showSubpage = (selectedSubpage: JSX.Element) => {
 		setSubpage(selectedSubpage);
@@ -100,15 +110,21 @@ export function TransactionPage(props: TransactionPagePropsType) {
 	const navigateToAccountSelectionSubpage = () => {
 		showSubpage(<AccountSelectionSubpage selectedAccountID={accountID} accounts={accounts} handleBackClick={hideSubpage} selectAccount={selectAccount} />);
 	};
-	const handleDateOnClick = () => {};
-
+	const showDateSelection = () => {
+		setCalendarClasses([styles.calendar, styles.showCalendar])
+		setIsCalendarShown(true);
+	}
+	const hideDateSelection = () => {
+		setCalendarClasses([styles.calendar, styles.hideCalendar])
+		setIsCalendarShown(false);
+	}
 
 	const handleChangeApprovalState = (event: ChangeEvent<HTMLInputElement>) => {
 		setIsApproved(event.target.checked);
 	};
 	const handleMemoOnChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
 		setMemo(event.currentTarget.value);
-	}
+	};
 
 	// Formatting the transaction.balance for display
 	let balanceString = "";
@@ -152,7 +168,11 @@ export function TransactionPage(props: TransactionPagePropsType) {
 							handleOnClick={navigateToCategorySelectionSubpage}
 						/>
 						<TransactionData key={2} data={getAccountNameByID(accountID, accounts)} categoryName="" type="Account" handleOnClick={navigateToAccountSelectionSubpage} />
-						<TransactionData key={3} data={getDateStringFromTimestamp(timestamp)} categoryName="" type="Date" handleOnClick={handleDateOnClick} />
+						<TransactionData key={3} data={getDateStringFromTimestamp(timestamp)} categoryName="" type="Date" handleOnClick={isCalendarShown ? hideDateSelection : showDateSelection} />
+						<div className={classNames(calendarClasses)}>
+							<DateSelectionSubpage date={timestamp.toDate()} handleBackClick={hideDateSelection} selectDate={selectDate} />
+							<hr className={styles.border} />
+						</div>
 						<button className={styles.otherTransactionData}>
 							<img src={isApproved ? "/icons/cleared.svg" : "/icons/cleared-grey-100.svg"} alt="Cleared icon" />
 							<h2>Cleared</h2>
@@ -165,7 +185,7 @@ export function TransactionPage(props: TransactionPagePropsType) {
 							<img src="/icons/memo-grey-100.svg" alt="Memo icon" />
 							<h2>Memo</h2>
 						</div>
-						<textarea className={styles.memo} placeholder="Enter memo..." onChange={handleMemoOnChange}/>
+						<textarea className={styles.memo} placeholder="Enter memo..." onChange={handleMemoOnChange} />
 					</div>
 				</div>
 			</main>
