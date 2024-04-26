@@ -7,7 +7,7 @@ import { User } from "firebase/auth/cordova";
 import { getSelectedBudget, getUnassignedBalance, updateUnassignedBalance } from "@/firebase/budgets";
 import { getAllocations, updateAssignedAllocation } from "@/firebase/allocations";
 import { getCategories, getSubcategories } from "@/firebase/categories";
-import { getTransactions } from "@/firebase/transactions";
+import { createTransaction, getTransactions } from "@/firebase/transactions";
 import { Account, Allocation, Budget, Category, Subcategory, Transaction } from "@/firebase/models";
 import { Topbar } from "@/features/topbar/topbar";
 import { Unassigned } from "@/features/unassigned";
@@ -92,12 +92,18 @@ export default function BudgetPage() {
 	// Passed to AccountsPage
 	const handleConfirmNewAccount = async (newAccount: Account) => {
 		await createAccount(user!.uid, budget!.id, newAccount);
+		// TODO: update unassigned balance
 	};
 
 	// Passed to CreateTransactionPage
 	const handleCreateTransaction = (newTransaction: Transaction) => {
-		console.log("New transaction created");
-		navigateToBudgetPage();
+		if (newTransaction.categoryID && newTransaction.accountID && newTransaction.date) {
+			createTransaction(user!.uid, budget!.id, newTransaction);
+			// TODO: update unassigned balance
+			navigateToBudgetPage();
+		} else {
+			alert("A transaction requires a selected category, account, and date.")
+		}
 	};
 
 	// Sets user
@@ -240,19 +246,6 @@ export default function BudgetPage() {
 		);
 
 	// User is on Create Transaction Page
-	const newTrans = new Transaction(uuidv4(), Timestamp.fromDate(new Date()), "", "", true, 0, false, "", "", "");
-	const testTrans = new Transaction(
-		uuidv4(),
-		Timestamp.fromDate(new Date()),
-		"Weis Markets",
-		"Eggs, milk, cheese, bread",
-		true,
-		210.57,
-		true,
-		"0b6014d2-64f6-44d7-8fad-de0b5fda5470",
-		"95d402f0-0c53-4573-82a4-a6f273d71e6d",
-		"29b23f08-60f5-4a78-a8a0-baebe9802e05"
-	);
 	page === "Create Transaction" &&
 		pageContent.push(
 			<>
@@ -263,7 +256,7 @@ export default function BudgetPage() {
 					categories={categories}
 					subcategories={subcategories}
 					accounts={accounts}
-					transaction={testTrans}
+					transaction={new Transaction(uuidv4(), Timestamp.fromDate(new Date()), "", "", true, 0, false, "", "", "")}
 					unassignedBalance={budget ? budget.unassignedBalance : 0}
 					handleCreateTransaction={handleCreateTransaction}
 				/>

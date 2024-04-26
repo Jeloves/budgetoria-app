@@ -26,7 +26,6 @@ export type TransactionPagePropsType = {
 
 export function TransactionPage(props: TransactionPagePropsType) {
 	const { userID, budgetID, categories, subcategories, accounts, transaction, unassignedBalance, handleCreateTransaction } = props;
-	const [isApproved, setIsApproved] = useState<boolean>(false);
 	const [timestamp, setTimestamp] = useState<Timestamp>(transaction.date);
 	const [payee, setPayee] = useState<string>(transaction.payee);
 	const [payees, setPayees] = useState<string[]>([]);
@@ -119,8 +118,8 @@ export function TransactionPage(props: TransactionPagePropsType) {
 		setIsCalendarShown(false);
 	}
 
-	const handleChangeApprovalState = (event: ChangeEvent<HTMLInputElement>) => {
-		setIsApproved(event.target.checked);
+	const handleApprovalOnChange = (event: ChangeEvent<HTMLInputElement>) => {
+		setApproval(event.target.checked);
 	};
 	const handleMemoOnChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
 		setMemo(event.currentTarget.value);
@@ -143,7 +142,7 @@ export function TransactionPage(props: TransactionPagePropsType) {
 				<span>Create Transaction</span>
 				<button
 					onClick={() => {
-						handleCreateTransaction(transaction);
+						handleCreateTransaction(new Transaction(transaction.id, timestamp, payee, memo, outflow, balance, approval, accountID, categoryID, subcategoryID));
 					}}
 				>
 					Finish
@@ -174,10 +173,10 @@ export function TransactionPage(props: TransactionPagePropsType) {
 							<hr className={styles.border} />
 						</div>
 						<button className={styles.otherTransactionData}>
-							<img src={isApproved ? "/icons/cleared.svg" : "/icons/cleared-grey-100.svg"} alt="Cleared icon" />
+							<img src={approval ? "/icons/cleared.svg" : "/icons/cleared-grey-100.svg"} alt="Cleared icon" />
 							<h2>Cleared</h2>
 							<label className={styles.switch}>
-								<input type="checkbox" onChange={handleChangeApprovalState} />
+								<input type="checkbox" onChange={handleApprovalOnChange} />
 								<span className={styles.slider} />
 							</label>
 						</button>

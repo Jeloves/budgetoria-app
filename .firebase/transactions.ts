@@ -26,6 +26,24 @@ export async function getTransactions(userID: string, budgetID: string, month: n
 	}
 }
 
+export async function createTransaction(userID: string, budgetID: string, newTransaction: Transaction) {
+	try {
+		await setDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.transactions, newTransaction.id), {
+			date: newTransaction.date,
+			payee: newTransaction.payee,
+			memo: newTransaction.memo,
+			outflow: newTransaction.outflow,
+			balance: newTransaction.balance,
+			approval: newTransaction.approval,
+			accountID: newTransaction.accountID,
+			categoryID: newTransaction.categoryID,
+			subcategoryID: newTransaction.subcategoryID,
+		});
+	} catch (error) {
+		console.error("Failed to add new transaction", error);
+	}
+}
+
 export async function updateTransaction(userID: string, budgetID: string, transaction: Transaction) {
 	try {
 		await setDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.transactions, transaction.id), {
