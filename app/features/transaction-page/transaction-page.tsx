@@ -12,6 +12,7 @@ import { PayeeSelectionSubpage } from "./payee-selection-subpage/payee-selection
 import { CategorySelectionSubpage } from "./category-selection-subpage/category-selection-subpage";
 import { AccountSelectionSubpage } from "./account-selection-subpage/account-selection-subpage";
 import { DateSelectionSubpage } from "./date-selection-subpage/date-selection-subpage";
+import { formatCurrencyBasedOnOutflow } from "@/utils/currency";
 
 export type TransactionPagePropsType = {
 	userID: string;
@@ -26,6 +27,7 @@ export type TransactionPagePropsType = {
 
 export function TransactionPage(props: TransactionPagePropsType) {
 	const { userID, budgetID, categories, subcategories, accounts, transaction, unassignedBalance, handleCreateTransaction } = props;
+	const [dataListenerKey, setDataListenerKey] = useState<boolean>(false);
 	const [timestamp, setTimestamp] = useState<Timestamp>(transaction.date);
 	const [payee, setPayee] = useState<string>(transaction.payee);
 	const [payees, setPayees] = useState<string[]>([]);
@@ -37,14 +39,16 @@ export function TransactionPage(props: TransactionPagePropsType) {
 	const [subcategoryID, setSubcategoryID] = useState<string>(transaction.subcategoryID);
 	const [categoryID, setCategoryID] = useState<string>(transaction.categoryID);
 
-	// Transaction Data
+	// Balance Display
+	const [balanceRenderKey, setBalanceRenderKey] = useState<1 | 0>(0);
+	const [balanceClasses, setBalanceClasses] = useState<string[]>([styles.balance, outflow ? "" : styles.inflow]);
+	const [balanceString, setBalanceString] = useState<string>(formatCurrencyBasedOnOutflow(balance, outflow));
 
+	// Subpage useStates
 	const [subpage, setSubpage] = useState<JSX.Element | null>(null);
 	const [subpageClasses, setSubpageClasses] = useState<string[]>([styles.subpage]);
 	const [isCalendarShown, setIsCalendarShown] = useState<boolean>(false);
 	const [calendarClasses, setCalendarClasses] = useState<string[]>([styles.calendar]);
-
-	const [dataListenerKey, setDataListenerKey] = useState<boolean>(false);
 
 	// Read payees from firebase
 	useEffect(() => {
@@ -55,7 +59,7 @@ export function TransactionPage(props: TransactionPagePropsType) {
 		fetchPayees();
 	}, [budgetID, dataListenerKey, userID]);
 
-	// Subpage Props
+	// Updates Transaction Data
 	const createNewPayee = (newPayee: string) => {
 		// Creates payee doc in firebase
 		createPayee(userID, budgetID, newPayee);
@@ -91,7 +95,35 @@ export function TransactionPage(props: TransactionPagePropsType) {
 		}
 		hideDateSelection();
 	};
+	const handleApprovalOnChange = (event: ChangeEvent<HTMLInputElement>) => {
+		setApproval(event.target.checked);
+	};
+	const handleMemoOnChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+		setMemo(event.currentTarget.value);
+	};
+	// Updates Transaction balance
+	const handleEnterKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+		if (event.key === "Enter") {
+			event.currentTarget.blur();
+		}
+	};
+	const handleInputBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+		let value = event.target.value;
 
+		// Removes non-number characters
+		const nonCurrencyRegex = /[^0-9.]/g;
+		value = value.replace(nonCurrencyRegex, "");
+
+		// If still not a valid number, sets to 0
+		const isValidNumber = !isNaN(parseFloat(value));
+		const newBalance = isValidNumber ? parseFloat(value) * 1000000 : 0;
+		
+		setBalance(newBalance);
+		setBalanceString(formatCurrencyBasedOnOutflow(newBalance, outflow));
+		setBalanceRenderKey(balanceRenderKey === 0 ? 1 : 0);
+	};
+
+	// Subpage Navigation
 	const showSubpage = (selectedSubpage: JSX.Element) => {
 		setSubpage(selectedSubpage);
 		setSubpageClasses([styles.subpage, styles.show]);
@@ -110,31 +142,13 @@ export function TransactionPage(props: TransactionPagePropsType) {
 		showSubpage(<AccountSelectionSubpage selectedAccountID={accountID} accounts={accounts} handleBackClick={hideSubpage} selectAccount={selectAccount} />);
 	};
 	const showDateSelection = () => {
-		setCalendarClasses([styles.calendar, styles.showCalendar])
+		setCalendarClasses([styles.calendar, styles.showCalendar]);
 		setIsCalendarShown(true);
-	}
+	};
 	const hideDateSelection = () => {
-		setCalendarClasses([styles.calendar, styles.hideCalendar])
+		setCalendarClasses([styles.calendar, styles.hideCalendar]);
 		setIsCalendarShown(false);
-	}
-
-	const handleApprovalOnChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setApproval(event.target.checked);
 	};
-	const handleMemoOnChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-		setMemo(event.currentTarget.value);
-	};
-
-	// Formatting the transaction.balance for display
-	let balanceString = "";
-	let balanceClass = "";
-	if (transaction.balance < 0) {
-		balanceString = "-$" + (transaction.balance / 1000000).toFixed(2);
-		balanceClass = "";
-	} else {
-		balanceString = "$" + (transaction.balance / 1000000).toFixed(2);
-		balanceClass = "";
-	}
 
 	return (
 		<>
@@ -149,12 +163,28 @@ export function TransactionPage(props: TransactionPagePropsType) {
 				</button>
 			</header>
 			<main className={styles.main}>
-				<div className={styles.balance}>
+				<div className={classNames(balanceClasses)}>
 					<div>
-						<button>- Outflow</button>
-						<button>- Inflow</button>
+						<button
+							className={outflow ? styles.flow : ""}
+							onClick={() => {
+								setOutflow(true);
+								setBalanceClasses([styles.balance])
+							}}
+						>
+							- Outflow
+						</button>
+						<button
+							className={outflow ? "" : styles.flow}
+							onClick={() => {
+								setOutflow(false);
+								setBalanceClasses([styles.balance, styles.inflow])
+							}}
+						>
+							+ Inflow
+						</button>
 					</div>
-					<input type="text" defaultValue={balanceString} className={balanceClass} />
+					<input key={balanceRenderKey} type="text" defaultValue={balanceString} onKeyDown={handleEnterKeyDown} onBlur={handleInputBlur} />
 				</div>
 				<div className={styles.contentContainer}>
 					<div className={styles.content}>

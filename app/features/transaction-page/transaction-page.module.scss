@@ -66,6 +66,11 @@
 		& button {
 			width: 50%;
 			border: space.$s0-1 solid color.$gray-400;
+			color: color.$gray-100;
+		}
+
+		& .flow {
+			background-color: color.$primary-dark;
 		}
 	}
 
@@ -75,6 +80,9 @@
 		font: font.$text-large;
 		color: white;
 	}
+}
+.inflow {
+	background-color: color.$green-500;
 }
 
 .contentContainer {
