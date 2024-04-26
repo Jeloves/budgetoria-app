@@ -37,7 +37,7 @@
     background-color: color.$primary-dark;
     box-sizing: border-box;
     padding: space.$s2;
-    margin: 8px 8px;
+    margin: space.$s2 space.$s2;
     border-radius: space.$s4;
 
     & input[type="text"] {

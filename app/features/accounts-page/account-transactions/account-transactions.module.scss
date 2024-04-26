@@ -123,8 +123,8 @@
 		justify-content: center;
 
 		& span {
-			height: 16px;
-			width: 16px;
+			height: space.$s4;
+			width: space.$s4;
 			border: space.$s0-1 solid white;
 			border-radius: 50%;
 		}
@@ -147,8 +147,8 @@
 		justify-content: flex-end;
 		gap: space.$s2;
 		& img {
-			height: 14px;
-			width: 14px;
+			height: space.$s3-1;
+			width: space.$s3-1;
 		}
 	}
 	& .initial {

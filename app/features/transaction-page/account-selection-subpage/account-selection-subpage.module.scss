@@ -53,8 +53,8 @@
 	gap: space.$s2;
 
 	& .selected {
-		width: 25px;
-		height: 25px;
+		width: space.$s6-0;
+		height: space.$s6-0;
 
 		& img {
 			visibility: hidden;

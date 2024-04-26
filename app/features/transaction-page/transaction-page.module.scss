@@ -46,14 +46,14 @@
 
 .balance {
 	background-color: color.$gray-500;
-	padding-top: 16px;
-	padding-right: 16px;
-	padding-bottom: 32px;
-	padding-left: 16px;
+	padding-top: space.$s4;
+	padding-right: space.$s4;
+	padding-bottom: space.$s8;
+	padding-left: space.$s4;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 16px;
+	gap: space.$s4;
 
 	& div {
 		width: 80%;
@@ -61,7 +61,7 @@
 		display: flex;
 		justify-content: center;
 		border: space.$s0-1 solid color.$gray-400;
-		border-radius: 4px;
+		border-radius: space.$s1;
 
 		& button {
 			width: 50%;
@@ -131,7 +131,7 @@
 		padding: 0;
 		margin: 0;
 		margin-top: space.$s2;
-		margin-left: calc(24px + 20px); // Width of icon within TransactionData
+		margin-left: calc(space.$s6 + space.$s5); // Width of icon within TransactionData
 		grid-area: border;
 		background-color: color.$gray-500;
 		height: space.$s0-1;
@@ -198,7 +198,7 @@
 
 .memo {
 	background-color: color.$primary-dark;
-	min-height: 100px;
+	min-height: space.$s25;
 	box-sizing: border-box;
 	margin-right: space.$s3;
 	margin-left: calc(space.$s3 + space.$s5 + space.$s3);
