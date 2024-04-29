@@ -1,8 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 import classNames from "classnames";
 import styles from "./accounts-page.module.scss";
-import { Account, Transaction } from "@/firebase/models";
-import { ChangeEvent, useState } from "react";
+import { Account, Subcategory, Transaction } from "@/firebase/models";
+import { ChangeEvent, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { IconButton } from "../ui";
 import { AccountTransactionsSubpage } from "./account-transactions-subpage/account-transactions-subpage";
@@ -29,6 +29,18 @@ export function AccountsPage(props: AccountsPagePropsType) {
 		})
 	);
 
+	// Checks for unfinished transactions
+	useEffect(() => {
+		const unfinished: Transaction[] = [];
+		for (let transaction of transactions) {
+			// A transaction is unfinished if it has no associated payee, account, category, or subcategory.
+			if (transaction.payee === "" || transaction.accountID === "" || transaction.categoryID === "" || transaction.subcategoryID === "") {
+				unfinished.push(transaction);
+			}
+		}
+		setUnfinishedTransactions(unfinished);
+	}, [transactions]);
+
 	const [newAccountData, setNewAccountData] = useState<NewAccountData>({ name: "", initialBalance: 0 });
 	const [accountsPageRenderKey, setAccountsPageRenderKey] = useState<0 | 1>(0);
 	const [initialBalanceRenderKey, setInitialBalanceRenderKey] = useState<0 | 1>(0);
@@ -44,19 +56,14 @@ export function AccountsPage(props: AccountsPagePropsType) {
 		setSubpage(null);
 		setSubpageClasses([styles.subpage, styles.hide]);
 	};
-	const navigateToUnfinishedTransactionsSubpage = () => {
-	};
-	const navigateToAllTransactionsSubpage = () => {
-
-	};
+	const navigateToUnfinishedTransactionsSubpage = () => {};
+	const navigateToAllTransactionsSubpage = () => {};
 	const navigateToAccountTransactionsSubpage = (selectedAccount: Account, selectedTransactions: Transaction[]) => {
-		const clearedTransactions = selectedTransactions.filter(transaction => transaction.approval);
-		const unclearedTransactions = selectedTransactions.filter(transaction => !transaction.approval)
-		showSubpage(<AccountTransactionsSubpage subcategories={subcategories} account={selectedAccount} clearedTransactions={clearedTransactions} unclearedTransactions={unclearedTransactions}/>)
+		const clearedTransactions = selectedTransactions.filter((transaction) => transaction.approval);
+		const unclearedTransactions = selectedTransactions.filter((transaction) => !transaction.approval);
+		showSubpage(<AccountTransactionsSubpage subcategories={subcategories} account={selectedAccount} clearedTransactions={clearedTransactions} unclearedTransactions={unclearedTransactions} handleBackClick={hideSubpage} />);
 	};
-	const navigateToCreateAccountSubpage = () => {
-
-	};
+	const navigateToCreateAccountSubpage = () => {};
 
 	const handleNewAccountNameBlur = (event: ChangeEvent<HTMLInputElement>) => {
 		const newName = event.target.value;
@@ -167,10 +174,12 @@ export function AccountsPage(props: AccountsPagePropsType) {
 			<header className={styles.header}>Accounts</header>
 			<main key={accountsPageRenderKey} className={styles.main}>
 				<div className={styles.subpageButtonContainer}>
-					<button className={styles.subpageButton} onClick={navigateToUnfinishedTransactionsSubpage}>
-						New Transactions
-						<img src="/icons/arrow-right.svg" alt="Button to add accounts" />
-					</button>
+					{unfinishedTransactions.length > 0 && (
+						<button className={styles.subpageButton} onClick={navigateToUnfinishedTransactionsSubpage}>
+							New Transactions
+							<img src="/icons/arrow-right.svg" alt="Button to add accounts" />
+						</button>
+					)}
 					<button className={styles.subpageButton} onClick={navigateToAllTransactionsSubpage}>
 						All Accounts
 						<img src="/icons/arrow-right.svg" alt="Button to add accounts" />
