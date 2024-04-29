@@ -1,0 +1,149 @@
+@use "@styles/color";
+@use "@styles/font";
+@use "@styles/space";
+@use "@styles/header";
+@use "@styles/main";
+
+.accountTransactions {
+	width: 100%;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+.header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.main {
+	background-color: color.$secondary-dark;
+	color: color.$gray-100;
+
+	& .date {
+		box-sizing: border-box;
+		padding: space.$s2;
+		background-color: color.$secondary-dark;
+		border-bottom: space.$s0-1 solid color.$gray-500;
+	}
+
+	& .transaction {
+		background-color: color.$primary-dark;
+		box-sizing: border-box;
+		padding: space.$s2;
+		width: 100%;
+		border-bottom: space.$s0-1 solid color.$gray-500;
+		display: grid;
+		grid-template-columns: 0.1fr 0.6fr 0.3fr;
+		grid-template-areas:
+			"select payee balance"
+			"select subcategory balance";
+
+		& > * {
+			display: flex;
+			align-items: center;
+		}
+	}
+
+	& .select {
+		box-sizing: border-box;
+		margin-left: calc(0rem - space.$s4);
+		grid-area: select;
+		justify-content: center;
+
+		& span {
+			height: space.$s4;
+			width: space.$s4;
+			border: space.$s0-1 solid white;
+			border-radius: 50%;
+		}
+	}
+
+	& .payee {
+		grid-area: payee;
+	}
+
+	& .subcategory {
+		box-sizing: border-box;
+		padding-top: space.$s1;
+		grid-area: subcategory;
+		color: color.$gray-500;
+		font-size: small;
+	}
+
+	& .balance {
+		grid-area: balance;
+		justify-content: flex-end;
+		gap: space.$s2;
+		& img {
+			height: space.$s3-1;
+			width: space.$s3-1;
+		}
+	}
+	& .initial {
+		color: color.$green;
+	}
+}
+
+.balances {
+	height: space.$s15;
+	padding: 0 space.$s2-1;
+	box-sizing: border-box;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-template-areas:
+		"totalLabel cleared"
+		"totalBalance uncleared";
+
+	& > * {
+		display: flex;
+		align-items: center;
+	}
+
+	& .totalLabel {
+		grid-area: totalLabel;
+	}
+
+	& .totalBalance {
+		grid-area: totalBalance;
+	}
+
+	& .cleared {
+		grid-area: cleared;
+		justify-content: space-between;
+	}
+
+	& .uncleared {
+		grid-area: uncleared;
+		justify-content: space-between;
+	}
+}
+
+.filter {
+    display: flex;
+    gap: space.$s2;
+    background-color: color.$primary-dark;
+    box-sizing: border-box;
+    padding: space.$s2;
+    margin: space.$s2 space.$s2;
+    border-radius: space.$s4;
+
+	& img {
+		width: space.$s5;
+		height: space.$s5;
+	}
+
+    & input[type="text"] {
+		padding: 0;
+		outline: none;
+		background: none;
+		font: font.$text-regular;
+		color: color.$gray-100;
+        flex: 1;
+	}
+
+	& input::placeholder {
+		color: color.$gray-300;
+	}
+}
