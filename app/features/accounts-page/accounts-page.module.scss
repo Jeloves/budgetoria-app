@@ -3,6 +3,7 @@
 @use "@styles/space";
 @use "@styles/header";
 @use "@styles/main";
+@use "@styles/subpage";
 
 .header {
 	justify-content: center;
@@ -22,23 +23,23 @@
 	font-weight: bold;
 }
 
-.accountButtons {
+.subpageButtonContainer {
 	padding: space.$s2;
 	display: flex;
 	flex-direction: column;
 	gap: space.$s2;
+}
 
-	& button {
-		width: 100%;
-		color: white;
-		background-color: color.$gray-500;
-		padding: space.$s2 space.$s2;
-		border: 0;
-		border-radius: space.$s1;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
+.subpageButton {
+	width: 100%;
+	color: white;
+	background-color: color.$gray-500;
+	padding: space.$s2 space.$s2;
+	border: 0;
+	border-radius: space.$s1;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 
 	& img {
 		width: space.$s5;
@@ -56,27 +57,6 @@
 	flex-direction: column;
 	color: white;
 
-	& header {
-		height: space.$s15;
-		background-color: color.$secondary-dark;
-		border-bottom: space.$s0-1 solid color.$gray-500;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 0 space.$s2;
-
-		& button {
-			color: white;
-            font-size: space.$s4;
-		}
-        & .cancel {
-            color: red;
-        }
-        & .done {
-            color: color.$green;
-        }
-	}
-
 	& div {
 		display: flex;
 		flex-direction: column;
@@ -90,34 +70,10 @@
 			background: none;
 			font: inherit;
 			color: white;
-            border: space.$s0-1 solid color.$gray-500;
-            border-radius: space.$s1;
-            padding: space.$s2;
+			border: space.$s0-1 solid color.$gray-500;
+			border-radius: space.$s1;
+			padding: space.$s2;
 		}
 	}
 }
 
-.displayAddAccount {
-	animation: growAnimation 0.5s forwards;
-}
-.hideAddAccount {
-	animation: shrinkAnimation 0.5s forwards;
-}
-
-@keyframes growAnimation {
-	0% {
-		height: 0;
-	}
-	100% {
-		height: 100vh;
-	}
-}
-
-@keyframes shrinkAnimation {
-	0% {
-		height: 100vh;
-	}
-	100% {
-		height: 0;
-	}
-}

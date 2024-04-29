@@ -1,12 +1,16 @@
+/* eslint-disable @next/next/no-img-element */
 import classNames from "classnames";
 import styles from "./accounts-page.module.scss";
-import { Account } from "@/firebase/models";
+import { Account, Transaction } from "@/firebase/models";
 import { ChangeEvent, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { IconButton } from "../ui";
+import { AccountTransactionsSubpage } from "./account-transactions-subpage/account-transactions-subpage";
 
 export type AccountsPagePropsType = {
 	accounts: Account[];
+	subcategories: Subcategory[];
+	transactions: Transaction[];
 	handleConfirmNewAccount: (newAccount: Account) => void;
 };
 
@@ -16,13 +20,42 @@ type NewAccountData = {
 };
 
 export function AccountsPage(props: AccountsPagePropsType) {
-	const { accounts, handleConfirmNewAccount } = props;
+	const { subcategories, handleConfirmNewAccount } = props;
+	const [accounts, setAccounts] = useState<Account[]>(props.accounts);
+	const [transactions, setTransactions] = useState<Transaction[]>(props.transactions);
+	const [unfinishedTransactions, setUnfinishedTransactions] = useState<Transaction[]>(
+		props.transactions.filter((transaction) => {
+			return transaction.accountID === "" || transaction.categoryID === "" || transaction.subcategoryID === "" || transaction.payee === "";
+		})
+	);
+
 	const [newAccountData, setNewAccountData] = useState<NewAccountData>({ name: "", initialBalance: 0 });
 	const [accountsPageRenderKey, setAccountsPageRenderKey] = useState<0 | 1>(0);
 	const [initialBalanceRenderKey, setInitialBalanceRenderKey] = useState<0 | 1>(0);
 
-	const viewTransactionsClick = () => {
-		alert("viewing transactions");
+	const [subpage, setSubpage] = useState<JSX.Element | null>(null);
+	const [subpageClasses, setSubpageClasses] = useState<string[]>([styles.subpage]);
+
+	const showSubpage = (selectedSubpage: JSX.Element) => {
+		setSubpage(selectedSubpage);
+		setSubpageClasses([styles.subpage, styles.show]);
+	};
+	const hideSubpage = () => {
+		setSubpage(null);
+		setSubpageClasses([styles.subpage, styles.hide]);
+	};
+	const navigateToUnfinishedTransactionsSubpage = () => {
+	};
+	const navigateToAllTransactionsSubpage = () => {
+
+	};
+	const navigateToAccountTransactionsSubpage = (selectedAccount: Account, selectedTransactions: Transaction[]) => {
+		const clearedTransactions = selectedTransactions.filter(transaction => transaction.approval);
+		const unclearedTransactions = selectedTransactions.filter(transaction => !transaction.approval)
+		showSubpage(<AccountTransactionsSubpage subcategories={subcategories} account={selectedAccount} clearedTransactions={clearedTransactions} unclearedTransactions={unclearedTransactions}/>)
+	};
+	const navigateToCreateAccountSubpage = () => {
+
 	};
 
 	const handleNewAccountNameBlur = (event: ChangeEvent<HTMLInputElement>) => {
@@ -81,18 +114,27 @@ export function AccountsPage(props: AccountsPagePropsType) {
 		}
 	};
 
+	// Creates list of accounts
 	const accountItems: JSX.Element[] = [];
 	let totalAccountBalance = 0;
 	for (let i = 0; i < accounts.length; i++) {
 		const account = accounts[i];
+		const filteredTransactions = transactions.filter((transaction) => transaction.accountID === account.id);
 		totalAccountBalance += account.balance;
 		accountItems.push(
-			<div key={`account_item_${i}`} className={styles.accountItem}>
+			<div
+				key={`account_item_${i}`}
+				className={styles.accountItem}
+				onClick={() => {
+					navigateToAccountTransactionsSubpage(account, filteredTransactions);
+				}}
+			>
 				<span key={`account_item_name_${i}`}>{account.name}</span>
 				<span key={`account_item_balance_${i}`}>${(account.balance / 1000000).toFixed(2)}</span>
 			</div>
 		);
 	}
+	// Adds "Budget" heading for list of accounts
 	accountItems.unshift(
 		<div key={"total_item_0"} className={classNames(styles.accountItem, styles.totalItem)}>
 			<span key={"total_item_name_0"}>Budget</span>
@@ -124,21 +166,26 @@ export function AccountsPage(props: AccountsPagePropsType) {
 		<>
 			<header className={styles.header}>Accounts</header>
 			<main key={accountsPageRenderKey} className={styles.main}>
-				{addAccountElement}
-				{accountItems}
-				<div className={styles.accountButtons}>
-					<button onClick={handleShowAddAccountElement}>
-						Add Accounts
-						{/*eslint-disable-next-line @next/next/no-img-element*/}
+				<div className={styles.subpageButtonContainer}>
+					<button className={styles.subpageButton} onClick={navigateToUnfinishedTransactionsSubpage}>
+						New Transactions
 						<img src="/icons/arrow-right.svg" alt="Button to add accounts" />
 					</button>
-					<button>
-						Closed Accounts
-						{/*eslint-disable-next-line @next/next/no-img-element*/}
-						<img src="/icons/arrow-right.svg" alt="Button to show closed accounts" />
+					<button className={styles.subpageButton} onClick={navigateToAllTransactionsSubpage}>
+						All Accounts
+						<img src="/icons/arrow-right.svg" alt="Button to add accounts" />
+					</button>
+				</div>
+
+				{accountItems}
+				<div className={styles.subpageButtonContainer}>
+					<button className={styles.subpageButton} onClick={navigateToCreateAccountSubpage}>
+						Add Accounts
+						<img src="/icons/arrow-right.svg" alt="Button to add accounts" />
 					</button>
 				</div>
 			</main>
+			<section className={classNames(subpageClasses)}>{subpage}</section>
 		</>
 	);
 }

@@ -31,6 +31,7 @@ export default function BudgetPage() {
 	const [allocations, setAllocations] = useState<Allocation[]>([]);
 	const [categories, setCategories] = useState<Category[]>([]);
 	const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
+	const [transactions, setTransactions] = useState<Transaction[]>([]);
 	const [clearedTransactions, setClearedTransactions] = useState<Transaction[]>([]);
 	const [unclearedTransactions, setUnclearedTransactions] = useState<Transaction[]>([]);
 
@@ -171,6 +172,7 @@ export default function BudgetPage() {
 				setCategories(categoryData);
 				setSubcategories(subcategoryData);
 				setAllocations(allocationData);
+				setTransactions(transactionData);
 				setClearedTransactions(clearedTransactionData);
 				setUnclearedTransactions(unclearedTransactions);
 				setIsLoading(false);
@@ -233,7 +235,7 @@ export default function BudgetPage() {
 	page === "Accounts" &&
 		pageContent.push(
 			<>
-				<AccountsPage key={"accountsPage"} accounts={accounts} handleConfirmNewAccount={handleConfirmNewAccount} />
+				<AccountsPage key={"accountsPage"} accounts={accounts} subcategories={subcategories} transactions={transactions} handleConfirmNewAccount={handleConfirmNewAccount} />
 			</>
 		);
 
