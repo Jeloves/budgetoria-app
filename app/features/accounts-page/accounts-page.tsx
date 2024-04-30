@@ -8,16 +8,12 @@ import { IconButton } from "../ui";
 import { AccountTransactionsSubpage } from "./account-transactions-subpage/account-transactions-subpage";
 import { createAccount, getAccounts } from "@/firebase/accounts";
 import { CreateAccountSubpage } from "./create-account-subpage/create-account-subpage";
-import { read } from "fs";
 import { getTransactions } from "@/firebase/transactions";
 
 export type AccountsPagePropsType = {
 	userID: string;
 	budgetID: string;
-	accounts: Account[];
 	subcategories: Subcategory[];
-	transactions: Transaction[];
-	handleConfirmNewAccount: (newAccount: Account) => void;
 };
 
 type NewAccountData = {
@@ -28,22 +24,17 @@ type NewAccountData = {
 export function AccountsPage(props: AccountsPagePropsType) {
 	const { userID, budgetID, subcategories } = props;
 	const [accountsDataKey, setAccountsDataKey] = useState<boolean>(false);
+	const [transactionsDataKey, setTransactionsDataKey] = useState<boolean>(false);
 	const [accounts, setAccounts] = useState<Account[]>([]);
 	const [transactions, setTransactions] = useState<Transaction[]>([]);
-	const [unfinishedTransactions, setUnfinishedTransactions] = useState<Transaction[]>(
-		props.transactions.filter((transaction) => {
-			return transaction.accountID === "" || transaction.categoryID === "" || transaction.subcategoryID === "" || transaction.payee === "";
-		})
-	);
-
-
+	const [unfinishedTransactions, setUnfinishedTransactions] = useState<Transaction[]>([]);
 
 	// Retrieves accounts
 	useEffect(() => {
 		const fetchData = async () => {
 			const accountsData = await getAccounts(userID, budgetID);
-			setAccounts(accountsData)
-		}
+			setAccounts(accountsData);
+		};
 		fetchData();
 	}, [accountsDataKey, budgetID, userID]);
 
@@ -52,22 +43,19 @@ export function AccountsPage(props: AccountsPagePropsType) {
 		const fetchData = async () => {
 			const transactionsData = await getTransactions(userID, budgetID);
 			setTransactions(transactionsData);
-		}
-		fetchData();
-	}, [accountsDataKey, budgetID, userID]);
 
-
-	// Checks for unfinished transactions
-	useEffect(() => {
-		const unfinished: Transaction[] = [];
-		for (let transaction of transactions) {
+			// Sets unfinished transactions
 			// A transaction is unfinished if it has no associated payee, account, category, or subcategory.
-			if (transaction.payee === "" || transaction.accountID === "" || transaction.categoryID === "" || transaction.subcategoryID === "") {
-				unfinished.push(transaction);
+			const unfinishedTransactions: Transaction[] = [];
+			for (let transaction of transactionsData) {
+				if (transaction.payee === "" || transaction.accountID === "" || transaction.categoryID === "" || transaction.subcategoryID === "") {
+					unfinishedTransactions.push(transaction);
+				}
 			}
-		}
-		setUnfinishedTransactions(unfinished);
-	}, [transactions]);
+			setUnfinishedTransactions(unfinishedTransactions)
+		};
+		fetchData();
+	}, [transactionsDataKey, budgetID, userID]);
 
 
 	const [accountsPageRenderKey, setAccountsPageRenderKey] = useState<0 | 1>(0);
@@ -76,10 +64,10 @@ export function AccountsPage(props: AccountsPagePropsType) {
 	const [subpageClasses, setSubpageClasses] = useState<string[]>([styles.subpage]);
 
 	const handleCreateAccount = (newAccount: Account) => {
-		createAccount(userID, budgetID, newAccount)
+		createAccount(userID, budgetID, newAccount);
 		setAccountsDataKey(!accountsDataKey);
-		hideSubpage()
-	}
+		hideSubpage();
+	};
 
 	const showSubpage = (selectedSubpage: JSX.Element) => {
 		setSubpage(selectedSubpage);
@@ -93,7 +81,7 @@ export function AccountsPage(props: AccountsPagePropsType) {
 	const navigateToAllTransactionsSubpage = () => {
 		const clearedTransactions = transactions.filter((transaction) => transaction.approval);
 		const unclearedTransactions = transactions.filter((transaction) => !transaction.approval);
-		showSubpage(<AccountTransactionsSubpage subcategories={subcategories} account={selectedAccount}  handleBackClick={hideSubpage} />);
+		showSubpage(<AccountTransactionsSubpage subcategories={subcategories} account={selectedAccount} handleBackClick={hideSubpage} />);
 	};
 	const navigateToAccountTransactionsSubpage = (selectedAccount: Account, selectedTransactions: Transaction[]) => {
 		const clearedTransactions = selectedTransactions.filter((transaction) => transaction.approval);
@@ -101,7 +89,7 @@ export function AccountsPage(props: AccountsPagePropsType) {
 		showSubpage(<AccountTransactionsSubpage subcategories={subcategories} account={selectedAccount} clearedTransactions={clearedTransactions} unclearedTransactions={unclearedTransactions} handleBackClick={hideSubpage} />);
 	};
 	const navigateToCreateAccountSubpage = () => {
-		showSubpage(<CreateAccountSubpage handleBackClick={hideSubpage} handleCreateAccount={handleCreateAccount}/>);
+		showSubpage(<CreateAccountSubpage handleBackClick={hideSubpage} handleCreateAccount={handleCreateAccount} />);
 	};
 
 	// Creates list of accounts
