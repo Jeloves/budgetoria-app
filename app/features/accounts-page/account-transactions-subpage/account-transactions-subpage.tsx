@@ -118,17 +118,14 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 			const filtered = transactions.filter((transaction) => {
 				// Filter for category
 				if (getCategoryNameByID(transaction.categoryID, categories).includes(filter)) {
-					console.log("Category Filter hit", transaction);
 					return transaction;
 				}
 				// Filter for subcategory
 				else if (getSubcategoryNameByID(transaction.subcategoryID, subcategories).includes(filter)) {
-					console.log("Subcategory Filter hit", transaction);
 					return transaction;
 				}
 				// Filter for payee
 				else if (transaction.payee.includes(filter)) {
-					console.log("Payee Filter hit", transaction);
 					return transaction;
 				}
 				// Filter for date
@@ -143,12 +140,10 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 						})
 						.includes(filter)
 				) {
-					console.log("Date Filter hit", transaction);
 					return transaction;
 				}
 				// Filter for transaction balance
 				else if ((transaction.balance / 1000000).toFixed(2).toString().includes(filter)) {
-					console.log("Balance Filter hit", transaction);
 					return transaction;
 				}
 			});
@@ -177,7 +172,6 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 
 		// Grouping transactions by date in descending order
 		const allTransactions = filteredTransactions.concat(initialTransactions);
-		console.log("amount of transactions", allTransactions.length);
 		allTransactions.sort((a, b) => b.date.toMillis() - a.date.toMillis());
 		const newDateTransactionsMap: DateTransactionsMap = new Map();
 		for (const transaction of allTransactions) {
