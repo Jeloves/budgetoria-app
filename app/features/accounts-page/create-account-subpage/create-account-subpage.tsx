@@ -1,6 +1,6 @@
 import { IconButton } from "@/features/ui";
 import styles from "./create-account-subpage.module.scss";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useState } from "react";
 
 export type CreateAccountSubpagePropsType = {
 	handleBackClick: () => void;
@@ -10,28 +10,12 @@ export type CreateAccountSubpagePropsType = {
 export function CreateAccountSubpage(props: CreateAccountSubpagePropsType) {
 	const { handleBackClick, createAccount } = props;
 
+	const [name, setName] = useState<string>("");
+	const [initialBalance, setInitialBalance] = useState<number>(0);
+
 	const handleNewAccountNameBlur = (event: ChangeEvent<HTMLInputElement>) => {
 		const newName = event.target.value;
 
-	};
-	const handleNewAccountInitialBalanceBlur = (event: React.FocusEvent<HTMLInputElement>) => {
-		let newInitialBalance = event.target.value;
-		// Removes currency string if present
-		if (newInitialBalance.includes("$")) {
-			newInitialBalance = newInitialBalance.replace("$", "");
-		}
-		// Removes non-number characters
-		const nonCurrencyRegex = /[^0-9.]/g;
-		newInitialBalance = newInitialBalance.replace(nonCurrencyRegex, "");
-		const isValidNumber = !isNaN(parseFloat(newInitialBalance));
-
-		const currentName = newAccountData.name;
-		if (isValidNumber) {
-			setNewAccountData({ name: currentName, initialBalance: parseFloat(newInitialBalance) * 1000000 });
-		} else {
-			setNewAccountData({ name: currentName, initialBalance: 0 });
-		}
-		setInitialBalanceRenderKey(initialBalanceRenderKey === 0 ? 1 : 0);
 	};
 	const handleEnterKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
 		if (event.key === "Enter") {
@@ -42,6 +26,10 @@ export function CreateAccountSubpage(props: CreateAccountSubpagePropsType) {
 		createAccount();
 	};
 
+	const handleNameOnChange = (event: ChangeEvent<HTMLInputElement>) => {
+		let newName = event.target.value;
+		setName(newName);
+	}
 	const handleInitialBalanceOnChange = (event: ChangeEvent<HTMLInputElement>) => {
 		let newInitialBalance = event.target.value;
 
@@ -58,7 +46,13 @@ export function CreateAccountSubpage(props: CreateAccountSubpagePropsType) {
 			newInitialBalance = substringBeforeDecimal + "." + substringAfterDecimalReplaced;
 		}
 
-		event.target.value = newInitialBalance;
+		if (newInitialBalance === "") {
+			event.target.value = "";
+			setInitialBalance(0)
+		} else {
+			event.target.value = "$" + newInitialBalance;
+			setInitialBalance(parseFloat(newInitialBalance) * 1000000);
+		}
 	}
 
 	return (
@@ -72,9 +66,9 @@ export function CreateAccountSubpage(props: CreateAccountSubpagePropsType) {
 			</header>
 			<main className={styles.main}>
 				<label>Enter a name for the account</label>
-				<input type="text" placeholder="Account name..." required onBlur={handleNewAccountNameBlur} onKeyDown={handleEnterKeyDown} />
+				<input type="text" placeholder="Account name..." required onChange={handleNameOnChange}/>
 				<label>Enter the starting balance for the account</label>
-				<input type="text" placeholder="$0.00" required onBlur={handleNewAccountInitialBalanceBlur} onKeyDown={handleEnterKeyDown} onChange={handleInitialBalanceOnChange}/>
+				<input type="text" placeholder="$0.00" required onKeyDown={handleEnterKeyDown} onChange={handleInitialBalanceOnChange}/>
 			</main>
 		</>
 	);
