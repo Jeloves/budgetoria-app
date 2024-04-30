@@ -20,6 +20,7 @@ export function CreateAccountSubpage(props: CreateAccountSubpagePropsType) {
 		let newName = event.target.value;
 		setName(newName);
 	}
+	// TODO - Implement ability to add a negative initial balance
 	const handleInitialBalanceOnChange = (event: ChangeEvent<HTMLInputElement>) => {
 		let newInitialBalance = event.target.value;
 

@@ -9,15 +9,18 @@ const budget = new Budget(uuidv4(), "My Budget", Timestamp.fromDate(budgetCreati
 
 // Accounts
 const initialBalance_checkings: number = 8500;
-const account_checkings = new Account(uuidv4(), "Checkings", initialBalance_checkings * 1000000, initialBalance_checkings * 1000000);
+const timestamp_checkings = Timestamp.fromDate(budgetCreationDate);
+const account_checkings = new Account(uuidv4(), "Checkings", timestamp_checkings, initialBalance_checkings * 1000000, initialBalance_checkings * 1000000);
 budget.unassignedBalance += account_checkings.balance;
 
 const initialBalance_credit: number = 0;
-const account_credit = new Account(uuidv4(), "Credit", initialBalance_credit * 1000000, initialBalance_credit * 1000000);
+const timestamp_credit = Timestamp.fromDate(budgetCreationDate);
+const account_credit = new Account(uuidv4(), "Credit", timestamp_credit, initialBalance_credit * 1000000, initialBalance_credit * 1000000);
 budget.unassignedBalance += account_credit.balance;
 
 const initialBalance_savings: number = 2500;
-const account_savings = new Account(uuidv4(), "Savings", initialBalance_savings * 1000000, initialBalance_savings * 1000000);
+const timestamp_savings = Timestamp.fromDate(new Date(2024, 0, 5));
+const account_savings = new Account(uuidv4(), "Savings", timestamp_savings, initialBalance_savings * 1000000, initialBalance_savings * 1000000);
 budget.unassignedBalance += account_savings.balance;
 
 // Categories
@@ -85,27 +88,44 @@ const payees = [
 
 /* January */
 const timestamp_january1 = Timestamp.fromDate(new Date(2024, 0, 1));
-const timestamp_january10 = Timestamp.fromDate(new Date(2024, 0, 1));
-const timestamp_january20 = Timestamp.fromDate(new Date(2024, 0, 1));
+const timestamp_january5 = Timestamp.fromDate(new Date(2024, 0, 5));
+const timestamp_january10 = Timestamp.fromDate(new Date(2024, 0, 10));
+const timestamp_january15 = Timestamp.fromDate(new Date(2024, 0, 15));
+const timestamp_january20 = Timestamp.fromDate(new Date(2024, 0, 20));
+const timestamp_january25 = Timestamp.fromDate(new Date(2024, 0, 25));
+const timestamp_january30 = Timestamp.fromDate(new Date(2024, 0, 30));
 
 const transactionBalance_food_january = 287.65;
 const transactionBalance_gas_january = 44.77;
 const transactionBalance_studentLoans_january = 250;
 const transactionBalance_iceCream_january = 11.45;
-const transactionBalance_weed_january = 125.38;
+const transactionBalance_weed_january = 35.38;
 const transactionBalance_videoGames_january = 80.54;
 const transactionBalance_crunchyroll_january = 11.99;
 const transactionBalance_netflix_january = 13.99;
 const transactionBalance_nordVPN_january = 9.97;
-/*
-const transaction_food_january = new Transaction(uuidv4(), timestamp_january1, "Weis Markets", "Groceries", true, transactionBalance_food_january * 1000000, true,);
-const transaction_gas_january = new Transaction();
-const transaction_studentLoans_january = new Transaction();
-const transaction_iceCream_january = new Transaction();
-const transaction_weed_january = new Transaction();
-const transaction_videoGames_january = new Transaction();
-const transaction_crunchyroll_january = new Transaction();
-const transaction_netflix_january = new Transaction();
-const transaction_nordVPN_january = new Transaction();
-*/
 
+// Cleared, Credit, Outflow, Essential, Food
+const transaction_food_january = new Transaction(uuidv4(), timestamp_january1, "Weis Markets", "Groceries", true, transactionBalance_food_january * 1000000, true, account_credit.id, category_essential.id, subcategory_food.id);
+// Uncleared, Credit, Outflow, Essential, Gas
+const transaction_gas_january = new Transaction(uuidv4(), timestamp_january10, "Royal Farms", "", true, transactionBalance_gas_january * 1000000, false, account_credit.id, category_essential.id, subcategory_gas.id);
+// Cleared, Checkings, Outflow, Essential, Student Loans
+const transaction_studentLoans_january = new Transaction(uuidv4(), timestamp_january15, "FAFSA", "Cancel this please", true, transactionBalance_studentLoans_january * 1000000, true, account_checkings.id, category_essential.id, subcategory_studentLoans.id);
+// Cleared, Checkings, Outflow, Nonessential, Ice Cream
+const transaction_iceCream_january = new Transaction(uuidv4(), timestamp_january15, "Royal Farms", "Chocolate and vanilla", true, transactionBalance_iceCream_january * 1000000, true, account_checkings.id, category_nonessential.id, subcategory_iceCream.id);
+// Uncleared, Checkings, Inflow, Nonessential, Ice Cream
+const transaction_weed_january = new Transaction(uuidv4(), timestamp_january20, "Curaleaf", "Refunded for bad product", false, transactionBalance_weed_january * 1000000, false, account_checkings.id, category_nonessential.id, subcategory_weed.id);
+// Cleared, Savings, Outflow, Nonessential, Videogames
+const transaction_videoGames_january = new Transaction(uuidv4(), timestamp_january20, "Steam", "ProjectZomboid", true, transactionBalance_videoGames_january * 1000000, true, account_savings.id, category_nonessential.id, subcategory_videoGames.id);
+// Uncleared, Checkings, Outflow, Subscriptions, Crunchyroll
+const transaction_crunchyroll_january = new Transaction(uuidv4(), timestamp_january25, "Crunchyroll", "", true, transactionBalance_crunchyroll_january * 1000000, false, account_checkings.id, category_subscriptions.id, subcategory_crunchyroll.id);
+// Cleared, Checkings, Outflow, Subscriptions, Netflix
+const transaction_netflix_january = new Transaction(uuidv4(), timestamp_january25, "Netflix", "", true, transactionBalance_netflix_january * 1000000, true, account_checkings.id, category_subscriptions.id, subcategory_netflix.id);
+// Cleared, Checkings, Outflow, Subscriptions, NordVPN
+const transaction_nordVPN_january = new Transaction(uuidv4(), timestamp_january25, "NordVPN", "", true, transactionBalance_nordVPN_january * 1000000, true, account_checkings.id, category_subscriptions.id, subcategory_nordVPN.id);
+
+// Unfinished Transactions
+const transaction_unfinished1_january = new Transaction(uuidv4(), timestamp_january10, "", "", true, 23960000, false, account_checkings.id, "", "");
+const transaction_unfinished2_january = new Transaction(uuidv4(), timestamp_january10, "", "", true, 41460000, false, account_checkings.id, "", "");
+const transaction_unfinished3_january = new Transaction(uuidv4(), timestamp_january15, "Weis Markets", "gum", true, 20040000, false, account_checkings.id, "", subcategory_food.id);
+const transaction_unfinished4_january = new Transaction(uuidv4(), timestamp_january20, "", "", true, 26000000, false, account_checkings.id, category_nonessential.id, "");

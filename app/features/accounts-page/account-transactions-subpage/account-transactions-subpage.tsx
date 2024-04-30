@@ -108,7 +108,7 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 	useEffect(() => {
 
 		for (let account of accounts) {
-			const initialTransaction = new Transaction(`initial_${uuidv4()}`, )
+
 		}
 	})
 
