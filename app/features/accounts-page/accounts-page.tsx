@@ -6,8 +6,14 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { IconButton } from "../ui";
 import { AccountTransactionsSubpage } from "./account-transactions-subpage/account-transactions-subpage";
+import { createAccount, getAccounts } from "@/firebase/accounts";
+import { CreateAccountSubpage } from "./create-account-subpage/create-account-subpage";
+import { read } from "fs";
+import { getTransactions } from "@/firebase/transactions";
 
 export type AccountsPagePropsType = {
+	userID: string;
+	budgetID: string;
 	accounts: Account[];
 	subcategories: Subcategory[];
 	transactions: Transaction[];
@@ -20,14 +26,36 @@ type NewAccountData = {
 };
 
 export function AccountsPage(props: AccountsPagePropsType) {
-	const { subcategories, handleConfirmNewAccount } = props;
-	const [accounts, setAccounts] = useState<Account[]>(props.accounts);
-	const [transactions, setTransactions] = useState<Transaction[]>(props.transactions);
+	const { userID, budgetID, subcategories } = props;
+	const [accountsDataKey, setAccountsDataKey] = useState<boolean>(false);
+	const [accounts, setAccounts] = useState<Account[]>([]);
+	const [transactions, setTransactions] = useState<Transaction[]>([]);
 	const [unfinishedTransactions, setUnfinishedTransactions] = useState<Transaction[]>(
 		props.transactions.filter((transaction) => {
 			return transaction.accountID === "" || transaction.categoryID === "" || transaction.subcategoryID === "" || transaction.payee === "";
 		})
 	);
+
+
+
+	// Retrieves accounts
+	useEffect(() => {
+		const fetchData = async () => {
+			const accountsData = await getAccounts(userID, budgetID);
+			setAccounts(accountsData)
+		}
+		fetchData();
+	}, [accountsDataKey, budgetID, userID]);
+
+	// Retrieves transactions
+	useEffect(() => {
+		const fetchData = async () => {
+			const transactionsData = await getTransactions(userID, budgetID);
+			setTransactions(transactionsData);
+		}
+		fetchData();
+	}, [accountsDataKey, budgetID, userID]);
+
 
 	// Checks for unfinished transactions
 	useEffect(() => {
@@ -41,12 +69,17 @@ export function AccountsPage(props: AccountsPagePropsType) {
 		setUnfinishedTransactions(unfinished);
 	}, [transactions]);
 
-	const [newAccountData, setNewAccountData] = useState<NewAccountData>({ name: "", initialBalance: 0 });
+
 	const [accountsPageRenderKey, setAccountsPageRenderKey] = useState<0 | 1>(0);
 	const [initialBalanceRenderKey, setInitialBalanceRenderKey] = useState<0 | 1>(0);
-
 	const [subpage, setSubpage] = useState<JSX.Element | null>(null);
 	const [subpageClasses, setSubpageClasses] = useState<string[]>([styles.subpage]);
+
+	const handleCreateAccount = (newAccount: Account) => {
+		createAccount(userID, budgetID, newAccount)
+		setAccountsDataKey(!accountsDataKey);
+		hideSubpage()
+	}
 
 	const showSubpage = (selectedSubpage: JSX.Element) => {
 		setSubpage(selectedSubpage);
@@ -67,33 +100,8 @@ export function AccountsPage(props: AccountsPagePropsType) {
 		const unclearedTransactions = selectedTransactions.filter((transaction) => !transaction.approval);
 		showSubpage(<AccountTransactionsSubpage subcategories={subcategories} account={selectedAccount} clearedTransactions={clearedTransactions} unclearedTransactions={unclearedTransactions} handleBackClick={hideSubpage} />);
 	};
-	const navigateToCreateAccountSubpage = () => {};
-
-	const handleShowAddAccountElement = () => {
-		const element = document.getElementById("add_account_element_id");
-		if (element) {
-			element!.classList.remove(styles.hideAddAccount);
-			element!.classList.add(styles.displayAddAccount);
-		}
-	};
-	const handleHideAddAccountElement = () => {
-		const element = document.getElementById("add_account_element_id");
-		if (element) {
-			element!.classList.remove(styles.displayAddAccount);
-			element!.classList.add(styles.hideAddAccount);
-			setNewAccountData({ name: "", initialBalance: 0 });
-		}
-	};
-	const handleVerifyNewAccount = () => {
-		if (newAccountData.name === "") {
-			alert("The new account must have a name.");
-		} else {
-			const newAccount = new Account(uuidv4(), newAccountData.name, newAccountData.initialBalance, newAccountData.initialBalance);
-			handleConfirmNewAccount(newAccount);
-			handleHideAddAccountElement();
-			accounts.push(newAccount);
-			setAccountsPageRenderKey(accountsPageRenderKey === 0 ? 1 : 0);
-		}
+	const navigateToCreateAccountSubpage = () => {
+		showSubpage(<CreateAccountSubpage handleBackClick={hideSubpage} handleCreateAccount={handleCreateAccount}/>);
 	};
 
 	// Creates list of accounts

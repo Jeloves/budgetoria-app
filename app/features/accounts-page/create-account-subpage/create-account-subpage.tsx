@@ -1,30 +1,19 @@
 import { IconButton } from "@/features/ui";
 import styles from "./create-account-subpage.module.scss";
 import { ChangeEvent, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { Account } from "@/firebase/models";
 
 export type CreateAccountSubpagePropsType = {
 	handleBackClick: () => void;
-	createAccount: () => void;
+	handleCreateAccount: (newAccount: Account) => void;
 };
 
 export function CreateAccountSubpage(props: CreateAccountSubpagePropsType) {
-	const { handleBackClick, createAccount } = props;
+	const { handleBackClick, handleCreateAccount } = props;
 
 	const [name, setName] = useState<string>("");
 	const [initialBalance, setInitialBalance] = useState<number>(0);
-
-	const handleNewAccountNameBlur = (event: ChangeEvent<HTMLInputElement>) => {
-		const newName = event.target.value;
-
-	};
-	const handleEnterKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-		if (event.key === "Enter") {
-			event.currentTarget.blur();
-		}
-	};
-	const handleCreateAccountClick = () => {
-		createAccount();
-	};
 
 	const handleNameOnChange = (event: ChangeEvent<HTMLInputElement>) => {
 		let newName = event.target.value;
@@ -54,6 +43,14 @@ export function CreateAccountSubpage(props: CreateAccountSubpagePropsType) {
 			setInitialBalance(parseFloat(newInitialBalance) * 1000000);
 		}
 	}
+	const handleCreateAccountClick = () => {
+		if (name === "") {
+			alert("Must enter a name for the new account.")
+		} else {
+			const newAccount = new Account(uuidv4(), name, initialBalance, initialBalance);
+			handleCreateAccount(newAccount);
+		}
+	};
 
 	return (
 		<>
@@ -68,7 +65,7 @@ export function CreateAccountSubpage(props: CreateAccountSubpagePropsType) {
 				<label>Enter a name for the account</label>
 				<input type="text" placeholder="Account name..." required onChange={handleNameOnChange}/>
 				<label>Enter the starting balance for the account</label>
-				<input type="text" placeholder="$0.00" required onKeyDown={handleEnterKeyDown} onChange={handleInitialBalanceOnChange}/>
+				<input type="text" placeholder="$0.00" required onChange={handleInitialBalanceOnChange}/>
 			</main>
 		</>
 	);

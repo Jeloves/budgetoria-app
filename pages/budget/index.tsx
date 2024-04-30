@@ -7,7 +7,7 @@ import { User } from "firebase/auth/cordova";
 import { getSelectedBudget, getUnassignedBalance, updateUnassignedBalance } from "@/firebase/budgets";
 import { getAllocations, updateAssignedAllocation } from "@/firebase/allocations";
 import { getCategories, getSubcategories } from "@/firebase/categories";
-import { createTransaction, getTransactions } from "@/firebase/transactions";
+import { createTransaction, getTransactionsByDate } from "@/firebase/transactions";
 import { Account, Allocation, Budget, Category, Subcategory, Transaction } from "@/firebase/models";
 import { Topbar } from "@/features/topbar/topbar";
 import { Unassigned } from "@/features/unassigned";
@@ -134,7 +134,7 @@ export default function BudgetPage() {
 
 				// Allocation and transaction data are filtered by month & year.
 				const allocationData = await getAllocations(user!.uid, budget.id, month, year);
-				const transactionData = await getTransactions(user!.uid, budget.id, month, year);
+				const transactionData = await getTransactionsByDate(user!.uid, budget.id, month, year);
 
 				const categoryData = await getCategories(user!.uid, budget.id);
 				const subcategoryData = await getSubcategories(user!.uid, budget.id);
@@ -235,7 +235,7 @@ export default function BudgetPage() {
 	page === "Accounts" &&
 		pageContent.push(
 			<>
-				<AccountsPage key={"accountsPage"} accounts={accounts} subcategories={subcategories} transactions={transactions} handleConfirmNewAccount={handleConfirmNewAccount} />
+				<AccountsPage key={"accountsPage"} userID={user!.uid} budgetID={budget!.id} accounts={accounts} subcategories={subcategories} transactions={transactions} handleConfirmNewAccount={handleConfirmNewAccount} />
 			</>
 		);
 
