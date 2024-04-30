@@ -7,6 +7,7 @@ import { IconButton } from "@/features/ui";
 export type AccountTransactionsSubpagePropsType = {
 	subcategories: Subcategory[];
 	accounts: Account[];
+	showingAllAccounts: boolean;
 	transactions: Transaction[];
 	handleBackClick: () => void;
 };
@@ -14,15 +15,97 @@ export type AccountTransactionsSubpagePropsType = {
 type DateTransactionsMapType = Map<string, Transaction[]>;
 
 export function AccountTransactionsSubpage(props: AccountTransactionsSubpagePropsType) {
-	const { account, subcategories, handleBackClick } = props;
-	const [clearedTransactions, setClearedTransactions] = useState<Transaction[]>(props.clearedTransactions);
-	const [unclearedTransactions, setUnclearedTransactions] = useState<Transaction[]>(props.unclearedTransactions);
-	const [clearedTransactionBalanceString, setClearedTransactionBalanceString] = useState<string>("$0.00");
-	const [unclearedTransactionBalanceString, setUnclearedTransactionBalanceString] = useState<string>("$0.00");
-	const [accountBalanceString, setAccountBalanceString] = useState<string>("$0.00");
+	const { accounts, transactions, subcategories, handleBackClick } = props;
+
+	const [clearedTransactions, setClearedTransactions] = useState<Transaction[]>([]);
+	const [unclearedTransactions, setUnclearedTransactions] = useState<Transaction[]>([]);
+
+	const [clearedBalance, setClearedBalance] = useState<number>(0);
+	const [unclearedBalance, setUnclearedBalance] = useState<number>(0);
+	const [workingBalance, setWorkingBalance] = useState<number>(0);
+	const [clearedBalanceString, setClearedBalanceString] = useState<string>("");
+	const [unclearedBalanceString, setUnclearedBalanceString] = useState<string>("");
+	const [workingBalanceString, setWorkingBalanceString] = useState<string>("");
+
 	const [dateTransactionsMap, setDateTransactionsMap] = useState<DateTransactionsMapType>(new Map());
 	const [payees, setPayees] = useState<string[]>([]);
 	const [filter, setFilter] = useState<string>("");
+
+	// Separates cleared from uncleared transactions
+	useEffect(() => {
+		const cleared: Transaction[] = [];
+		const uncleared: Transaction[] = [];
+		for (let transaction of transactions) {
+			if (transaction.approval) {
+				cleared.push(transaction);
+			} else {
+				uncleared.push(transaction);
+			}
+		}
+		setClearedTransactions(cleared);
+		setUnclearedTransactions(uncleared);
+	}, [transactions]);
+
+	// Calculates cleared, uncleared, and working balance
+	useEffect(() => {
+		// Calculates sum of account initial balances
+		let initialAccountSum = 0;
+		for (let account of accounts) {
+			initialAccountSum += account.initialBalance;
+		}
+
+		// Calculates sum of cleared transaction balances, which includes initial account balances
+		let clearedTransactionSum = initialAccountSum;
+		for (let transaction of clearedTransactions) {
+			clearedTransactionSum += transaction.balance;
+		}
+		setClearedBalance(clearedTransactionSum);
+
+		// Calculates sum of uncleared transaction balances
+		let unclearedTransactionSum = 0;
+		for (let transaction of unclearedTransactions) {
+			unclearedTransactionSum += transaction.balance;
+		}
+		setUnclearedBalance(unclearedTransactionSum);
+
+		// Calculating the working balance
+		const workingAccountSum = clearedTransactionSum + unclearedTransactionSum;
+		setWorkingBalance(workingAccountSum);
+	}, [accounts, clearedTransactions, unclearedTransactions]);
+
+	// Formats balances into strings
+	useEffect(() => {
+		// Formats cleared balance
+		if (clearedBalance > 0) {
+			setClearedBalanceString("$" + (clearedBalance / 1000000).toFixed(2));
+		} else if (clearedBalance < 0) {
+			setClearedBalanceString("-$" + (clearedBalance / 1000000).toFixed(2));
+		} else {
+			setClearedBalanceString("$0.00");
+		}
+
+		// Formats uncleared balance
+		if (unclearedBalance > 0) {
+			setUnclearedBalanceString("$" + (clearedBalance / 1000000).toFixed(2));
+		} else if (unclearedBalance < 0) {
+			setUnclearedBalanceString("-$" + (clearedBalance / 1000000).toFixed(2));
+		} else {
+			setUnclearedBalanceString("$0.00");
+		}
+
+		// Formats working balance
+		if (workingBalance > 0) {
+			setWorkingBalanceString("$" + (workingBalance / 1000000).toFixed(2));
+		} else if (workingBalance < 0) {
+			setWorkingBalanceString("-$" + (workingBalance / 1000000).toFixed(2));
+		} else {
+			setWorkingBalanceString("$0.00");
+		}
+	}, [clearedBalance, unclearedBalance, workingBalance]);
+
+
+
+
 
 	// Generates list of payees included in transactions
 	useEffect(() => {
@@ -38,58 +121,8 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 			}
 		}
 		setPayees(payeeList);
-	}, [clearedTransactions, unclearedTransactions])
+	}, [clearedTransactions, unclearedTransactions]);
 
-	// Calculates cleared transaction balance.
-	useEffect(() => {
-		let totalClearedBalance = account.initialBalance;
-		for (const transaction of clearedTransactions) {
-			if (transaction.outflow) {
-				totalClearedBalance -= transaction.balance;
-			} else {
-				totalClearedBalance += transaction.balance;
-			}
-		}
-		if (totalClearedBalance > 0) {
-			setClearedTransactionBalanceString("$" + (totalClearedBalance / 1000000).toFixed(2));
-		} else {
-			setClearedTransactionBalanceString("- $" + (totalClearedBalance / -1000000).toFixed(2));
-		}
-	}, [account.initialBalance, clearedTransactions]);
-
-	// Calculates uncleared transaction balance.
-	useEffect(() => {
-		let totalUnclearedBalance = 0;
-		for (const transaction of unclearedTransactions) {
-			if (transaction.outflow) {
-				totalUnclearedBalance -= transaction.balance;
-			} else {
-				totalUnclearedBalance += transaction.balance;
-			}
-		}
-		if (totalUnclearedBalance > 0) {
-			setUnclearedTransactionBalanceString("$" + (totalUnclearedBalance / 1000000).toFixed(2));
-		} else {
-			setUnclearedTransactionBalanceString("- $" + (totalUnclearedBalance / -1000000).toFixed(2));
-		}
-	}, [unclearedTransactions]);
-
-	// Calculates total account balance.
-	useEffect(() => {
-		let totalBalance = account.initialBalance;
-		for (const transaction of clearedTransactions.concat(unclearedTransactions)) {
-			if (transaction.outflow) {
-				totalBalance -= transaction.balance;
-			} else {
-				totalBalance += transaction.balance;
-			}
-		}
-		if (totalBalance > 0) {
-			setAccountBalanceString("$" + (totalBalance / 1000000).toFixed(2));
-		} else {
-			setAccountBalanceString("- $" + (totalBalance / -1000000).toFixed(2));
-		}
-	}, [account.initialBalance, clearedTransactions, unclearedTransactions]);
 
 	// Groups all transactions by date
 	useEffect(() => {
@@ -187,14 +220,14 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 			<main className={styles.main}>
 				<div className={styles.balances}>
 					<span className={styles.totalLabel}>Total</span>
-					<span className={styles.totalBalance}>{accountBalanceString}</span>
+					<span className={styles.totalBalance}>{workingBalanceString}</span>
 					<div className={styles.cleared}>
 						Cleared
-						<span>{clearedTransactionBalanceString}</span>
+						<span>{clearedBalanceString}</span>
 					</div>
 					<div className={styles.uncleared}>
 						Uncleared
-						<span>{unclearedTransactionBalanceString}</span>
+						<span>{unclearedBalanceString}</span>
 					</div>
 				</div>
 				<div className={styles.filter}>

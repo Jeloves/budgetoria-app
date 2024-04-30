@@ -8,7 +8,7 @@ import { IconButton } from "../ui";
 import { AccountTransactionsSubpage } from "./account-transactions-subpage/account-transactions-subpage";
 import { createAccount, getAccounts } from "@/firebase/accounts";
 import { CreateAccountSubpage } from "./create-account-subpage/create-account-subpage";
-import { getTransactions } from "@/firebase/transactions";
+import { createTransaction, getTransactions } from "@/firebase/transactions";
 
 export type AccountsPagePropsType = {
 	userID: string;
@@ -79,9 +79,7 @@ export function AccountsPage(props: AccountsPagePropsType) {
 	};
 	const navigateToUnfinishedTransactionsSubpage = () => {};
 	const navigateToAllTransactionsSubpage = () => {
-		const clearedTransactions = transactions.filter((transaction) => transaction.approval);
-		const unclearedTransactions = transactions.filter((transaction) => !transaction.approval);
-		showSubpage(<AccountTransactionsSubpage subcategories={subcategories} account={selectedAccount} handleBackClick={hideSubpage} />);
+		showSubpage(<AccountTransactionsSubpage subcategories={subcategories} accounts={accounts} showingAllAccounts={true} transactions={transactions} handleBackClick={hideSubpage}/>);
 	};
 	const navigateToAccountTransactionsSubpage = (selectedAccount: Account, selectedTransactions: Transaction[]) => {
 		const clearedTransactions = selectedTransactions.filter((transaction) => transaction.approval);
