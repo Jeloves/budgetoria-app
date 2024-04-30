@@ -26,8 +26,9 @@
       "@/icons/*": ["public/icons/*"],
       "@/ui/*": ["app/features/ui/*"],
       "@/utils/*": ["utils/*"],
+      "@/mock-data/*": ["mock-data/*"],
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/features/accounts-page/account-transactions"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/features/accounts-page/account-transactions-subpage"],
   "exclude": ["node_modules"]
 }

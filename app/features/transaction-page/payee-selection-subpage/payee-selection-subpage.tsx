@@ -89,7 +89,7 @@ export function PayeeSelectionSubpage(props: PayeeSelectionSubpagePropsType) {
 			</header>
 			<main className={styles.main}>
 				<div className={styles.filter}>
-					<img src="/icons/search-grey-100.svg" alt="Search icon" />
+					<img src="/icons/search-grey-300.svg" alt="Search icon" />
 					<input type="text" placeholder="Enter payee..." onChange={handleFilterChange} />
 				</div>
 				<div className={styles.payeesContainer}>

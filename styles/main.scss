@@ -3,6 +3,7 @@
 @use "@styles/space";
 
 .main {
+	background-color: color.$secondary-dark;
 	box-sizing: border-box;
 	height: calc(100vh - space.$s15);	// 100vh - header.height
 	width: 100vw;
@@ -14,8 +15,6 @@
 
 	& input[type="text"] {
 		margin: 0;
-		padding: 0;
-		border: none;
 		outline: none;
 		background: none;
 		box-sizing: border-box;
