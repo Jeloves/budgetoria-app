@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import classNames from "classnames";
 import styles from "./accounts-page.module.scss";
-import { Account, Subcategory, Transaction } from "@/firebase/models";
+import { Account, Category, Subcategory, Transaction } from "@/firebase/models";
 import { ChangeEvent, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { IconButton } from "../ui";
@@ -83,9 +83,7 @@ export function AccountsPage(props: AccountsPagePropsType) {
 		showSubpage(<AccountTransactionsSubpage categories={categories} subcategories={subcategories} accounts={accounts} showingAllAccounts={true} transactions={transactions} handleBackClick={hideSubpage}/>);
 	};
 	const navigateToAccountTransactionsSubpage = (selectedAccount: Account, selectedTransactions: Transaction[]) => {
-		const clearedTransactions = selectedTransactions.filter((transaction) => transaction.approval);
-		const unclearedTransactions = selectedTransactions.filter((transaction) => !transaction.approval);
-		showSubpage(<AccountTransactionsSubpage subcategories={subcategories} account={selectedAccount} clearedTransactions={clearedTransactions} unclearedTransactions={unclearedTransactions} handleBackClick={hideSubpage} />);
+		showSubpage(<AccountTransactionsSubpage categories={categories} subcategories={subcategories} accounts={[selectedAccount]} showingAllAccounts={false} transactions={transactions} handleBackClick={hideSubpage}/>);
 	};
 	const navigateToCreateAccountSubpage = () => {
 		showSubpage(<CreateAccountSubpage handleBackClick={hideSubpage} handleCreateAccount={handleCreateAccount} />);
