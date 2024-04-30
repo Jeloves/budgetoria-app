@@ -13,6 +13,7 @@ import { createTransaction, getTransactions } from "@/firebase/transactions";
 export type AccountsPagePropsType = {
 	userID: string;
 	budgetID: string;
+	categories: Category[];
 	subcategories: Subcategory[];
 };
 
@@ -22,7 +23,7 @@ type NewAccountData = {
 };
 
 export function AccountsPage(props: AccountsPagePropsType) {
-	const { userID, budgetID, subcategories } = props;
+	const { userID, budgetID, categories, subcategories } = props;
 	const [accountsDataKey, setAccountsDataKey] = useState<boolean>(false);
 	const [transactionsDataKey, setTransactionsDataKey] = useState<boolean>(false);
 	const [accounts, setAccounts] = useState<Account[]>([]);
@@ -79,7 +80,7 @@ export function AccountsPage(props: AccountsPagePropsType) {
 	};
 	const navigateToUnfinishedTransactionsSubpage = () => {};
 	const navigateToAllTransactionsSubpage = () => {
-		showSubpage(<AccountTransactionsSubpage subcategories={subcategories} accounts={accounts} showingAllAccounts={true} transactions={transactions} handleBackClick={hideSubpage}/>);
+		showSubpage(<AccountTransactionsSubpage categories={categories} subcategories={subcategories} accounts={accounts} showingAllAccounts={true} transactions={transactions} handleBackClick={hideSubpage}/>);
 	};
 	const navigateToAccountTransactionsSubpage = (selectedAccount: Account, selectedTransactions: Transaction[]) => {
 		const clearedTransactions = selectedTransactions.filter((transaction) => transaction.approval);

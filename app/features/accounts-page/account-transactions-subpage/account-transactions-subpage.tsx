@@ -6,7 +6,7 @@ import { IconButton } from "@/features/ui";
 import { v4 as uuidv4 } from "uuid";
 import { NIL as NIL_UUID } from "uuid";
 import { cloneDeep } from "lodash";
-import { getCategoryNameByID, getSubcategoryNameByID } from "@/utils/getByID";
+import { getAccountNameByID, getCategoryNameByID, getSubcategoryNameByID } from "@/utils/getByID";
 import { formatCurrencyBasedOnOutflow } from "@/utils/currency";
 
 export type AccountTransactionsSubpagePropsType = {
@@ -21,7 +21,7 @@ export type AccountTransactionsSubpagePropsType = {
 type DateTransactionsMap = Map<string, Transaction[]>;
 
 export function AccountTransactionsSubpage(props: AccountTransactionsSubpagePropsType) {
-	const { accounts, categories, subcategories, transactions, handleBackClick } = props;
+	const { accounts, showingAllAccounts, categories, subcategories, transactions, handleBackClick } = props;
 
 	const [clearedTransactions, setClearedTransactions] = useState<Transaction[]>([]);
 	const [unclearedTransactions, setUnclearedTransactions] = useState<Transaction[]>([]);
@@ -118,36 +118,41 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 			const filtered = transactions.filter((transaction) => {
 				// Filter for category
 				if (getCategoryNameByID(transaction.categoryID, categories).includes(filter)) {
-					console.log("Category Filter hit", transaction)
+					console.log("Category Filter hit", transaction);
 					return transaction;
 				}
 				// Filter for subcategory
 				else if (getSubcategoryNameByID(transaction.subcategoryID, subcategories).includes(filter)) {
-					console.log("Subcategory Filter hit", transaction)
+					console.log("Subcategory Filter hit", transaction);
 					return transaction;
 				}
-				// Filter for payee 
+				// Filter for payee
 				else if (transaction.payee.includes(filter)) {
-					console.log("Payee Filter hit", transaction)
+					console.log("Payee Filter hit", transaction);
 					return transaction;
 				}
 				// Filter for date
-				else if (transaction.date.toDate().toLocaleDateString('en-US', {
-					weekday: 'long',
-					year: 'numeric',
-					month: 'long',
-					day: 'numeric'
-				  }).includes(filter)) {
-					console.log("Date Filter hit", transaction)
+				else if (
+					transaction.date
+						.toDate()
+						.toLocaleDateString("en-US", {
+							weekday: "long",
+							year: "numeric",
+							month: "long",
+							day: "numeric",
+						})
+						.includes(filter)
+				) {
+					console.log("Date Filter hit", transaction);
 					return transaction;
 				}
 				// Filter for transaction balance
 				else if ((transaction.balance / 1000000).toFixed(2).toString().includes(filter)) {
-					console.log("Balance Filter hit", transaction)
+					console.log("Balance Filter hit", transaction);
 					return transaction;
 				}
 			});
-			setFilteredTransactions(filtered)
+			setFilteredTransactions(filtered);
 		}
 	}, [categories, filter, subcategories, transactions]);
 
@@ -193,7 +198,7 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 		setFilter(event.currentTarget.value);
 	};
 
-	// Generating filtered transaction elements
+	// Generates filtered transaction elements
 	const transactionItems: JSX.Element[] = [];
 	dateTransactionsMap.forEach((transactions, dateISOString) => {
 		const dateString = new Date(dateISOString).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
@@ -212,9 +217,11 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 					</div>
 					<span className={styles.payee}>{payeeString ? payeeString : "Payee Needed"}</span>
 					<span className={styles.subcategory}>{subcategoryString ? subcategoryString : "Category Needed"}</span>
-					<span className={styles.balance}>
-						{formatCurrencyBasedOnOutflow(transaction.balance, transaction.outflow)}
-
+					<span className={styles.balanceContainer}>
+						<div className={styles.balance}>
+							{formatCurrencyBasedOnOutflow(transaction.balance, transaction.outflow)}
+							{showingAllAccounts && <div>{getAccountNameByID(transaction.accountID, accounts)}</div>}
+						</div>
 						{transaction.approval ? (
 							// eslint-disable-next-line @next/next/no-img-element
 							<img src="/icons/cleared.svg" alt="Cleared transaction icon" />
@@ -228,12 +235,11 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 		}
 	});
 
-
 	return (
 		<>
 			<header className={styles.header}>
 				<IconButton button={{ onClick: handleBackClick }} src={"/icons/arrow-left-grey-100.svg"} altText={"Button to return to Accounts Page"} />
-				<span>{}</span>
+				<span>{showingAllAccounts ? "All Accounts" : accounts[0].name}</span>
 				<IconButton button={{ onClick: handleBackClick }} src={"/icons/edit-grey-100.svg"} altText={"Navigate to Edit Account Page"} />
 			</header>
 			<main className={styles.main}>
@@ -252,7 +258,7 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 				<div className={styles.filter}>
 					{/*eslint-disable-next-line @next/next/no-img-element */}
 					<img src="/icons/search-grey-300.svg" alt="Search icon" />
-					<input type="text" placeholder="Search Transactions" onChange={handleFilterChange}/>
+					<input type="text" placeholder="Search Transactions" onChange={handleFilterChange} />
 				</div>
 				{transactionItems}
 			</main>

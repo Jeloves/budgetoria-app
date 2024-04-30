@@ -69,18 +69,31 @@
 		padding-top: space.$s1;
 		grid-area: subcategory;
 		color: color.$gray-500;
-		font-size: small;
 	}
 
-	& .balance {
+	& .balanceContainer {
 		grid-area: balance;
+		display: flex;
 		justify-content: flex-end;
+		align-items: center;
 		gap: space.$s2;
+
+		& .balance {
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			gap: space.$s1;
+		}
+
+
 		& img {
 			height: space.$s3-1;
 			width: space.$s3-1;
 		}
+
 	}
+
 	& .initial {
 		color: color.$green;
 	}
@@ -121,26 +134,26 @@
 }
 
 .filter {
-    display: flex;
-    gap: space.$s2;
-    background-color: color.$primary-dark;
-    box-sizing: border-box;
-    padding: space.$s2;
-    margin: space.$s2 space.$s2;
-    border-radius: space.$s4;
+	display: flex;
+	gap: space.$s2;
+	background-color: color.$primary-dark;
+	box-sizing: border-box;
+	padding: space.$s2;
+	margin: space.$s2 space.$s2;
+	border-radius: space.$s4;
 
 	& img {
 		width: space.$s5;
 		height: space.$s5;
 	}
 
-    & input[type="text"] {
+	& input[type="text"] {
 		padding: 0;
 		outline: none;
+		border: none;
 		background: none;
-		font: font.$text-regular;
 		color: color.$gray-100;
-        flex: 1;
+		flex: 1;
 	}
 
 	& input::placeholder {

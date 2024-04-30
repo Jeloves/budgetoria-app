@@ -235,7 +235,7 @@ export default function BudgetPage() {
 	page === "Accounts" &&
 		pageContent.push(
 			<>
-				<AccountsPage key={"accountsPage"} userID={user!.uid} budgetID={budget!.id} subcategories={subcategories}/>
+				<AccountsPage key={"accountsPage"} userID={user!.uid} budgetID={budget!.id} categories={categories} subcategories={subcategories}/>
 			</>
 		);
 
