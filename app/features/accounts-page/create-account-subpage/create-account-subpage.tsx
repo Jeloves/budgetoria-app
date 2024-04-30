@@ -3,6 +3,7 @@ import styles from "./create-account-subpage.module.scss";
 import { ChangeEvent, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Account } from "@/firebase/models";
+import { Timestamp } from "firebase/firestore";
 
 export type CreateAccountSubpagePropsType = {
 	handleBackClick: () => void;
@@ -47,7 +48,7 @@ export function CreateAccountSubpage(props: CreateAccountSubpagePropsType) {
 		if (name === "") {
 			alert("Must enter a name for the new account.")
 		} else {
-			const newAccount = new Account(uuidv4(), name, initialBalance, initialBalance);
+			const newAccount = new Account(uuidv4(), name, Timestamp.fromDate(new Date()), initialBalance, initialBalance);
 			handleCreateAccount(newAccount);
 		}
 	};

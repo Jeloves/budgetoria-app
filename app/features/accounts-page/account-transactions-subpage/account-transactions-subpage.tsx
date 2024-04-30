@@ -3,6 +3,7 @@ import styles from "./account-transactions-subpage.module.scss";
 import { useEffect, useState } from "react";
 import classNames from "classnames";
 import { IconButton } from "@/features/ui";
+import { v4 as uuidv4 } from "uuid";
 
 export type AccountTransactionsSubpagePropsType = {
 	subcategories: Subcategory[];
@@ -103,7 +104,13 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 		}
 	}, [clearedBalance, unclearedBalance, workingBalance]);
 
+	// Grouping transactions by date, and creating TransactionObjects for initial account balances
+	useEffect(() => {
 
+		for (let account of accounts) {
+			const initialTransaction = new Transaction(`initial_${uuidv4()}`, )
+		}
+	})
 
 
 

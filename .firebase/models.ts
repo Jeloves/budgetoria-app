@@ -23,11 +23,13 @@ export class Budget {
 export class Account {
     id: string;
     name: string;
+    date: Timestamp;
     initialBalance: number;
     balance: number;
-    constructor(id: string, name: string,initialBalance: number, balance: number) {
+    constructor(id: string, name: string, date: Timestamp, initialBalance: number, balance: number) {
         this.id = id;
         this.name = name;
+        this.date = date;
         this.initialBalance = initialBalance;
         this.balance = balance;
     }

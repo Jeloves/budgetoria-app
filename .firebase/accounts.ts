@@ -8,7 +8,7 @@ export async function getAccounts(userID: string, budgetID: string): Promise<Acc
 
 		const accounts: Account[] = accountsSnapshot.docs.map((doc) => {
 			const data = doc.data();
-			return new Account(doc.id, data.name, data.initialBalance, data.balance);
+			return new Account(doc.id, data.name, data.date, data.initialBalance, data.balance);
 		});
 
 		return accounts;
@@ -23,6 +23,7 @@ export async function createAccount(userID: string, budgetID: string, newAccount
 		const accountRef = doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.accounts, newAccount.id);
 		await setDoc(accountRef, {
 			name: newAccount.name,
+			date: newAccount.date,
 			initialBalance: newAccount.initialBalance,
 			balance: newAccount.balance,
 		});
