@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import classNames from "classnames";
 import { IconButton } from "@/features/ui";
 import { v4 as uuidv4 } from "uuid";
+import { NIL as NIL_UUID } from "uuid";
+import { cloneDeep } from "lodash";
 
 export type AccountTransactionsSubpagePropsType = {
 	subcategories: Subcategory[];
@@ -13,7 +15,7 @@ export type AccountTransactionsSubpagePropsType = {
 	handleBackClick: () => void;
 };
 
-type DateTransactionsMapType = Map<string, Transaction[]>;
+type DateTransactionsMap = Map<string, Transaction[]>;
 
 export function AccountTransactionsSubpage(props: AccountTransactionsSubpagePropsType) {
 	const { accounts, transactions, subcategories, handleBackClick } = props;
@@ -28,27 +30,30 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 	const [unclearedBalanceString, setUnclearedBalanceString] = useState<string>("");
 	const [workingBalanceString, setWorkingBalanceString] = useState<string>("");
 
-	const [dateTransactionsMap, setDateTransactionsMap] = useState<DateTransactionsMapType>(new Map());
+	const [dateTransactionsMap, setDateTransactionsMap] = useState<DateTransactionsMap>(new Map());
 	const [payees, setPayees] = useState<string[]>([]);
 	const [filter, setFilter] = useState<string>("");
 
-	// Separates cleared from uncleared transactions
+	// Separates cleared from uncleared transactions, and generates list of payees
 	useEffect(() => {
 		const cleared: Transaction[] = [];
 		const uncleared: Transaction[] = [];
+		const payeesList: string[] = [];
 		for (let transaction of transactions) {
 			if (transaction.approval) {
 				cleared.push(transaction);
 			} else {
 				uncleared.push(transaction);
 			}
+
+			if (!payeesList.includes(transaction.payee) && transaction.payee !== "") {
+				payeesList.push(transaction.payee);
+			}
 		}
 		setClearedTransactions(cleared);
 		setUnclearedTransactions(uncleared);
-	}, [transactions]);
-
-	console.log("cleared", clearedTransactions)
-	console.log("uncleared", unclearedTransactions)
+		setPayees(payeesList);
+	}, [payees, transactions]);
 
 	// Calculates cleared, uncleared, and working balance
 	useEffect(() => {
@@ -107,57 +112,47 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 		}
 	}, [clearedBalance, unclearedBalance, workingBalance]);
 
-	// Grouping transactions by date, and creating TransactionObjects for initial account balances
+	// Grouping transactions by date, including Transaction objects for initial account balances
 	useEffect(() => {
-
+		// Creating transactions to represent initial account balances
+		const initialTransactions: Transaction[] = [];
 		for (let account of accounts) {
-
+			const transactionID = "initial_balance_" + uuidv4();
+			const date = account.date;
+			const payee = "Starting Balance";
+			const memo = "";
+			const outflow = account.initialBalance < 0 ? true : false;
+			const balance = account.initialBalance < 0 ? account.initialBalance * -1 : account.initialBalance;
+			const approval = true;
+			const accountID = account.id;
+			const categoryID = NIL_UUID;
+			const subcategoryID = NIL_UUID;
+			initialTransactions.push(new Transaction(transactionID, date, payee, memo, outflow, balance, approval, accountID, categoryID, subcategoryID));
 		}
-	})
 
-
-
-	// Generates list of payees included in transactions
-	useEffect(() => {
-		const payeeList: string[] = [];
-		for (let transaction of clearedTransactions) {
-			if (!payeeList.includes(transaction.payee)) {
-				payeeList.push(transaction.payee);
-			}
-		}
-		for (let transaction of unclearedTransactions) {
-			if (!payeeList.includes(transaction.payee)) {
-				payeeList.push(transaction.payee);
-			}
-		}
-		setPayees(payeeList);
-	}, [clearedTransactions, unclearedTransactions]);
-
-
-	// Groups all transactions by date
-	useEffect(() => {
-		// Ordering all transactions by date in descending order, into a single array
-		const allTransactions = clearedTransactions.concat(unclearedTransactions);
+		// Grouping transactions by date in descending order
+		const allTransactions = transactions.concat(initialTransactions);
+		console.log("amount of transactions", allTransactions.length)
 		allTransactions.sort((a, b) => b.date.toMillis() - a.date.toMillis());
-
-		const newDateTransactionsMap: Map<string, Transaction[]> = new Map();
+		const newDateTransactionsMap: DateTransactionsMap = new Map();
 		for (const transaction of allTransactions) {
 			const dateISOString = transaction.date.toDate().toISOString();
 			if (newDateTransactionsMap.has(dateISOString)) {
-				const currentTransactions = [...newDateTransactionsMap.get(dateISOString)!];
-				currentTransactions!.push(transaction);
-				newDateTransactionsMap.set(dateISOString, currentTransactions!);
+				const updatedTransactions = cloneDeep(newDateTransactionsMap.get(dateISOString));
+				updatedTransactions!.push(transaction);
+				newDateTransactionsMap.set(dateISOString, updatedTransactions!);
 			} else {
 				newDateTransactionsMap.set(dateISOString, [transaction]);
 			}
-		}
+		}	
 		setDateTransactionsMap(newDateTransactionsMap);
-	}, [clearedTransactions, unclearedTransactions]);
+	}, [transactions, accounts]);
 
 	const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const currentFilter = event.currentTarget.value;
 		setFilter(event.currentTarget.value);
 	};
+
+	const transactionItems: JSX.Element[] = [];
 
 	/*
 	const transactionItems: JSX.Element[] = [];
