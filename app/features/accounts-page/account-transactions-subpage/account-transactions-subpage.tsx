@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 import { NIL as NIL_UUID } from "uuid";
 import { cloneDeep } from "lodash";
 import { getCategoryNameByID, getSubcategoryNameByID } from "@/utils/getByID";
+import { formatCurrencyBasedOnOutflow } from "@/utils/currency";
 
 export type AccountTransactionsSubpagePropsType = {
 	categories: Category[];
@@ -192,44 +193,27 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 		setFilter(event.currentTarget.value);
 	};
 
+	// Generating filtered transaction elements
 	const transactionItems: JSX.Element[] = [];
-	dateTransactionsMap.forEach((transactions, dateISOString) => {
-		const dateString = new Date(dateISOString).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
-
-		// Date Filter
-		const filterIncludesCurrentDate = dateString.includes(filter);
-	});
-
-
-	/*
 	dateTransactionsMap.forEach((transactions, dateISOString) => {
 		const dateString = new Date(dateISOString).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
 
 		transactionItems.push(<div className={styles.date}>{dateString}</div>);
 		for (let i = 0; i < transactions.length; i++) {
 			const transaction = transactions[i];
-
-			// Checks if filter includes this transaction
+			const payeeString = transaction.payee;
+			const subcategoryString = getSubcategoryNameByID(transaction.subcategoryID, subcategories);
 
 			// Formatting strings for transaction data
-			const targetSubcategory = subcategories.find((subcategory) => subcategory.id === transaction.subcategoryID);
-			const subcategoryString = targetSubcategory!.name;
-			let balanceString = "";
-			if (transaction.outflow) {
-				balanceString = "- $" + (transaction.balance / 1000000).toFixed(2);
-			} else {
-				balanceString = "$" + (transaction.balance / 1000000).toFixed(2);
-			}
-
 			transactionItems.push(
 				<div className={styles.transaction}>
 					<div className={styles.select}>
 						<span />
 					</div>
-					<span className={styles.payee}>{transaction.payee}</span>
-					<span className={styles.subcategory}>{subcategoryString}</span>
+					<span className={styles.payee}>{payeeString ? payeeString : "Payee Needed"}</span>
+					<span className={styles.subcategory}>{subcategoryString ? subcategoryString : "Category Needed"}</span>
 					<span className={styles.balance}>
-						{balanceString}
+						{formatCurrencyBasedOnOutflow(transaction.balance, transaction.outflow)}
 
 						{transaction.approval ? (
 							// eslint-disable-next-line @next/next/no-img-element
@@ -243,7 +227,7 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 			);
 		}
 	});
-	*/
+
 
 	return (
 		<>
@@ -270,7 +254,7 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 					<img src="/icons/search-grey-300.svg" alt="Search icon" />
 					<input type="text" placeholder="Search Transactions" onChange={handleFilterChange}/>
 				</div>
-				{}
+				{transactionItems}
 			</main>
 		</>
 	);
