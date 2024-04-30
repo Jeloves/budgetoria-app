@@ -60,7 +60,6 @@ export function AccountsPage(props: AccountsPagePropsType) {
 
 
 	const [accountsPageRenderKey, setAccountsPageRenderKey] = useState<0 | 1>(0);
-	const [initialBalanceRenderKey, setInitialBalanceRenderKey] = useState<0 | 1>(0);
 	const [subpage, setSubpage] = useState<JSX.Element | null>(null);
 	const [subpageClasses, setSubpageClasses] = useState<string[]>([styles.subpage]);
 

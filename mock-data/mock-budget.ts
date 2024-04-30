@@ -128,7 +128,7 @@ const transaction_nordVPN_january = new Transaction(uuidv4(), timestamp_january2
 const transaction_unfinished1_january = new Transaction(uuidv4(), timestamp_january10, "", "", true, 23960000, false, account_checkings.id, "", "");
 const transaction_unfinished2_january = new Transaction(uuidv4(), timestamp_january10, "", "", true, 41460000, false, account_checkings.id, "", "");
 const transaction_unfinished3_january = new Transaction(uuidv4(), timestamp_january15, "Weis Markets", "gum", true, 20040000, false, account_checkings.id, "", subcategory_food.id);
-const transaction_unfinished4_january = new Transaction(uuidv4(), timestamp_january20, "", "", true, 26000000, false, account_checkings.id, category_nonessential.id, "");
+const transaction_unfinished4_january = new Transaction(uuidv4(), timestamp_january20, "", "", true, 26000000, false, "", category_nonessential.id, "");
 
 export function getMockData() {
 	return {

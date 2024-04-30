@@ -201,7 +201,8 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 		for (let i = 0; i < transactions.length; i++) {
 			const transaction = transactions[i];
 			const payeeString = transaction.payee;
-			const subcategoryString = getSubcategoryNameByID(transaction.subcategoryID, subcategories);
+			const subcategoryNameString = getSubcategoryNameByID(transaction.subcategoryID, subcategories);
+			const accountNameString = getAccountNameByID(transaction.accountID, accounts);
 
 			// Formatting strings for transaction data
 			transactionItems.push(
@@ -210,11 +211,11 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 						<span />
 					</div>
 					<span className={styles.payee}>{payeeString ? payeeString : "Payee Needed"}</span>
-					<span className={styles.subcategory}>{subcategoryString ? subcategoryString : "Category Needed"}</span>
+					<span className={styles.subcategory}>{subcategoryNameString ? subcategoryNameString : "Category Needed"}</span>
 					<span className={styles.balanceContainer}>
 						<div className={styles.balance}>
 							{formatCurrencyBasedOnOutflow(transaction.balance, transaction.outflow)}
-							{showingAllAccounts && <div>{getAccountNameByID(transaction.accountID, accounts)}</div>}
+							{showingAllAccounts && <div className={styles.accountName}>{accountNameString ? accountNameString : "Account Needed"}</div>}
 						</div>
 						{transaction.approval ? (
 							// eslint-disable-next-line @next/next/no-img-element
