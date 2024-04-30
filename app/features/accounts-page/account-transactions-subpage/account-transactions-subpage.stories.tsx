@@ -20,6 +20,7 @@ export const Default = Template.bind({});
 const mock = getMockData();
 
 Default.args = {
+	categories: mock.categories,
 	subcategories: mock.subcategories,
 	accounts: mock.accounts,
 	showingAllAccounts: true,

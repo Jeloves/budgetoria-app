@@ -1,4 +1,4 @@
-import { Account, Subcategory, Transaction } from "@/firebase/models";
+import { Account, Category, Subcategory, Transaction } from "@/firebase/models";
 import styles from "./account-transactions-subpage.module.scss";
 import { useEffect, useState } from "react";
 import classNames from "classnames";
@@ -6,8 +6,10 @@ import { IconButton } from "@/features/ui";
 import { v4 as uuidv4 } from "uuid";
 import { NIL as NIL_UUID } from "uuid";
 import { cloneDeep } from "lodash";
+import { getCategoryNameByID, getSubcategoryNameByID } from "@/utils/getByID";
 
 export type AccountTransactionsSubpagePropsType = {
+	categories: Category[];
 	subcategories: Subcategory[];
 	accounts: Account[];
 	showingAllAccounts: boolean;
@@ -18,7 +20,7 @@ export type AccountTransactionsSubpagePropsType = {
 type DateTransactionsMap = Map<string, Transaction[]>;
 
 export function AccountTransactionsSubpage(props: AccountTransactionsSubpagePropsType) {
-	const { accounts, transactions, subcategories, handleBackClick } = props;
+	const { accounts, categories, subcategories, transactions, handleBackClick } = props;
 
 	const [clearedTransactions, setClearedTransactions] = useState<Transaction[]>([]);
 	const [unclearedTransactions, setUnclearedTransactions] = useState<Transaction[]>([]);
@@ -30,30 +32,24 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 	const [unclearedBalanceString, setUnclearedBalanceString] = useState<string>("");
 	const [workingBalanceString, setWorkingBalanceString] = useState<string>("");
 
-	const [dateTransactionsMap, setDateTransactionsMap] = useState<DateTransactionsMap>(new Map());
-	const [payees, setPayees] = useState<string[]>([]);
 	const [filter, setFilter] = useState<string>("");
+	const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>(transactions);
+	const [dateTransactionsMap, setDateTransactionsMap] = useState<DateTransactionsMap>(new Map());
 
-	// Separates cleared from uncleared transactions, and generates list of payees
+	// Separates cleared from uncleared transactions
 	useEffect(() => {
 		const cleared: Transaction[] = [];
 		const uncleared: Transaction[] = [];
-		const payeesList: string[] = [];
 		for (let transaction of transactions) {
 			if (transaction.approval) {
 				cleared.push(transaction);
 			} else {
 				uncleared.push(transaction);
 			}
-
-			if (!payeesList.includes(transaction.payee) && transaction.payee !== "") {
-				payeesList.push(transaction.payee);
-			}
 		}
 		setClearedTransactions(cleared);
 		setUnclearedTransactions(uncleared);
-		setPayees(payeesList);
-	}, [payees, transactions]);
+	}, [transactions]);
 
 	// Calculates cleared, uncleared, and working balance
 	useEffect(() => {
@@ -112,7 +108,50 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 		}
 	}, [clearedBalance, unclearedBalance, workingBalance]);
 
+	// Filters transactions
+	useEffect(() => {
+		// Filter can search for category, subcategory, payee, or amount, and date
+		if (filter === "") {
+			setFilteredTransactions(transactions);
+		} else {
+			const filtered = transactions.filter((transaction) => {
+				// Filter for category
+				if (getCategoryNameByID(transaction.categoryID, categories).includes(filter)) {
+					console.log("Category Filter hit", transaction)
+					return transaction;
+				}
+				// Filter for subcategory
+				else if (getSubcategoryNameByID(transaction.subcategoryID, subcategories).includes(filter)) {
+					console.log("Subcategory Filter hit", transaction)
+					return transaction;
+				}
+				// Filter for payee 
+				else if (transaction.payee.includes(filter)) {
+					console.log("Payee Filter hit", transaction)
+					return transaction;
+				}
+				// Filter for date
+				else if (transaction.date.toDate().toLocaleDateString('en-US', {
+					weekday: 'long',
+					year: 'numeric',
+					month: 'long',
+					day: 'numeric'
+				  }).includes(filter)) {
+					console.log("Date Filter hit", transaction)
+					return transaction;
+				}
+				// Filter for transaction balance
+				else if ((transaction.balance / 1000000).toFixed(2).toString().includes(filter)) {
+					console.log("Balance Filter hit", transaction)
+					return transaction;
+				}
+			});
+			setFilteredTransactions(filtered)
+		}
+	}, [categories, filter, subcategories, transactions]);
+
 	// Grouping transactions by date, including Transaction objects for initial account balances
+	// The resulting dateTransactionsMap is therefore ordered by date in descending order
 	useEffect(() => {
 		// Creating transactions to represent initial account balances
 		const initialTransactions: Transaction[] = [];
@@ -131,8 +170,8 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 		}
 
 		// Grouping transactions by date in descending order
-		const allTransactions = transactions.concat(initialTransactions);
-		console.log("amount of transactions", allTransactions.length)
+		const allTransactions = filteredTransactions.concat(initialTransactions);
+		console.log("amount of transactions", allTransactions.length);
 		allTransactions.sort((a, b) => b.date.toMillis() - a.date.toMillis());
 		const newDateTransactionsMap: DateTransactionsMap = new Map();
 		for (const transaction of allTransactions) {
@@ -144,18 +183,25 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 			} else {
 				newDateTransactionsMap.set(dateISOString, [transaction]);
 			}
-		}	
+		}
 		setDateTransactionsMap(newDateTransactionsMap);
-	}, [transactions, accounts]);
+	}, [filteredTransactions, accounts]);
 
+	// Filter can search for category, subcategory, payee, or amount, and date
 	const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setFilter(event.currentTarget.value);
 	};
 
 	const transactionItems: JSX.Element[] = [];
+	dateTransactionsMap.forEach((transactions, dateISOString) => {
+		const dateString = new Date(dateISOString).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
+
+		// Date Filter
+		const filterIncludesCurrentDate = dateString.includes(filter);
+	});
+
 
 	/*
-	const transactionItems: JSX.Element[] = [];
 	dateTransactionsMap.forEach((transactions, dateISOString) => {
 		const dateString = new Date(dateISOString).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
 
@@ -197,22 +243,6 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 			);
 		}
 	});
-	transactionItems.push(
-		<>
-			<div className={styles.date}>Account Created</div>
-			<div className={styles.transaction}>
-				<div className={styles.select}>
-					<span />
-				</div>
-				<span className={styles.payee}>Starting Balance</span>
-				<span className={styles.subcategory}>Unassigned</span>
-				<span className={classNames(styles.balance, styles.initial)}>
-					{account.initialBalance > 0 ? "$" + (account.initialBalance / 1000000).toFixed(2) : "- $" + (account.initialBalance / 1000000).toFixed(2)}
-					<img src="/icons/cleared.svg" alt="Cleared transaction icon" />
-				</span>
-			</div>
-		</>
-	);
 	*/
 
 	return (
@@ -238,7 +268,7 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 				<div className={styles.filter}>
 					{/*eslint-disable-next-line @next/next/no-img-element */}
 					<img src="/icons/search-grey-300.svg" alt="Search icon" />
-					<input type="text" placeholder="Search Transactions" onChange={handleFilterChange} />
+					<input type="text" placeholder="Search Transactions" onChange={handleFilterChange}/>
 				</div>
 				{}
 			</main>
