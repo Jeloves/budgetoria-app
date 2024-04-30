@@ -15,17 +15,23 @@ export function CreateAccountSubpage(props: CreateAccountSubpagePropsType) {
 
 	const [name, setName] = useState<string>("");
 	const [initialBalance, setInitialBalance] = useState<number>(0);
+	const [outflow, setOutflow] = useState<boolean>(false);
 
 	const handleNameOnChange = (event: ChangeEvent<HTMLInputElement>) => {
 		let newName = event.target.value;
 		setName(newName);
+	};
+	const handleSwitchToOutflow = () => {
+		setOutflow(true);
 	}
-	// TODO - Implement ability to add a negative initial balance
+	const handleSwitchToInflow = () => {
+		setOutflow(false);
+	}
 	const handleInitialBalanceOnChange = (event: ChangeEvent<HTMLInputElement>) => {
 		let newInitialBalance = event.target.value;
 
 		// Removes non-number characters
-		const nonCurrencyRegex = /[^0-9.]/g;
+		const nonCurrencyRegex = /[^0-9.-]/g;
 		newInitialBalance = newInitialBalance.replace(nonCurrencyRegex, "");
 
 		// Removes decimal points after the first
@@ -39,17 +45,21 @@ export function CreateAccountSubpage(props: CreateAccountSubpagePropsType) {
 
 		if (newInitialBalance === "") {
 			event.target.value = "";
-			setInitialBalance(0)
+			setInitialBalance(0);
 		} else {
 			event.target.value = "$" + newInitialBalance;
 			setInitialBalance(parseFloat(newInitialBalance) * 1000000);
 		}
-	}
+	};
 	const handleCreateAccountClick = () => {
 		if (name === "") {
-			alert("Must enter a name for the new account.")
+			alert("Must enter a name for the new account.");
 		} else {
 			const newAccount = new Account(uuidv4(), name, Timestamp.fromDate(new Date()), initialBalance, initialBalance);
+			if (outflow) {
+				newAccount.initialBalance *= -1;
+				newAccount.balance *= -1;
+			} 
 			handleCreateAccount(newAccount);
 		}
 	};
@@ -57,7 +67,7 @@ export function CreateAccountSubpage(props: CreateAccountSubpagePropsType) {
 	return (
 		<>
 			<header className={styles.header}>
-				<IconButton button={{onClick: handleBackClick}} src={"/icons/arrow-left-grey-100.svg"} altText={"Button to navigate back to Accounts Page"}/>
+				<IconButton button={{ onClick: handleBackClick }} src={"/icons/arrow-left-grey-100.svg"} altText={"Button to navigate back to Accounts Page"} />
 				<span>Create Account</span>
 				<button className={styles.finish} onClick={handleCreateAccountClick}>
 					Finish
@@ -65,9 +75,20 @@ export function CreateAccountSubpage(props: CreateAccountSubpagePropsType) {
 			</header>
 			<main className={styles.main}>
 				<label>Enter a name for the account</label>
-				<input type="text" placeholder="Account name..." required onChange={handleNameOnChange}/>
+				<input type="text" placeholder="Account name..." required onChange={handleNameOnChange} />
 				<label>Enter the starting balance for the account</label>
-				<input type="text" placeholder="$0.00" required onChange={handleInitialBalanceOnChange}/>
+				<div className={styles.balance}>
+					<div className={styles.flowContainer}>
+						<div className={outflow ? styles.outflow : ""}>
+							<IconButton button={{ onClick: handleSwitchToOutflow }} src={outflow ? "/icons/minus-gray-100.svg" : "/icons/minus-gray-500.svg"} altText={"Button to make a negative balance"} />
+						</div>
+						<hr className={styles.border}/>
+						<div className={outflow ? "" : styles.inflow}>
+							<IconButton button={{ onClick: handleSwitchToInflow}} src={outflow ? "/icons/plus-gray-500.svg" : "/icons/plus-gray-100.svg"} altText={"Button to make a positive balance"} />
+						</div>
+					</div>
+					<input type="text" placeholder="$0.00" required onChange={handleInitialBalanceOnChange} />
+				</div>
 			</main>
 		</>
 	);

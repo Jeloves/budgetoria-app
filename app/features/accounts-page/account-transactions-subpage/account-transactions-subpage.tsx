@@ -85,7 +85,7 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 		if (clearedBalance > 0) {
 			setClearedBalanceString("$" + (clearedBalance / 1000000).toFixed(2));
 		} else if (clearedBalance < 0) {
-			setClearedBalanceString("-$" + (clearedBalance / 1000000).toFixed(2));
+			setClearedBalanceString("-$" + (clearedBalance / -1000000).toFixed(2));
 		} else {
 			setClearedBalanceString("$0.00");
 		}
@@ -94,7 +94,7 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 		if (unclearedBalance > 0) {
 			setUnclearedBalanceString("$" + (unclearedBalance / 1000000).toFixed(2));
 		} else if (unclearedBalance < 0) {
-			setUnclearedBalanceString("-$" + (unclearedBalance / 1000000).toFixed(2));
+			setUnclearedBalanceString("-$" + (unclearedBalance / -1000000).toFixed(2));
 		} else {
 			setUnclearedBalanceString("$0.00");
 		}
@@ -103,7 +103,7 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 		if (workingBalance > 0) {
 			setWorkingBalanceString("$" + (workingBalance / 1000000).toFixed(2));
 		} else if (workingBalance < 0) {
-			setWorkingBalanceString("-$" + (workingBalance / 1000000).toFixed(2));
+			setWorkingBalanceString("-$" + (workingBalance / -1000000).toFixed(2));
 		} else {
 			setWorkingBalanceString("$0.00");
 		}

@@ -30,6 +30,44 @@
 		border: space.$s0-1 solid color.$gray-500;
 		border-radius: space.$s1;
 		box-sizing: border-box;
-		padding: space.$s2;	
+		padding: space.$s2;
+	}
+}
+
+.balance {
+	display: flex;
+}
+
+.flowContainer {
+	width: 40%;
+	display: flex;
+	border: space.$s0-1 solid color.$gray-500;
+	border-radius: space.$s1;
+	margin-right: space.$s2;
+
+	& div {
+		height: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex: 1;
+	}
+
+	& .inflow {
+		background-color: color.$green-500;
+	}
+
+	& .outflow {
+		background-color: color.$red-500;
+	}
+
+	& .flow {
+		background-color: color.$primary-dark;
+	}
+
+	& .border {
+		background-color: color.$gray-500;
+		width: space.$s0-1;
+		height: 100%;
 	}
 }
