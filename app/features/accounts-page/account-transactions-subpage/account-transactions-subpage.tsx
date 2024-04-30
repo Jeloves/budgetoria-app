@@ -47,6 +47,9 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 		setUnclearedTransactions(uncleared);
 	}, [transactions]);
 
+	console.log("cleared", clearedTransactions)
+	console.log("uncleared", unclearedTransactions)
+
 	// Calculates cleared, uncleared, and working balance
 	useEffect(() => {
 		// Calculates sum of account initial balances
@@ -87,9 +90,9 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 
 		// Formats uncleared balance
 		if (unclearedBalance > 0) {
-			setUnclearedBalanceString("$" + (clearedBalance / 1000000).toFixed(2));
+			setUnclearedBalanceString("$" + (unclearedBalance / 1000000).toFixed(2));
 		} else if (unclearedBalance < 0) {
-			setUnclearedBalanceString("-$" + (clearedBalance / 1000000).toFixed(2));
+			setUnclearedBalanceString("-$" + (unclearedBalance / 1000000).toFixed(2));
 		} else {
 			setUnclearedBalanceString("$0.00");
 		}
@@ -156,6 +159,7 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 		setFilter(event.currentTarget.value);
 	};
 
+	/*
 	const transactionItems: JSX.Element[] = [];
 	dateTransactionsMap.forEach((transactions, dateISOString) => {
 		const dateString = new Date(dateISOString).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
@@ -198,7 +202,6 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 			);
 		}
 	});
-	// Starting balance item
 	transactionItems.push(
 		<>
 			<div className={styles.date}>Account Created</div>
@@ -210,18 +213,18 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 				<span className={styles.subcategory}>Unassigned</span>
 				<span className={classNames(styles.balance, styles.initial)}>
 					{account.initialBalance > 0 ? "$" + (account.initialBalance / 1000000).toFixed(2) : "- $" + (account.initialBalance / 1000000).toFixed(2)}
-					{/*eslint-disable-next-line @next/next/no-img-element*/}
 					<img src="/icons/cleared.svg" alt="Cleared transaction icon" />
 				</span>
 			</div>
 		</>
 	);
+	*/
 
 	return (
 		<>
 			<header className={styles.header}>
 				<IconButton button={{ onClick: handleBackClick }} src={"/icons/arrow-left-grey-100.svg"} altText={"Button to return to Accounts Page"} />
-				<span>{account.name}</span>
+				<span>{}</span>
 				<IconButton button={{ onClick: handleBackClick }} src={"/icons/edit-grey-100.svg"} altText={"Navigate to Edit Account Page"} />
 			</header>
 			<main className={styles.main}>
@@ -242,7 +245,7 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 					<img src="/icons/search-grey-300.svg" alt="Search icon" />
 					<input type="text" placeholder="Search Transactions" onChange={handleFilterChange} />
 				</div>
-				{transactionItems}
+				{}
 			</main>
 		</>
 	);

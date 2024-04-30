@@ -129,3 +129,14 @@ const transaction_unfinished1_january = new Transaction(uuidv4(), timestamp_janu
 const transaction_unfinished2_january = new Transaction(uuidv4(), timestamp_january10, "", "", true, 41460000, false, account_checkings.id, "", "");
 const transaction_unfinished3_january = new Transaction(uuidv4(), timestamp_january15, "Weis Markets", "gum", true, 20040000, false, account_checkings.id, "", subcategory_food.id);
 const transaction_unfinished4_january = new Transaction(uuidv4(), timestamp_january20, "", "", true, 26000000, false, account_checkings.id, category_nonessential.id, "");
+
+export function getMockData() {
+	return {
+		budget: budget,
+		accounts: [account_checkings, account_credit, account_savings],
+		categories: [category_essential, category_nonessential, category_subscriptions],
+		subcategories: [subcategory_crunchyroll, subcategory_food,subcategory_gas,subcategory_gas,subcategory_iceCream, subcategory_netflix,subcategory_nordVPN, subcategory_studentLoans, subcategory_videoGames, subcategory_weed],
+		allocations: [allocation_crunchyroll_january,allocation_food_jan,allocation_gas_january,allocation_iceCream_january,allocation_netflix_january,allocation_nordVPN_january,allocation_studentLoans_january,allocation_videoGames_january,allocation_weed_january],
+		transactions: [transaction_crunchyroll_january,transaction_food_january,transaction_gas_january,transaction_iceCream_january,transaction_netflix_january,transaction_nordVPN_january,transaction_studentLoans_january,transaction_videoGames_january,transaction_weed_january,transaction_unfinished1_january,transaction_unfinished2_january,transaction_unfinished3_january,transaction_unfinished4_january]
+	}
+}
