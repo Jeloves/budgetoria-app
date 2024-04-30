@@ -1,0 +1,35 @@
+@use "@styles/color";
+@use "@styles/font";
+@use "@styles/space";
+@use "@styles/header";
+@use "@styles/main";
+
+.header {
+	justify-content: space-between;
+
+	& .finish {
+		color: color.$green-500;
+	}
+}
+
+.main {
+	display: flex;
+	flex-direction: column;
+	gap: space.$s2;
+	box-sizing: border-box;
+	padding: space.$s2;
+	color: color.$gray-100;
+	font: font.$text-regular;
+
+	& label {
+		width: 100%;
+	}
+
+	& input {
+		width: 100%;
+		border: space.$s0-1 solid color.$gray-500;
+		border-radius: space.$s1;
+		box-sizing: border-box;
+		padding: space.$s2;	
+	}
+}

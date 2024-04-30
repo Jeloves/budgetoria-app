@@ -57,7 +57,11 @@ export function AccountsPage(props: AccountsPagePropsType) {
 		setSubpageClasses([styles.subpage, styles.hide]);
 	};
 	const navigateToUnfinishedTransactionsSubpage = () => {};
-	const navigateToAllTransactionsSubpage = () => {};
+	const navigateToAllTransactionsSubpage = () => {
+		const clearedTransactions = transactions.filter((transaction) => transaction.approval);
+		const unclearedTransactions = transactions.filter((transaction) => !transaction.approval);
+		showSubpage(<AccountTransactionsSubpage subcategories={subcategories} account={selectedAccount}  handleBackClick={hideSubpage} />);
+	};
 	const navigateToAccountTransactionsSubpage = (selectedAccount: Account, selectedTransactions: Transaction[]) => {
 		const clearedTransactions = selectedTransactions.filter((transaction) => transaction.approval);
 		const unclearedTransactions = selectedTransactions.filter((transaction) => !transaction.approval);
@@ -65,35 +69,6 @@ export function AccountsPage(props: AccountsPagePropsType) {
 	};
 	const navigateToCreateAccountSubpage = () => {};
 
-	const handleNewAccountNameBlur = (event: ChangeEvent<HTMLInputElement>) => {
-		const newName = event.target.value;
-		const currentInitialBalance = newAccountData.initialBalance;
-		setNewAccountData({ name: newName, initialBalance: currentInitialBalance });
-	};
-	const handleNewAccountInitialBalanceBlur = (event: React.FocusEvent<HTMLInputElement>) => {
-		let newInitialBalance = event.target.value;
-		// Removes currency string if present
-		if (newInitialBalance.includes("$")) {
-			newInitialBalance = newInitialBalance.replace("$", "");
-		}
-		// Removes non-number characters
-		const nonCurrencyRegex = /[^0-9.]/g;
-		newInitialBalance = newInitialBalance.replace(nonCurrencyRegex, "");
-		const isValidNumber = !isNaN(parseFloat(newInitialBalance));
-
-		const currentName = newAccountData.name;
-		if (isValidNumber) {
-			setNewAccountData({ name: currentName, initialBalance: parseFloat(newInitialBalance) * 1000000 });
-		} else {
-			setNewAccountData({ name: currentName, initialBalance: 0 });
-		}
-		setInitialBalanceRenderKey(initialBalanceRenderKey === 0 ? 1 : 0);
-	};
-	const handleEnterKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-		if (event.key === "Enter") {
-			event.currentTarget.blur();
-		}
-	};
 	const handleShowAddAccountElement = () => {
 		const element = document.getElementById("add_account_element_id");
 		if (element) {
@@ -147,26 +122,6 @@ export function AccountsPage(props: AccountsPagePropsType) {
 			<span key={"total_item_name_0"}>Budget</span>
 			<span key={"total_item_balance_0"}>${(totalAccountBalance / 1000000).toFixed(2)}</span>
 		</div>
-	);
-
-	const addAccountElement = (
-		<section id="add_account_element_id" className={styles.addAccount}>
-			<header>
-				<button className={styles.cancel} onClick={handleHideAddAccountElement}>
-					Cancel
-				</button>
-				<span>Add Account</span>
-				<button className={styles.done} onClick={handleVerifyNewAccount}>
-					Done
-				</button>
-			</header>
-			<div>
-				<label>Enter a name for the account:</label>
-				<input type="text" placeholder="Account name..." required defaultValue={newAccountData.name} onBlur={handleNewAccountNameBlur} onKeyDown={handleEnterKeyDown} />
-				<label>Enter the starting balance for the account:</label>
-				<input key={initialBalanceRenderKey} type="text" placeholder="$0.00" required defaultValue={"$" + (newAccountData.initialBalance / 1000000).toFixed(2)} onBlur={handleNewAccountInitialBalanceBlur} onKeyDown={handleEnterKeyDown} />
-			</div>
-		</section>
 	);
 
 	return (

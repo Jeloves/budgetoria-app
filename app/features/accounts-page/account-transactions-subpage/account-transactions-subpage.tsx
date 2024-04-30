@@ -6,9 +6,8 @@ import { IconButton } from "@/features/ui";
 
 export type AccountTransactionsSubpagePropsType = {
 	subcategories: Subcategory[];
-	account: Account;
-	clearedTransactions: Transaction[];
-	unclearedTransactions: Transaction[];
+	accounts: Account[];
+	transactions: Transaction[];
 	handleBackClick: () => void;
 };
 
