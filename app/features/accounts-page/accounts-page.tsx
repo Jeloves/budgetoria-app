@@ -94,8 +94,10 @@ export function AccountsPage(props: AccountsPagePropsType) {
 	let totalAccountBalance = 0;
 	for (let i = 0; i < accounts.length; i++) {
 		const account = accounts[i];
+		const accountBalanceString = account.balance >= 0 ? "$" + (account.balance / 1000000).toFixed(2) : "-$" + (account.balance / -1000000).toFixed(2);
 		const filteredTransactions = transactions.filter((transaction) => transaction.accountID === account.id);
 		totalAccountBalance += account.balance;
+
 		accountItems.push(
 			<div
 				data-test-id={`account_item_${i}`}
@@ -106,15 +108,16 @@ export function AccountsPage(props: AccountsPagePropsType) {
 				}}
 			>
 				<span key={`account_item_name_${i}`}>{account.name}</span>
-				<span key={`account_item_balance_${i}`}>${(account.balance / 1000000).toFixed(2)}</span>
+				<span key={`account_item_balance_${i}`}>{accountBalanceString}</span>
 			</div>
 		);
 	}
 	// Adds "Budget" heading for list of accounts
+	const totalBalanceString = totalAccountBalance >= 0 ? "$" + (totalAccountBalance / 1000000).toFixed(2) : "-$" + (totalAccountBalance / -1000000).toFixed(2);
 	accountItems.unshift(
 		<div data-test-id={`total_item`} key={"total_item"} className={classNames(styles.accountItem, styles.totalItem)}>
 			<span key={"total_item_name"}>Budget</span>
-			<span key={"total_item_balance"}>${(totalAccountBalance / 1000000).toFixed(2)}</span>
+			<span key={"total_item_balance"}>{totalBalanceString}</span>
 		</div>
 	);
 
