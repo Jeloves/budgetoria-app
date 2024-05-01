@@ -9,6 +9,7 @@ import { AccountTransactionsSubpage } from "./account-transactions-subpage/accou
 import { createAccount, getAccounts } from "@/firebase/accounts";
 import { CreateAccountSubpage } from "./create-account-subpage/create-account-subpage";
 import { createTransaction, getTransactions } from "@/firebase/transactions";
+import { sortAccountsAlphabetically } from "@/utils/sorting";
 
 export type AccountsPagePropsType = {
 	userID: string;
@@ -34,6 +35,7 @@ export function AccountsPage(props: AccountsPagePropsType) {
 	useEffect(() => {
 		const fetchData = async () => {
 			const accountsData = await getAccounts(userID, budgetID);
+			sortAccountsAlphabetically(accountsData);
 			setAccounts(accountsData);
 		};
 		fetchData();
@@ -53,11 +55,10 @@ export function AccountsPage(props: AccountsPagePropsType) {
 					unfinishedTransactions.push(transaction);
 				}
 			}
-			setUnfinishedTransactions(unfinishedTransactions)
+			setUnfinishedTransactions(unfinishedTransactions);
 		};
 		fetchData();
 	}, [transactionsDataKey, budgetID, userID]);
-
 
 	const [accountsPageRenderKey, setAccountsPageRenderKey] = useState<0 | 1>(0);
 	const [subpage, setSubpage] = useState<JSX.Element | null>(null);
@@ -79,10 +80,10 @@ export function AccountsPage(props: AccountsPagePropsType) {
 	};
 	const navigateToUnfinishedTransactionsSubpage = () => {};
 	const navigateToAllTransactionsSubpage = () => {
-		showSubpage(<AccountTransactionsSubpage categories={categories} subcategories={subcategories} accounts={accounts} showingAllAccounts={true} transactions={transactions} handleBackClick={hideSubpage}/>);
+		showSubpage(<AccountTransactionsSubpage categories={categories} subcategories={subcategories} accounts={accounts} showingAllAccounts={true} transactions={transactions} handleBackClick={hideSubpage} />);
 	};
 	const navigateToAccountTransactionsSubpage = (selectedAccount: Account, selectedTransactions: Transaction[]) => {
-		showSubpage(<AccountTransactionsSubpage categories={categories} subcategories={subcategories} accounts={[selectedAccount]} showingAllAccounts={false} transactions={transactions} handleBackClick={hideSubpage}/>);
+		showSubpage(<AccountTransactionsSubpage categories={categories} subcategories={subcategories} accounts={[selectedAccount]} showingAllAccounts={false} transactions={transactions} handleBackClick={hideSubpage} />);
 	};
 	const navigateToCreateAccountSubpage = () => {
 		showSubpage(<CreateAccountSubpage handleBackClick={hideSubpage} handleCreateAccount={handleCreateAccount} />);
@@ -97,6 +98,7 @@ export function AccountsPage(props: AccountsPagePropsType) {
 		totalAccountBalance += account.balance;
 		accountItems.push(
 			<div
+				data-test-id={`account_item_${i}`}
 				key={`account_item_${i}`}
 				className={styles.accountItem}
 				onClick={() => {
@@ -132,7 +134,6 @@ export function AccountsPage(props: AccountsPagePropsType) {
 						<img src="/icons/arrow-right.svg" alt="Button to add accounts" />
 					</button>
 				</div>
-
 				{accountItems}
 				<div className={styles.subpageButtonContainer}>
 					<button className={styles.subpageButton} onClick={navigateToCreateAccountSubpage}>

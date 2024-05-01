@@ -88,12 +88,10 @@ const payees = [
 
 /* January */
 const timestamp_january1 = Timestamp.fromDate(new Date(2024, 0, 1));
-const timestamp_january5 = Timestamp.fromDate(new Date(2024, 0, 5));
 const timestamp_january10 = Timestamp.fromDate(new Date(2024, 0, 10));
 const timestamp_january15 = Timestamp.fromDate(new Date(2024, 0, 15));
 const timestamp_january20 = Timestamp.fromDate(new Date(2024, 0, 20));
 const timestamp_january25 = Timestamp.fromDate(new Date(2024, 0, 25));
-const timestamp_january30 = Timestamp.fromDate(new Date(2024, 0, 30));
 
 const transactionBalance_food_january = 287.65;
 const transactionBalance_gas_january = 44.77;
@@ -130,6 +128,51 @@ const transaction_unfinished2_january = new Transaction(uuidv4(), timestamp_janu
 const transaction_unfinished3_january = new Transaction(uuidv4(), timestamp_january15, "Weis Markets", "gum", true, 20040000, false, account_checkings.id, "", subcategory_food.id);
 const transaction_unfinished4_january = new Transaction(uuidv4(), timestamp_january20, "", "", true, 26000000, false, "", category_nonessential.id, "");
 
+/* February */
+const transactionBalance_food_february = 265.65;
+const transactionBalance_gas_february = 30.99;
+const transactionBalance_studentLoans_february = 250;
+const transactionBalance_iceCream_february = 1.50;
+const transactionBalance_weed_february = 40;
+const transactionBalance_videoGames_february = 75.00;
+const transactionBalance_crunchyroll_february = 11.99;
+const transactionBalance_netflix_february = 13.99;
+const transactionBalance_nordVPN_february = 9.97;
+
+const timestamp_february1 = Timestamp.fromDate(new Date(2024, 1, 1));
+const timestamp_february5 = Timestamp.fromDate(new Date(2024, 1, 5));
+const timestamp_february10 = Timestamp.fromDate(new Date(2024, 1, 10));
+const timestamp_february15 = Timestamp.fromDate(new Date(2024, 1, 15));
+const timestamp_february20 = Timestamp.fromDate(new Date(2024, 1, 20));
+const timestamp_february25 = Timestamp.fromDate(new Date(2024, 1, 25));
+
+// Cleared, Credit, Outflow, Essential, Food
+const transaction_food_february = new Transaction(uuidv4(), timestamp_february1, "Weis Markets", "Groceries", true, transactionBalance_food_february * 1000000, true, account_credit.id, category_essential.id, subcategory_food.id);
+// Uncleared, Credit, Outflow, Essential, Gas
+const transaction_gas_february = new Transaction(uuidv4(), timestamp_february10, "Royal Farms", "", true, transactionBalance_gas_february * 1000000, false, account_credit.id, category_essential.id, subcategory_gas.id);
+// Cleared, Checkings, Outflow, Essential, Student Loans
+const transaction_studentLoans_february = new Transaction(uuidv4(), timestamp_february15, "FAFSA", "Cancel this please", true, transactionBalance_studentLoans_february * 1000000, true, account_checkings.id, category_essential.id, subcategory_studentLoans.id);
+// Cleared, Checkings, Outflow, Nonessential, Ice Cream
+const transaction_iceCream_february = new Transaction(uuidv4(), timestamp_february15, "Royal Farms", "Chocolate and vanilla", true, transactionBalance_iceCream_february * 1000000, true, account_checkings.id, category_nonessential.id, subcategory_iceCream.id);
+// Uncleared, Checkings, Inflow, Nonessential, Ice Cream
+const transaction_weed_february = new Transaction(uuidv4(), timestamp_february20, "Curaleaf", "Refunded for bad product", false, transactionBalance_weed_february * 1000000, false, account_checkings.id, category_nonessential.id, subcategory_weed.id);
+// Cleared, Savings, Outflow, Nonessential, Videogames
+const transaction_videoGames_february = new Transaction(uuidv4(), timestamp_february20, "Steam", "ProjectZomboid", true, transactionBalance_videoGames_february * 1000000, true, account_savings.id, category_nonessential.id, subcategory_videoGames.id);
+// Uncleared, Checkings, Outflow, Subscriptions, Crunchyroll
+const transaction_crunchyroll_february = new Transaction(uuidv4(), timestamp_february25, "Crunchyroll", "", true, transactionBalance_crunchyroll_february * 1000000, false, account_checkings.id, category_subscriptions.id, subcategory_crunchyroll.id);
+// Cleared, Checkings, Outflow, Subscriptions, Netflix
+const transaction_netflix_february = new Transaction(uuidv4(), timestamp_february25, "Netflix", "", true, transactionBalance_netflix_february * 1000000, true, account_checkings.id, category_subscriptions.id, subcategory_netflix.id);
+// Cleared, Checkings, Outflow, Subscriptions, NordVPN
+const transaction_nordVPN_february = new Transaction(uuidv4(), timestamp_february25, "NordVPN", "", true, transactionBalance_nordVPN_february * 1000000, true, account_checkings.id, category_subscriptions.id, subcategory_nordVPN.id);
+
+// Unfinished Transactions
+const transaction_unfinished1_february = new Transaction(uuidv4(), timestamp_february10, "", "", true, 13940000, false, account_checkings.id, "", "");
+const transaction_unfinished2_february = new Transaction(uuidv4(), timestamp_february10, "", "", true, 31430000, false, account_checkings.id, "", "");
+const transaction_unfinished3_february = new Transaction(uuidv4(), timestamp_february15, "Weis Markets", "gum", true, 12340000, false, account_checkings.id, "", subcategory_food.id);
+const transaction_unfinished4_february = new Transaction(uuidv4(), timestamp_february20, "", "", true, 10000000, false, "", category_nonessential.id, "");
+
+
+
 export function getMockData() {
 	return {
 		budget: budget,
@@ -137,6 +180,7 @@ export function getMockData() {
 		categories: [category_essential, category_nonessential, category_subscriptions],
 		subcategories: [subcategory_crunchyroll, subcategory_food,subcategory_gas,subcategory_gas,subcategory_iceCream, subcategory_netflix,subcategory_nordVPN, subcategory_studentLoans, subcategory_videoGames, subcategory_weed],
 		allocations: [allocation_crunchyroll_january,allocation_food_jan,allocation_gas_january,allocation_iceCream_january,allocation_netflix_january,allocation_nordVPN_january,allocation_studentLoans_january,allocation_videoGames_january,allocation_weed_january],
-		transactions: [transaction_crunchyroll_january,transaction_food_january,transaction_gas_january,transaction_iceCream_january,transaction_netflix_january,transaction_nordVPN_january,transaction_studentLoans_january,transaction_videoGames_january,transaction_weed_january,transaction_unfinished1_january,transaction_unfinished2_january,transaction_unfinished3_january,transaction_unfinished4_january]
+		transactions: [transaction_crunchyroll_january,transaction_food_january,transaction_gas_january,transaction_iceCream_january,transaction_netflix_january,transaction_nordVPN_january,transaction_studentLoans_january,transaction_videoGames_january,transaction_weed_january,transaction_unfinished1_january,transaction_unfinished2_january,transaction_unfinished3_january,transaction_unfinished4_january, transaction_crunchyroll_february, transaction_food_february, transaction_gas_february, transaction_iceCream_february, transaction_netflix_february, transaction_nordVPN_february, transaction_studentLoans_february, transaction_videoGames_february, transaction_weed_february, transaction_unfinished1_february, transaction_unfinished2_february, transaction_unfinished3_february, transaction_unfinished4_february]
+
 	}
 }
