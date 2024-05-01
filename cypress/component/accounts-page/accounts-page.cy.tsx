@@ -162,4 +162,38 @@ describe("<AccountsPage />", () => {
 			}
 		});
 	});
+
+	context("Navigation buttons show subpage", () => {
+		before(() => {
+			// Adding accounts to firebase (deleted after tests)
+			for (let account of mockAccounts) {
+				createAccount(userID, budgetID, account);
+			}
+
+			// Adding transactions to firebase (deleted after tests)
+			for (let transaction of mockTransactions) {
+				createTransaction(userID, budgetID, transaction);
+			}
+		});
+
+		beforeEach(() => {
+			cy.mount(<AccountsPage userID={userID} budgetID={budgetID} categories={mockCategories} subcategories={mockSubcategories} />);
+		});
+
+		it('opens subpage when "New Transactions" button is clicked', () => {
+			// TODO - Requires NewTransactions subpage to be completed
+			cy.get('[data-test-id="unfinished_transactions_button"]').should("exist")
+		});
+
+		it('opens subpage when "All Accounts" button is clicked', () => {
+			cy.get('[data-test-id="all_accounts_button"]').should("exist").click();
+			cy.get('[data-test-id="account_transactions_subpage_header"]').should("exist")
+		});
+
+		it('opens subpage when "Add Accounts" button is clicked', () => {
+			cy.get('[data-test-id="add_accounts_button"]').should("exist").click();
+			cy.get('[data-test-id="create_account_subpage_header"]').should("exist")
+		});
+
+	});
 });

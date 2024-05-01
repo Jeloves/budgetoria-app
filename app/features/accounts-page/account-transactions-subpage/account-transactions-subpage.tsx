@@ -232,7 +232,7 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 
 	return (
 		<>
-			<header className={styles.header}>
+			<header data-test-id="account_transactions_subpage_header"  className={styles.header}>
 				<IconButton button={{ onClick: handleBackClick }} src={"/icons/arrow-left-grey-100.svg"} altText={"Button to return to Accounts Page"} />
 				<span>{showingAllAccounts ? "All Accounts" : accounts[0].name}</span>
 				<IconButton button={{ onClick: handleBackClick }} src={"/icons/edit-grey-100.svg"} altText={"Navigate to Edit Account Page"} />

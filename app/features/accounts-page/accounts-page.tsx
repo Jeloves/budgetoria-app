@@ -149,7 +149,7 @@ export function AccountsPage(props: AccountsPagePropsType) {
 					</button>
 				</div>
 			</main>
-			<section className={classNames(subpageClasses)}>{subpage}</section>
+			<section data-test-id="accounts_subpage" className={classNames(subpageClasses)}>{subpage}</section>
 		</>
 	);
 }
