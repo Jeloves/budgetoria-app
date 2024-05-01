@@ -1,4 +1,5 @@
 import { Account, Allocation, Budget, Category, Subcategory, Transaction } from "@/firebase/models";
+import { getAccountByID } from "@/utils/getByID";
 import { Timestamp } from "firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
 import { NIL as NIL_UUID } from "uuid";
@@ -172,15 +173,37 @@ const transaction_unfinished3_february = new Transaction(uuidv4(), timestamp_feb
 const transaction_unfinished4_february = new Transaction(uuidv4(), timestamp_february20, "", "", true, 10000000, false, "", category_nonessential.id, "");
 
 
+const accounts = [account_checkings, account_credit, account_savings]
+
+const transactions = [transaction_crunchyroll_january,transaction_food_january,transaction_gas_january,transaction_iceCream_january,transaction_netflix_january,transaction_nordVPN_january,transaction_studentLoans_january,transaction_videoGames_january,transaction_weed_january,transaction_unfinished1_january,transaction_unfinished2_january,transaction_unfinished3_january,transaction_unfinished4_january, transaction_crunchyroll_february, transaction_food_february, transaction_gas_february, transaction_iceCream_february, transaction_netflix_february, transaction_nordVPN_february, transaction_studentLoans_february, transaction_videoGames_february, transaction_weed_february, transaction_unfinished1_february, transaction_unfinished2_february, transaction_unfinished3_february, transaction_unfinished4_february]
+
+for (let transaction of transactions) {
+	if (transaction.accountID !== "") {
+		const targetAccount = getAccountByID(transaction.accountID, accounts);
+
+	}
+}
+
+for (let account of accounts) {
+	const filteredTransactions = transactions.filter(transaction => transaction.accountID === account.id)
+	for (let transaction of filteredTransactions) {
+		if (transaction.outflow) {
+			account.balance -= transaction.balance;
+		} else {
+			account.balance += transaction.balance;
+		}
+	}
+}
+
+
 
 export function getMockData() {
 	return {
 		budget: budget,
-		accounts: [account_checkings, account_credit, account_savings],
+		accounts: accounts,
 		categories: [category_essential, category_nonessential, category_subscriptions],
 		subcategories: [subcategory_crunchyroll, subcategory_food,subcategory_gas,subcategory_gas,subcategory_iceCream, subcategory_netflix,subcategory_nordVPN, subcategory_studentLoans, subcategory_videoGames, subcategory_weed],
 		allocations: [allocation_crunchyroll_january,allocation_food_jan,allocation_gas_january,allocation_iceCream_january,allocation_netflix_january,allocation_nordVPN_january,allocation_studentLoans_january,allocation_videoGames_january,allocation_weed_january],
-		transactions: [transaction_crunchyroll_january,transaction_food_january,transaction_gas_january,transaction_iceCream_january,transaction_netflix_january,transaction_nordVPN_january,transaction_studentLoans_january,transaction_videoGames_january,transaction_weed_january,transaction_unfinished1_january,transaction_unfinished2_january,transaction_unfinished3_january,transaction_unfinished4_january, transaction_crunchyroll_february, transaction_food_february, transaction_gas_february, transaction_iceCream_february, transaction_netflix_february, transaction_nordVPN_february, transaction_studentLoans_february, transaction_videoGames_february, transaction_weed_february, transaction_unfinished1_february, transaction_unfinished2_february, transaction_unfinished3_february, transaction_unfinished4_february]
-
+		transactions: transactions
 	}
 }

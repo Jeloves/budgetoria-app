@@ -16,58 +16,163 @@ describe("<AccountsPage />", () => {
 	let mockSubcategories: Subcategory[];
 	let mockTransactions: Transaction[];
 
-	before(() => {
-		// Retrieving env variables
-		userID = Cypress.env("TEST_USER_ID");
-		budgetID = Cypress.env("TEST_BUDGET_ID");
+	context("Constant texts and images", () => {
 
-		const mock = getMockData();
-		mockAccounts = mock.accounts;
-		mockCategories = mock.categories;
-		mockSubcategories = mock.subcategories;
-		mockTransactions = mock.transactions;
+		before(() => {
+			// Retrieving env variables
+			userID = Cypress.env("TEST_USER_ID");
+			budgetID = Cypress.env("TEST_BUDGET_ID");
 
-		sortAccountsAlphabetically(mockAccounts);
+			const mock = getMockData();
+			mockAccounts = mock.accounts;
+			mockCategories = mock.categories;
+			mockSubcategories = mock.subcategories;
+			mockTransactions = mock.transactions;
 
-		// Adding accounts to firebase (deleted after tests)
-		for (let account of mockAccounts) {
-			createAccount(userID, budgetID, account);
-		}
+			sortAccountsAlphabetically(mockAccounts);
 
-		// Adding transactions to firebase (deleted after tests)
-		for (let transaction of mockTransactions) {
-			createTransaction(userID, budgetID, transaction);
-		}
+			// Adding accounts to firebase (deleted after tests)
+			for (let account of mockAccounts) {
+				createAccount(userID, budgetID, account);
+			}
+
+			// Adding transactions to firebase (deleted after tests)
+			for (let transaction of mockTransactions) {
+				createTransaction(userID, budgetID, transaction);
+			}
+		})
+
+		after(() => {
+			// Deletes all accounts from firebase
+			for (let account of mockAccounts) {
+				deleteAccount(userID, budgetID, account.id);
+			}
+	
+			// Deletes all transactions from firebase
+			for (let transaction of mockTransactions) {
+				deleteTransaction(userID, budgetID, transaction.id);
+			}
+		});
+
+		beforeEach(() => {
+			cy.mount(<AccountsPage userID={userID} budgetID={budgetID} categories={mockCategories} subcategories={mockSubcategories} />);
+		});
+
+		it("shows 'Accounts' as the header text", () => {
+			cy.get('[data-test-id="accounts_page_header"]').should("have.text", "Accounts");
+		});
+
+		it("shows 'Budget' as the total balance label", () => {
+			cy.get('[data-test-id="total_item"] span').eq(0).should("have.text", "Budget");
+		});
+
+		it("shows the correct text and image for 'New Transactions' button", () => {
+			cy.get('[data-test-id="unfinished_transactions_button"]').should("have.text", "New Transactions");
+			cy.get('[data-test-id="unfinished_transactions_button"] img').should("have.attr", "src", "/icons/arrow-right.svg");
+		});
+
+		it("shows the correct text and image for 'All Accounts' button", () => {
+			// Only "Add Accounts" button is shown
+			cy.get('[data-test-id="all_accounts_button"]').should("have.text", "All Accounts");
+			cy.get('[data-test-id="all_accounts_button"] img').should("have.attr", "src", "/icons/arrow-right.svg");
+		});
+		
+		it("shows the correct text and image for 'Add Accounts' button", () => {
+			// Only "Add Accounts" button is shown
+			cy.get('[data-test-id="add_accounts_button"]').should("have.text", "Add Accounts");
+			cy.get('[data-test-id="add_accounts_button"] img').should("have.attr", "src", "/icons/arrow-right.svg");
+		});
+		
 	});
 
-	after(() => {
-		// Deletes all accounts from firebase
-		for (let account of mockAccounts) {
-			deleteAccount(userID, budgetID, account.id);
-		}
+	context("New user's first navigation", () => {
+		beforeEach(() => {
+			cy.mount(<AccountsPage userID={userID} budgetID={budgetID} categories={[]} subcategories={[]} />);
+		});
 
-		// Deletes all transactions from firebase
-		for (let transaction of mockTransactions) {
-			deleteTransaction(userID, budgetID, transaction.id);
-		}
+		it("shows '$0.00' as the total balance amount", () => {
+			cy.get('[data-test-id="total_item"] span').eq(1).should("have.text", "$0.00");
+		});
+
+		it("shows 'Add Accounts' as the only button", () => {
+			// Only "Add Accounts" button is shown
+			cy.get('[data-test-id="add_accounts_button"]').should("exist");
+			cy.get('[data-test-id="all_accounts_button"]').should("not.exist");
+			cy.get('[data-test-id="unfinished_transactions_button"]').should("not.exist");
+		});
 	});
 
-	it("renders", () => {
-		cy.mount(<AccountsPage userID={userID} budgetID={budgetID} categories={mockCategories} subcategories={mockSubcategories} />);
+	context("Shows correct user data", () => {
+		before(() => {
+			// Retrieving env variables
+			userID = Cypress.env("TEST_USER_ID");
+			budgetID = Cypress.env("TEST_BUDGET_ID");
 
-		const account_checkings = mockAccounts[0];
-		const account_credit = mockAccounts[1];
-		const account_savings = mockAccounts[2];
+			const mock = getMockData();
+			mockAccounts = mock.accounts;
+			mockCategories = mock.categories;
+			mockSubcategories = mock.subcategories;
+			mockTransactions = mock.transactions;
 
-		cy.get('[data-test-id="account_item_0"] span').eq(0).should('have.text', account_checkings.name)
-		cy.get('[data-test-id="account_item_0"] span').eq(1).should('have.text', "$" + (account_checkings.balance / 1000000).toFixed(2))
+			sortAccountsAlphabetically(mockAccounts);
 
-		cy.get('[data-test-id="account_item_1"] span').eq(0).should('have.text', account_credit.name)
-		cy.get('[data-test-id="account_item_1"] span').eq(1).should('have.text', "$" + (account_credit.balance / 1000000).toFixed(2))
+			// Adding accounts to firebase (deleted after tests)
+			for (let account of mockAccounts) {
+				createAccount(userID, budgetID, account);
+			}
 
-		cy.get('[data-test-id="account_item_2"] span').eq(0).should('have.text',  account_savings.name)
-		cy.get('[data-test-id="account_item_2"] span').eq(1).should('have.text', "$" + (account_savings.balance / 1000000).toFixed(2))
+			// Adding transactions to firebase (deleted after tests)
+			for (let transaction of mockTransactions) {
+				createTransaction(userID, budgetID, transaction);
+			}
+		})
 
-	});
+		after(() => {
+			// Deletes all accounts from firebase
+			for (let account of mockAccounts) {
+				deleteAccount(userID, budgetID, account.id);
+			}
+	
+			// Deletes all transactions from firebase
+			for (let transaction of mockTransactions) {
+				deleteTransaction(userID, budgetID, transaction.id);
+			}
+		});
+
+		beforeEach(() => {
+			cy.mount(<AccountsPage userID={userID} budgetID={budgetID} categories={mockCategories} subcategories={mockSubcategories} />);
+		});
+
+		it("shows the correct total balance", () => {
+			let totalBalance = 0;
+			for (let account of mockAccounts) {
+				totalBalance += account.balance;
+			}
+			
+			let totalBalanceString = "";
+			if (totalBalance >= 0) {
+				totalBalanceString = "$" + (totalBalance / 1000000).toFixed(2);
+			} else {
+				totalBalanceString = "-$" + (totalBalance / 1000000).toFixed(2);
+			}
+
+			cy.get('[data-test-id="total_item"] span').eq(1).should("have.text", totalBalanceString);
+		})
+
+		it("shows the correct account labels and balances", () => {
+			for (let i=0; i<mockAccounts.length; i++) {
+				const account = mockAccounts[i];
+				let balanceString = "";
+				if (account.balance >= 0) {
+					balanceString = "$" + (account.balance / 1000000).toFixed(2);
+				} else {
+					balanceString = "-$" + (account.balance / 1000000).toFixed(2);
+				}
+				
+				cy.get(`[data-test-id="account_item_${i}"] span`).eq(0).should("have.text", account.name);
+				cy.get(`[data-test-id="account_item_${i}"] span`).eq(1).should("have.text", balanceString);
+			}
+		})
+	})
 
 });

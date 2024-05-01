@@ -51,3 +51,8 @@ export function getAccountNameByID(targetID: string, accounts: Account[]): strin
 	const targetAccount = accounts.find((account) => account.id === targetID);
 	return targetAccount ? targetAccount!.name : "";
 }
+
+export function getAccountByID(targetID: string, accounts: Account[]): Account | null {
+	const targetAccount = accounts.find((account) => account.id === targetID);
+	return targetAccount ? targetAccount : null;
+}

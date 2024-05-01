@@ -112,31 +112,35 @@ export function AccountsPage(props: AccountsPagePropsType) {
 	}
 	// Adds "Budget" heading for list of accounts
 	accountItems.unshift(
-		<div key={"total_item_0"} className={classNames(styles.accountItem, styles.totalItem)}>
-			<span key={"total_item_name_0"}>Budget</span>
-			<span key={"total_item_balance_0"}>${(totalAccountBalance / 1000000).toFixed(2)}</span>
+		<div data-test-id={`total_item`} key={"total_item"} className={classNames(styles.accountItem, styles.totalItem)}>
+			<span key={"total_item_name"}>Budget</span>
+			<span key={"total_item_balance"}>${(totalAccountBalance / 1000000).toFixed(2)}</span>
 		</div>
 	);
 
 	return (
 		<>
-			<header className={styles.header}>Accounts</header>
-			<main key={accountsPageRenderKey} className={styles.main}>
+			<header data-test-id="accounts_page_header" className={styles.header}>
+				Accounts
+			</header>
+			<main data-test-id="accounts_page_main" key={accountsPageRenderKey} className={styles.main}>
 				<div className={styles.subpageButtonContainer}>
 					{unfinishedTransactions.length > 0 && (
-						<button className={styles.subpageButton} onClick={navigateToUnfinishedTransactionsSubpage}>
+						<button data-test-id="unfinished_transactions_button" className={styles.subpageButton} onClick={navigateToUnfinishedTransactionsSubpage}>
 							New Transactions
 							<img src="/icons/arrow-right.svg" alt="Button to add accounts" />
 						</button>
 					)}
-					<button className={styles.subpageButton} onClick={navigateToAllTransactionsSubpage}>
-						All Accounts
-						<img src="/icons/arrow-right.svg" alt="Button to add accounts" />
-					</button>
+					{transactions.length > 0 && (
+						<button data-test-id="all_accounts_button" className={styles.subpageButton} onClick={navigateToAllTransactionsSubpage}>
+							All Accounts
+							<img src="/icons/arrow-right.svg" alt="Button to add accounts" />
+						</button>
+					)}
 				</div>
 				{accountItems}
 				<div className={styles.subpageButtonContainer}>
-					<button className={styles.subpageButton} onClick={navigateToCreateAccountSubpage}>
+					<button data-test-id="add_accounts_button" className={styles.subpageButton} onClick={navigateToCreateAccountSubpage}>
 						Add Accounts
 						<img src="/icons/arrow-right.svg" alt="Button to add accounts" />
 					</button>
