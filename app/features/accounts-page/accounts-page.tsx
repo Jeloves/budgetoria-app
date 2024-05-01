@@ -78,12 +78,18 @@ export function AccountsPage(props: AccountsPagePropsType) {
 		setSubpage(null);
 		setSubpageClasses([styles.subpage, styles.hide]);
 	};
-	const navigateToUnfinishedTransactionsSubpage = () => {};
+	const navigateToUnfinishedTransactionsSubpage = () => {
+		showSubpage(
+			<AccountTransactionsSubpage categories={categories} subcategories={subcategories} accounts={accounts} showingAllAccounts={false} transactions={unfinishedTransactions} showingUnfinishedTransactions={true} handleBackClick={hideSubpage} />
+		);
+	};
 	const navigateToAllTransactionsSubpage = () => {
-		showSubpage(<AccountTransactionsSubpage categories={categories} subcategories={subcategories} accounts={accounts} showingAllAccounts={true} transactions={transactions} handleBackClick={hideSubpage} />);
+		showSubpage(<AccountTransactionsSubpage categories={categories} subcategories={subcategories} accounts={accounts} showingAllAccounts={true} transactions={transactions} showingUnfinishedTransactions={false} handleBackClick={hideSubpage} />);
 	};
 	const navigateToAccountTransactionsSubpage = (selectedAccount: Account, selectedTransactions: Transaction[]) => {
-		showSubpage(<AccountTransactionsSubpage categories={categories} subcategories={subcategories} accounts={[selectedAccount]} showingAllAccounts={false} transactions={transactions} handleBackClick={hideSubpage} />);
+		showSubpage(
+			<AccountTransactionsSubpage categories={categories} subcategories={subcategories} accounts={[selectedAccount]} showingAllAccounts={false} transactions={selectedTransactions} showingUnfinishedTransactions={false} handleBackClick={hideSubpage} />
+		);
 	};
 	const navigateToCreateAccountSubpage = () => {
 		showSubpage(<CreateAccountSubpage handleBackClick={hideSubpage} handleCreateAccount={handleCreateAccount} />);
@@ -149,7 +155,9 @@ export function AccountsPage(props: AccountsPagePropsType) {
 					</button>
 				</div>
 			</main>
-			<section data-test-id="accounts_subpage" className={classNames(subpageClasses)}>{subpage}</section>
+			<section data-test-id="accounts_subpage" className={classNames(subpageClasses)}>
+				{subpage}
+			</section>
 		</>
 	);
 }
