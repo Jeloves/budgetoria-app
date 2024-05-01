@@ -31,3 +31,11 @@ export async function createAccount(userID: string, budgetID: string, newAccount
 		console.error("Failed to create account.", error);
 	}
 }
+
+export async function deleteAccount(userID: string, budgetID: string, accountID: string) {
+	try {
+		await deleteDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.accounts, accountID));
+	} catch (error) {
+		console.error("Failed to delete account", error);
+	}
+}

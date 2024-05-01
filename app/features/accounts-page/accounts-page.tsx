@@ -9,6 +9,7 @@ import { AccountTransactionsSubpage } from "./account-transactions-subpage/accou
 import { createAccount, getAccounts } from "@/firebase/accounts";
 import { CreateAccountSubpage } from "./create-account-subpage/create-account-subpage";
 import { createTransaction, getTransactions } from "@/firebase/transactions";
+import { sortAccountsAlphabetically } from "@/utils/sorting";
 
 export type AccountsPagePropsType = {
 	userID: string;
@@ -34,6 +35,7 @@ export function AccountsPage(props: AccountsPagePropsType) {
 	useEffect(() => {
 		const fetchData = async () => {
 			const accountsData = await getAccounts(userID, budgetID);
+			sortAccountsAlphabetically(accountsData);
 			setAccounts(accountsData);
 		};
 		fetchData();
@@ -53,11 +55,10 @@ export function AccountsPage(props: AccountsPagePropsType) {
 					unfinishedTransactions.push(transaction);
 				}
 			}
-			setUnfinishedTransactions(unfinishedTransactions)
+			setUnfinishedTransactions(unfinishedTransactions);
 		};
 		fetchData();
 	}, [transactionsDataKey, budgetID, userID]);
-
 
 	const [accountsPageRenderKey, setAccountsPageRenderKey] = useState<0 | 1>(0);
 	const [subpage, setSubpage] = useState<JSX.Element | null>(null);
@@ -77,12 +78,18 @@ export function AccountsPage(props: AccountsPagePropsType) {
 		setSubpage(null);
 		setSubpageClasses([styles.subpage, styles.hide]);
 	};
-	const navigateToUnfinishedTransactionsSubpage = () => {};
+	const navigateToUnfinishedTransactionsSubpage = () => {
+		showSubpage(
+			<AccountTransactionsSubpage categories={categories} subcategories={subcategories} accounts={accounts} showingAllAccounts={false} transactions={unfinishedTransactions} showingUnfinishedTransactions={true} handleBackClick={hideSubpage} />
+		);
+	};
 	const navigateToAllTransactionsSubpage = () => {
-		showSubpage(<AccountTransactionsSubpage categories={categories} subcategories={subcategories} accounts={accounts} showingAllAccounts={true} transactions={transactions} handleBackClick={hideSubpage}/>);
+		showSubpage(<AccountTransactionsSubpage categories={categories} subcategories={subcategories} accounts={accounts} showingAllAccounts={true} transactions={transactions} showingUnfinishedTransactions={false} handleBackClick={hideSubpage} />);
 	};
 	const navigateToAccountTransactionsSubpage = (selectedAccount: Account, selectedTransactions: Transaction[]) => {
-		showSubpage(<AccountTransactionsSubpage categories={categories} subcategories={subcategories} accounts={[selectedAccount]} showingAllAccounts={false} transactions={transactions} handleBackClick={hideSubpage}/>);
+		showSubpage(
+			<AccountTransactionsSubpage categories={categories} subcategories={subcategories} accounts={[selectedAccount]} showingAllAccounts={false} transactions={selectedTransactions} showingUnfinishedTransactions={false} handleBackClick={hideSubpage} />
+		);
 	};
 	const navigateToCreateAccountSubpage = () => {
 		showSubpage(<CreateAccountSubpage handleBackClick={hideSubpage} handleCreateAccount={handleCreateAccount} />);
@@ -93,10 +100,13 @@ export function AccountsPage(props: AccountsPagePropsType) {
 	let totalAccountBalance = 0;
 	for (let i = 0; i < accounts.length; i++) {
 		const account = accounts[i];
+		const accountBalanceString = account.balance >= 0 ? "$" + (account.balance / 1000000).toFixed(2) : "-$" + (account.balance / -1000000).toFixed(2);
 		const filteredTransactions = transactions.filter((transaction) => transaction.accountID === account.id);
 		totalAccountBalance += account.balance;
+
 		accountItems.push(
 			<div
+				data-test-id={`account_item_${i}`}
 				key={`account_item_${i}`}
 				className={styles.accountItem}
 				onClick={() => {
@@ -104,44 +114,50 @@ export function AccountsPage(props: AccountsPagePropsType) {
 				}}
 			>
 				<span key={`account_item_name_${i}`}>{account.name}</span>
-				<span key={`account_item_balance_${i}`}>${(account.balance / 1000000).toFixed(2)}</span>
+				<span key={`account_item_balance_${i}`}>{accountBalanceString}</span>
 			</div>
 		);
 	}
 	// Adds "Budget" heading for list of accounts
+	const totalBalanceString = totalAccountBalance >= 0 ? "$" + (totalAccountBalance / 1000000).toFixed(2) : "-$" + (totalAccountBalance / -1000000).toFixed(2);
 	accountItems.unshift(
-		<div key={"total_item_0"} className={classNames(styles.accountItem, styles.totalItem)}>
-			<span key={"total_item_name_0"}>Budget</span>
-			<span key={"total_item_balance_0"}>${(totalAccountBalance / 1000000).toFixed(2)}</span>
+		<div data-test-id={`total_item`} key={"total_item"} className={classNames(styles.accountItem, styles.totalItem)}>
+			<span key={"total_item_name"}>Budget</span>
+			<span key={"total_item_balance"}>{totalBalanceString}</span>
 		</div>
 	);
 
 	return (
 		<>
-			<header className={styles.header}>Accounts</header>
-			<main key={accountsPageRenderKey} className={styles.main}>
+			<header data-test-id="accounts_page_header" className={styles.header}>
+				Accounts
+			</header>
+			<main data-test-id="accounts_page_main" key={accountsPageRenderKey} className={styles.main}>
 				<div className={styles.subpageButtonContainer}>
 					{unfinishedTransactions.length > 0 && (
-						<button className={styles.subpageButton} onClick={navigateToUnfinishedTransactionsSubpage}>
+						<button data-test-id="unfinished_transactions_button" className={styles.subpageButton} onClick={navigateToUnfinishedTransactionsSubpage}>
 							New Transactions
 							<img src="/icons/arrow-right.svg" alt="Button to add accounts" />
 						</button>
 					)}
-					<button className={styles.subpageButton} onClick={navigateToAllTransactionsSubpage}>
-						All Accounts
-						<img src="/icons/arrow-right.svg" alt="Button to add accounts" />
-					</button>
+					{transactions.length > 0 && (
+						<button data-test-id="all_accounts_button" className={styles.subpageButton} onClick={navigateToAllTransactionsSubpage}>
+							All Accounts
+							<img src="/icons/arrow-right.svg" alt="Button to add accounts" />
+						</button>
+					)}
 				</div>
-
 				{accountItems}
 				<div className={styles.subpageButtonContainer}>
-					<button className={styles.subpageButton} onClick={navigateToCreateAccountSubpage}>
+					<button data-test-id="add_accounts_button" className={styles.subpageButton} onClick={navigateToCreateAccountSubpage}>
 						Add Accounts
 						<img src="/icons/arrow-right.svg" alt="Button to add accounts" />
 					</button>
 				</div>
 			</main>
-			<section className={classNames(subpageClasses)}>{subpage}</section>
+			<section data-test-id="accounts_subpage" className={classNames(subpageClasses)}>
+				{subpage}
+			</section>
 		</>
 	);
 }

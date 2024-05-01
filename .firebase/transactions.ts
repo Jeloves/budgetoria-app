@@ -1,4 +1,4 @@
-import { getDocs, collection, doc, setDoc } from "firebase/firestore";
+import { getDocs, collection, doc, setDoc, deleteDoc } from "firebase/firestore";
 import { collectionLabel } from "./firebase.config";
 import { firestore } from "./firebase.config";
 import { Transaction } from "./models";
@@ -56,6 +56,14 @@ export async function createTransaction(userID: string, budgetID: string, newTra
 		});
 	} catch (error) {
 		console.error("Failed to add new transaction", error);
+	}
+}
+
+export async function deleteTransaction(userID: string, budgetID: string, transactionID: string) {
+	try {
+		await deleteDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.transactions, transactionID));
+	} catch (error) {
+		console.error("Failed to delete transaction", error);
 	}
 }
 

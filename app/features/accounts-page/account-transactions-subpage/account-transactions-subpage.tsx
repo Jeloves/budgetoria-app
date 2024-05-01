@@ -15,13 +15,14 @@ export type AccountTransactionsSubpagePropsType = {
 	accounts: Account[];
 	showingAllAccounts: boolean;
 	transactions: Transaction[];
+	showingUnfinishedTransactions: boolean;
 	handleBackClick: () => void;
 };
 
 type DateTransactionsMap = Map<string, Transaction[]>;
 
 export function AccountTransactionsSubpage(props: AccountTransactionsSubpagePropsType) {
-	const { accounts, showingAllAccounts, categories, subcategories, transactions, handleBackClick } = props;
+	const { accounts, showingAllAccounts, categories, subcategories, transactions, showingUnfinishedTransactions, handleBackClick } = props;
 
 	const [clearedTransactions, setClearedTransactions] = useState<Transaction[]>([]);
 	const [unclearedTransactions, setUnclearedTransactions] = useState<Transaction[]>([]);
@@ -215,7 +216,7 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 					<span className={styles.balanceContainer}>
 						<div className={styles.balance}>
 							{formatCurrencyBasedOnOutflow(transaction.balance, transaction.outflow)}
-							{showingAllAccounts && <div className={styles.accountName}>{accountNameString ? accountNameString : "Account Needed"}</div>}
+							{(showingAllAccounts || showingUnfinishedTransactions) && <div className={styles.accountName}>{accountNameString ? accountNameString : "Account Needed"}</div>}
 						</div>
 						{transaction.approval ? (
 							// eslint-disable-next-line @next/next/no-img-element
@@ -232,9 +233,9 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 
 	return (
 		<>
-			<header className={styles.header}>
+			<header data-test-id="account_transactions_subpage_header" className={styles.header}>
 				<IconButton button={{ onClick: handleBackClick }} src={"/icons/arrow-left-grey-100.svg"} altText={"Button to return to Accounts Page"} />
-				<span>{showingAllAccounts ? "All Accounts" : accounts[0].name}</span>
+				<span>{showingAllAccounts ? "All Accounts" : showingUnfinishedTransactions ? "New Transactions" : accounts[0].name}</span>
 				<IconButton button={{ onClick: handleBackClick }} src={"/icons/edit-grey-100.svg"} altText={"Navigate to Edit Account Page"} />
 			</header>
 			<main className={styles.main}>
