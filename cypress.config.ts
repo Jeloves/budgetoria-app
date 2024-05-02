@@ -4,12 +4,6 @@ import { createBudget } from "./.firebase/budgets";
 export default defineConfig({
 	e2e: {
 		setupNodeEvents(on, config) {
-			on("task", {
-				async createNewBudget() {
-					await createBudget("a5v885wvVKVOtjjEkOCqKbbAGq82", "cypress_mock_6a52cd1a-886e-4f1d-9222-4e524792125f");
-					return true;
-				},
-			});
 		},
 	},
 
