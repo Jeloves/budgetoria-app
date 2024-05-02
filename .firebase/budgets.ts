@@ -1,4 +1,4 @@
-import { getDocs, collection, doc, updateDoc, getDoc } from "firebase/firestore";
+import { getDocs, collection, doc, updateDoc, getDoc, setDoc, Timestamp } from "firebase/firestore";
 import { collectionLabel } from "./firebase.config";
 import { firestore } from "./firebase.config";
 import { Budget } from "./models";
@@ -16,6 +16,23 @@ export async function getBudgets(userID: string): Promise<Budget[]> {
 	} catch (error) {
 		console.error("Failed to read user budgets: ", error);
 		throw error;
+	}
+}
+
+export async function createBudget(userID: string, budgetID: string) {
+
+	const newBudget = new Budget(budgetID, "Mock Budget", Timestamp.fromDate(new Date()), "en-US", "USD", true, 0.00)
+	try {
+		await setDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, newBudget.id), {
+			name: newBudget.name,
+			dateCreated: newBudget.dateCreated,
+			locale: newBudget.locale,
+			currency: newBudget.currency,
+			selected: newBudget.selected,
+			unassignedBalance: newBudget.unassignedBalance
+		});
+	} catch (error) {
+		console.error("Failed to add new budget", error);
 	}
 }
 
