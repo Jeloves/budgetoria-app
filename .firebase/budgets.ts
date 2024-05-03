@@ -34,6 +34,19 @@ export async function createBudget(userID: string, budgetID: string) {
 	}
 }
 
+export async function createTestBudget(userID: string, budget: Budget) {
+	try {
+		await setDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budget.id), {
+			name: budget.name,
+			dateCreated: budget.dateCreated,
+			selected: budget.selected,
+			unassignedBalance: budget.unassignedBalance
+		});
+	} catch (error) {
+		console.error("Failed to create test budget", error);
+	}
+}
+
 export async function getSelectedBudget(userID: string): Promise<Budget> {
 	try {
 		const budgetsSnapshot = await getDocs(collection(firestore, collectionLabel.users, userID, collectionLabel.budgets));

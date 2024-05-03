@@ -216,7 +216,7 @@ export default function BudgetPage() {
 		pageContent.push(
 			<header key={unassignedKey} className={styles.budgetPageHeader}>
 				<Topbar month={month} year={year} dateInterval={dateInterval} handleDateChangeOnClick={handleDateChangeOnClick} handleEditCategoriesClick={handleEditCategoriesClick} handleShowOptions={showOptions} />
-				<Unassigned currency={budget ? budget.currency : "USD"} unassignedBalance={budget ? budget.unassignedBalance : 0} />
+				<Unassigned currency={"USD"} unassignedBalance={budget ? budget.unassignedBalance : 0} />
 			</header>
 		) &&
 		pageContent.push(

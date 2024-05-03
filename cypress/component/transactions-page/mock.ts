@@ -70,6 +70,7 @@ export const getMockData = () => {
         accounts: accounts,
         categories: categories,
         subcategories: subcategories,
-        transaction: transaction1
+        transaction: transaction1,
+        emptyTransaction: new Transaction(uuidv4(), Timestamp.fromDate(new Date()), "", "", true, 0, false, "", "", ""),
     }
 }

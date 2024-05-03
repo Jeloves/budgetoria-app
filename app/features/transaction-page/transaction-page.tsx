@@ -75,6 +75,13 @@ export function TransactionPage(props: TransactionPagePropsType) {
 		fetchUnassignedBalance();
 	}, [budgetID, dataListenerKey, userID]);
 
+	// Formats balanceString when balance or outflow changes
+	useEffect(() => {
+		setBalanceString(formatCurrencyBasedOnOutflow(balance, outflow));
+		setBalanceRenderKey(balanceRenderKey === 0 ? 1 : 0);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [balance, outflow])
+
 	// Styles header
 	useEffect(() => {
 		isCreatingTransaction ? setHeaderClasses([styles.header, styles.newTransactionHeader]) : setHeaderClasses([styles.header, styles.existingTransactionHeader]);
@@ -140,7 +147,6 @@ export function TransactionPage(props: TransactionPagePropsType) {
 		const newBalance = isValidNumber ? parseFloat(value) * 1000000 : 0;
 
 		setBalance(newBalance);
-		setBalanceString(formatCurrencyBasedOnOutflow(newBalance, outflow));
 		setBalanceRenderKey(balanceRenderKey === 0 ? 1 : 0);
 	};
 
@@ -173,7 +179,7 @@ export function TransactionPage(props: TransactionPagePropsType) {
 
 	return (
 		<>
-			<header className={classNames(headerClasses)}>
+			<header data-test-id="transaction-page-header" className={classNames(headerClasses)}>
 				{!isCreatingTransaction && <IconButton button={{ onClick: hideTransactionPage! }} src={"/icons/arrow-left-grey-100.svg"} altText={"Navigate back to AccountTransactionsSubpage"} />}
 				<span>{isCreatingTransaction ? "Create Transaction" : "Transaction"}</span>
 				<button
@@ -184,8 +190,8 @@ export function TransactionPage(props: TransactionPagePropsType) {
 					Finish
 				</button>
 			</header>
-			<main className={styles.main}>
-				<div className={classNames(balanceClasses)}>
+			<main data-test-id="transaction-page-main" className={styles.main}>
+				<div data-test-id="transaction-page-flow-buttons" className={classNames(balanceClasses)}>
 					<div>
 						<button
 							className={outflow ? styles.flow : ""}
