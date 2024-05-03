@@ -79,8 +79,8 @@ export function TransactionPage(props: TransactionPagePropsType) {
 	useEffect(() => {
 		setBalanceString(formatCurrencyBasedOnOutflow(balance, outflow));
 		setBalanceRenderKey(balanceRenderKey === 0 ? 1 : 0);
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [balance, outflow])
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [balance, outflow]);
 
 	// Styles header
 	useEffect(() => {
@@ -130,6 +130,7 @@ export function TransactionPage(props: TransactionPagePropsType) {
 		setMemo(event.currentTarget.value);
 	};
 	// Updates Transaction balance
+	// TODO - implement a better way to input in currency values
 	const handleEnterKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
 		if (event.key === "Enter") {
 			event.currentTarget.blur();
@@ -191,9 +192,10 @@ export function TransactionPage(props: TransactionPagePropsType) {
 				</button>
 			</header>
 			<main data-test-id="transaction-page-main" className={styles.main}>
-				<div data-test-id="transaction-page-flow-buttons" className={classNames(balanceClasses)}>
+				<div className={classNames(balanceClasses)}>
 					<div>
 						<button
+							data-test-id="transaction-page-outflow-button"
 							className={outflow ? styles.flow : ""}
 							onClick={() => {
 								setOutflow(true);
@@ -203,6 +205,7 @@ export function TransactionPage(props: TransactionPagePropsType) {
 							- Outflow
 						</button>
 						<button
+							data-test-id="transaction-page-inflow-button"
 							className={outflow ? "" : styles.flow}
 							onClick={() => {
 								setOutflow(false);
@@ -212,10 +215,10 @@ export function TransactionPage(props: TransactionPagePropsType) {
 							+ Inflow
 						</button>
 					</div>
-					<input key={balanceRenderKey} type="text" defaultValue={balanceString} onKeyDown={handleEnterKeyDown} onBlur={handleInputBlur} />
+					<input data-test-id="transaction-page-balance-input" key={balanceRenderKey} type="text" defaultValue={balanceString} onKeyDown={handleEnterKeyDown} onBlur={handleInputBlur} />
 				</div>
 				<div className={styles.contentContainer}>
-					<div className={styles.content}>
+					<div data-test-id="transaction-page-data-container" className={styles.content}>
 						<TransactionData key={0} data={payee} type="Payee" categoryName="" handleOnClick={navigateToPayeeSelectionSubpage} />
 						<TransactionData
 							key={1}
@@ -226,11 +229,11 @@ export function TransactionPage(props: TransactionPagePropsType) {
 						/>
 						<TransactionData key={2} data={getAccountNameByID(accountID, accounts)} categoryName="" type="Account" handleOnClick={navigateToAccountSelectionSubpage} />
 						<TransactionData key={3} data={getDateStringFromTimestamp(timestamp)} categoryName="" type="Date" handleOnClick={isCalendarShown ? hideDateSelection : showDateSelection} />
-						<div className={classNames(calendarClasses)}>
+						<div data-test-id="transaction-calendar-item" className={classNames(calendarClasses)}>
 							<DateSelectionSubpage date={timestamp.toDate()} handleBackClick={hideDateSelection} selectDate={selectDate} />
 							<hr className={styles.border} />
 						</div>
-						<button className={styles.otherTransactionData}>
+						<button data-test-id="transaction-approval-item" className={styles.otherTransactionData}>
 							<img src={approval ? "/icons/cleared.svg" : "/icons/cleared-grey-100.svg"} alt="Cleared icon" />
 							<h2>Cleared</h2>
 							<label className={styles.switch}>
@@ -238,11 +241,11 @@ export function TransactionPage(props: TransactionPagePropsType) {
 								<span className={styles.slider} />
 							</label>
 						</button>
-						<div className={styles.otherTransactionData}>
+						<div data-test-id="transaction-memo-item" className={styles.otherTransactionData}>
 							<img src="/icons/memo-grey-100.svg" alt="Memo icon" />
 							<h2>Memo</h2>
 						</div>
-						<textarea className={styles.memo} placeholder="Enter memo..." onChange={handleMemoOnChange} />
+						<textarea data-test-id="transaction-memo-textarea" className={styles.memo} placeholder="Enter memo..." onChange={handleMemoOnChange} />
 					</div>
 				</div>
 			</main>
