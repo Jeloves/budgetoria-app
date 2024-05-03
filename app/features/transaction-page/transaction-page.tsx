@@ -13,6 +13,8 @@ import { CategorySelectionSubpage } from "./category-selection-subpage/category-
 import { AccountSelectionSubpage } from "./account-selection-subpage/account-selection-subpage";
 import { DateSelectionSubpage } from "./date-selection-subpage/date-selection-subpage";
 import { formatCurrencyBasedOnOutflow } from "@/utils/currency";
+import { getUnassignedBalance } from "@/firebase/budgets";
+import { IconButton } from "../ui";
 
 export type TransactionPagePropsType = {
 	userID: string;
@@ -21,12 +23,14 @@ export type TransactionPagePropsType = {
 	subcategories: Subcategory[];
 	accounts: Account[];
 	transaction: Transaction;
-	unassignedBalance: number;
+	isCreatingTransaction: boolean;
 	handleCreateTransaction: (newTransaction: Transaction) => void;
+	hideTransactionPage: null | (() => void);
 };
 
 export function TransactionPage(props: TransactionPagePropsType) {
-	const { userID, budgetID, categories, subcategories, accounts, transaction, unassignedBalance, handleCreateTransaction } = props;
+	const { userID, budgetID, categories, subcategories, accounts, transaction, isCreatingTransaction, handleCreateTransaction, hideTransactionPage } = props;
+	const [unassignedBalance, setUnassignedBalance] = useState<number>(0);
 	const [dataListenerKey, setDataListenerKey] = useState<boolean>(false);
 	const [timestamp, setTimestamp] = useState<Timestamp>(transaction.date);
 	const [payee, setPayee] = useState<string>(transaction.payee);
@@ -38,6 +42,9 @@ export function TransactionPage(props: TransactionPagePropsType) {
 	const [accountID, setAccountID] = useState<string>(transaction.accountID);
 	const [subcategoryID, setSubcategoryID] = useState<string>(transaction.subcategoryID);
 	const [categoryID, setCategoryID] = useState<string>(transaction.categoryID);
+
+	// Header Display
+	const [headerClasses, setHeaderClasses] = useState<string[]>([styles.header]);
 
 	// Balance Display
 	const [balanceRenderKey, setBalanceRenderKey] = useState<1 | 0>(0);
@@ -58,6 +65,27 @@ export function TransactionPage(props: TransactionPagePropsType) {
 		};
 		fetchPayees();
 	}, [budgetID, dataListenerKey, userID]);
+
+	// Read unassigned balance from firebase
+	useEffect(() => {
+		const fetchUnassignedBalance = async () => {
+			const unassigned = await getUnassignedBalance(userID, budgetID);
+			setUnassignedBalance(unassigned);
+		};
+		fetchUnassignedBalance();
+	}, [budgetID, dataListenerKey, userID]);
+
+	// Formats balanceString when balance or outflow changes
+	useEffect(() => {
+		setBalanceString(formatCurrencyBasedOnOutflow(balance, outflow));
+		setBalanceRenderKey(balanceRenderKey === 0 ? 1 : 0);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [balance, outflow]);
+
+	// Styles header
+	useEffect(() => {
+		isCreatingTransaction ? setHeaderClasses([styles.header, styles.newTransactionHeader]) : setHeaderClasses([styles.header, styles.existingTransactionHeader]);
+	}, [isCreatingTransaction]);
 
 	// Updates Transaction Data
 	const createNewPayee = (newPayee: string) => {
@@ -102,6 +130,7 @@ export function TransactionPage(props: TransactionPagePropsType) {
 		setMemo(event.currentTarget.value);
 	};
 	// Updates Transaction balance
+	// TODO - implement a better way to input in currency values
 	const handleEnterKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
 		if (event.key === "Enter") {
 			event.currentTarget.blur();
@@ -117,9 +146,8 @@ export function TransactionPage(props: TransactionPagePropsType) {
 		// If still not a valid number, sets to 0
 		const isValidNumber = !isNaN(parseFloat(value));
 		const newBalance = isValidNumber ? parseFloat(value) * 1000000 : 0;
-		
+
 		setBalance(newBalance);
-		setBalanceString(formatCurrencyBasedOnOutflow(newBalance, outflow));
 		setBalanceRenderKey(balanceRenderKey === 0 ? 1 : 0);
 	};
 
@@ -152,8 +180,9 @@ export function TransactionPage(props: TransactionPagePropsType) {
 
 	return (
 		<>
-			<header className={styles.header}>
-				<span>Create Transaction</span>
+			<header data-test-id="transaction-page-header" className={classNames(headerClasses)}>
+				{!isCreatingTransaction && <IconButton button={{ onClick: hideTransactionPage! }} src={"/icons/arrow-left-grey-100.svg"} altText={"Navigate back to AccountTransactionsSubpage"} />}
+				<span>{isCreatingTransaction ? "Create Transaction" : "Transaction"}</span>
 				<button
 					onClick={() => {
 						handleCreateTransaction(new Transaction(transaction.id, timestamp, payee, memo, outflow, balance, approval, accountID, categoryID, subcategoryID));
@@ -162,32 +191,34 @@ export function TransactionPage(props: TransactionPagePropsType) {
 					Finish
 				</button>
 			</header>
-			<main className={styles.main}>
+			<main data-test-id="transaction-page-main" className={styles.main}>
 				<div className={classNames(balanceClasses)}>
 					<div>
 						<button
+							data-test-id="transaction-page-outflow-button"
 							className={outflow ? styles.flow : ""}
 							onClick={() => {
 								setOutflow(true);
-								setBalanceClasses([styles.balance])
+								setBalanceClasses([styles.balance]);
 							}}
 						>
 							- Outflow
 						</button>
 						<button
+							data-test-id="transaction-page-inflow-button"
 							className={outflow ? "" : styles.flow}
 							onClick={() => {
 								setOutflow(false);
-								setBalanceClasses([styles.balance, styles.inflow])
+								setBalanceClasses([styles.balance, styles.inflow]);
 							}}
 						>
 							+ Inflow
 						</button>
 					</div>
-					<input key={balanceRenderKey} type="text" defaultValue={balanceString} onKeyDown={handleEnterKeyDown} onBlur={handleInputBlur} />
+					<input data-test-id="transaction-page-balance-input" key={balanceRenderKey} type="text" defaultValue={balanceString} onKeyDown={handleEnterKeyDown} onBlur={handleInputBlur} />
 				</div>
 				<div className={styles.contentContainer}>
-					<div className={styles.content}>
+					<div data-test-id="transaction-page-data-container" className={styles.content}>
 						<TransactionData key={0} data={payee} type="Payee" categoryName="" handleOnClick={navigateToPayeeSelectionSubpage} />
 						<TransactionData
 							key={1}
@@ -198,11 +229,11 @@ export function TransactionPage(props: TransactionPagePropsType) {
 						/>
 						<TransactionData key={2} data={getAccountNameByID(accountID, accounts)} categoryName="" type="Account" handleOnClick={navigateToAccountSelectionSubpage} />
 						<TransactionData key={3} data={getDateStringFromTimestamp(timestamp)} categoryName="" type="Date" handleOnClick={isCalendarShown ? hideDateSelection : showDateSelection} />
-						<div className={classNames(calendarClasses)}>
+						<div data-test-id="transaction-calendar-item" className={classNames(calendarClasses)}>
 							<DateSelectionSubpage date={timestamp.toDate()} handleBackClick={hideDateSelection} selectDate={selectDate} />
 							<hr className={styles.border} />
 						</div>
-						<button className={styles.otherTransactionData}>
+						<button data-test-id="transaction-approval-item" className={styles.otherTransactionData}>
 							<img src={approval ? "/icons/cleared.svg" : "/icons/cleared-grey-100.svg"} alt="Cleared icon" />
 							<h2>Cleared</h2>
 							<label className={styles.switch}>
@@ -210,11 +241,11 @@ export function TransactionPage(props: TransactionPagePropsType) {
 								<span className={styles.slider} />
 							</label>
 						</button>
-						<div className={styles.otherTransactionData}>
+						<div data-test-id="transaction-memo-item" className={styles.otherTransactionData}>
 							<img src="/icons/memo-grey-100.svg" alt="Memo icon" />
 							<h2>Memo</h2>
 						</div>
-						<textarea className={styles.memo} placeholder="Enter memo..." onChange={handleMemoOnChange} />
+						<textarea data-test-id="transaction-memo-textarea" className={styles.memo} placeholder="Enter memo..." onChange={handleMemoOnChange} />
 					</div>
 				</div>
 			</main>

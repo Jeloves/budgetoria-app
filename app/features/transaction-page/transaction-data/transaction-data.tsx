@@ -37,7 +37,7 @@ export function TransactionData(props: TransactionDataPropsType) {
 	} 
 
 	return (
-		<button className={styles.transactionData} onClick={handleOnClick}>
+		<button data-test-id={`transaction-${type.toLowerCase()}-item`} className={styles.transactionData} onClick={handleOnClick}>
 			<div className={styles.iconContainer}>
 				<img src={icon} alt={type + "icon"} />
 			</div>

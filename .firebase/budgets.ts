@@ -21,18 +21,29 @@ export async function getBudgets(userID: string): Promise<Budget[]> {
 
 export async function createBudget(userID: string, budgetID: string) {
 
-	const newBudget = new Budget(budgetID, "Mock Budget", Timestamp.fromDate(new Date()), "en-US", "USD", true, 0.00)
+	const newBudget = new Budget(budgetID, "Mock Budget", Timestamp.fromDate(new Date()), true, 0.00);
 	try {
 		await setDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, newBudget.id), {
 			name: newBudget.name,
 			dateCreated: newBudget.dateCreated,
-			locale: newBudget.locale,
-			currency: newBudget.currency,
 			selected: newBudget.selected,
 			unassignedBalance: newBudget.unassignedBalance
 		});
 	} catch (error) {
 		console.error("Failed to add new budget", error);
+	}
+}
+
+export async function createTestBudget(userID: string, budget: Budget) {
+	try {
+		await setDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budget.id), {
+			name: budget.name,
+			dateCreated: budget.dateCreated,
+			selected: budget.selected,
+			unassignedBalance: budget.unassignedBalance
+		});
+	} catch (error) {
+		console.error("Failed to create test budget", error);
 	}
 }
 
@@ -46,7 +57,7 @@ export async function getSelectedBudget(userID: string): Promise<Budget> {
 
 		if (budgetDoc) {
 			const data = budgetDoc.data();
-			return new Budget(budgetDoc.id, data.name, data.dateCreated, data.locale, data.currency, data.selected, data.unassignedBalance);
+			return new Budget(budgetDoc.id, data.name, data.dateCreated, data.selected, data.unassignedBalance);
 		} else {
 			throw new Error("Cannot find a selected budget.");
 		}

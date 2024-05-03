@@ -3,13 +3,7 @@
 @use "@styles/space";
 @use "@styles/header";
 @use "@styles/main";
-
-.accountTransactions {
-	width: 100%;
-	height: 100vh;
-	display: flex;
-	flex-direction: column;
-}
+@use "@styles/subpage";
 
 .header {
 	display: flex;

@@ -1,6 +1,16 @@
 import { deleteAccount, getAccounts } from "@/firebase/accounts";
-import { Account, Transaction } from "@/firebase/models";
+import { firestore, collectionLabel } from "@/firebase/firebase.config";
+import { Account, Budget, Transaction } from "@/firebase/models";
 import { deleteTransaction, getTransactions } from "@/firebase/transactions";
+import { setDoc, doc, deleteDoc } from "firebase/firestore";
+
+export async function deleteUser(userID: string) {
+    try {
+		await deleteDoc(doc(firestore, collectionLabel.users, userID));
+	} catch (error) {
+		console.error("Failed to delete user", error);
+	}
+}
 
 export async function clearAccountsAndTransactions(userID: string, budgetID: string) {
     try {
@@ -29,3 +39,15 @@ export async function clearAccountsAndTransactions(userID: string, budgetID: str
     }
 }
 
+export async function createBudget(userID: string, budget: Budget) {
+	try {
+		await setDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budget.id), {
+			name: budget.name,
+			dateCreated: budget.dateCreated,
+			selected: budget.selected,
+			unassignedBalance: budget.unassignedBalance
+		});
+	} catch (error) {
+		console.error("Failed to create test budget", error);
+	}
+}

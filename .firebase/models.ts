@@ -4,17 +4,13 @@ export class Budget {
 	id: string;
 	name: string;
 	dateCreated: Timestamp;
-	locale: string;
-	currency: string;
 	selected: boolean = false;
 	unassignedBalance: number = 0;
 
-	constructor(id: string, name: string, dateCreated: Timestamp, locale: string, currency: string, selected: boolean, unassignedBalance: number) {
+	constructor(id: string, name: string, dateCreated: Timestamp, selected: boolean, unassignedBalance: number) {
 		this.id = id;
 		this.name = name;
 		this.dateCreated = dateCreated;
-		this.locale = locale;
-		this.currency = currency;
         this.selected = selected;
         this.unassignedBalance = unassignedBalance;
 	}

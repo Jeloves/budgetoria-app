@@ -8,8 +8,12 @@ import { NIL as NIL_UUID } from "uuid";
 import { cloneDeep } from "lodash";
 import { getAccountNameByID, getCategoryNameByID, getSubcategoryNameByID } from "@/utils/getByID";
 import { formatCurrencyBasedOnOutflow } from "@/utils/currency";
+import { TransactionPage } from "@/features/transaction-page/transaction-page";
+import { updateTransaction } from "@/firebase/transactions";
 
 export type AccountTransactionsSubpagePropsType = {
+	userID: string;
+	budgetID: string;
 	categories: Category[];
 	subcategories: Subcategory[];
 	accounts: Account[];
@@ -22,8 +26,9 @@ export type AccountTransactionsSubpagePropsType = {
 type DateTransactionsMap = Map<string, Transaction[]>;
 
 export function AccountTransactionsSubpage(props: AccountTransactionsSubpagePropsType) {
-	const { accounts, showingAllAccounts, categories, subcategories, transactions, showingUnfinishedTransactions, handleBackClick } = props;
+	const { userID, budgetID, accounts, showingAllAccounts, categories, subcategories, showingUnfinishedTransactions, handleBackClick } = props;
 
+	const [transactions, setTransactions] = useState<Transaction[]>(props.transactions);
 	const [clearedTransactions, setClearedTransactions] = useState<Transaction[]>([]);
 	const [unclearedTransactions, setUnclearedTransactions] = useState<Transaction[]>([]);
 
@@ -37,6 +42,9 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 	const [filter, setFilter] = useState<string>("");
 	const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>(transactions);
 	const [dateTransactionsMap, setDateTransactionsMap] = useState<DateTransactionsMap>(new Map());
+
+	const [subpage, setSubpage] = useState<JSX.Element | null>(null);
+	const [subpageClasses, setSubpageClasses] = useState<string[]>([styles.subpage]);
 
 	// Separates cleared from uncleared transactions
 	useEffect(() => {
@@ -188,6 +196,39 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 		setDateTransactionsMap(newDateTransactionsMap);
 	}, [filteredTransactions, accounts]);
 
+	// Opens transaction subpage
+	const showSubpage = (selectedSubpage: JSX.Element) => {
+		setSubpage(selectedSubpage);
+		setSubpageClasses([styles.subpage, styles.show]);
+	};
+	const hideSubpage = () => {
+		setSubpage(null);
+		setSubpageClasses([styles.subpage, styles.hide]);
+	};
+	const handleUpdateTransaction = (updatedTransaction: Transaction) => {
+		const updatedTransactions: Transaction[] = cloneDeep(transactions);
+		const targetIndex = transactions.findIndex(transaction => transaction.id === updatedTransaction.id);
+		updatedTransactions[targetIndex] = updatedTransaction;
+		setTransactions(updatedTransactions);
+		updateTransaction(userID, budgetID, updatedTransaction);
+		hideSubpage();
+	};
+	const navigateToTransactionSubpage = (selectedTransaction: Transaction) => {
+		showSubpage(
+			<TransactionPage
+				userID={userID}
+				budgetID={budgetID}
+				categories={categories}
+				subcategories={subcategories}
+				accounts={accounts}
+				transaction={selectedTransaction}
+				isCreatingTransaction={false}
+				handleCreateTransaction={handleUpdateTransaction}
+				hideTransactionPage={hideSubpage}
+			/>
+		);
+	};
+
 	// Filter can search for category, subcategory, payee, or amount, and date
 	const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setFilter(event.currentTarget.value);
@@ -207,7 +248,12 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 
 			// Formatting strings for transaction data
 			transactionItems.push(
-				<div className={styles.transaction}>
+				<div
+					className={styles.transaction}
+					onClick={() => {
+						navigateToTransactionSubpage(transaction);
+					}}
+				>
 					<div className={styles.select}>
 						<span />
 					</div>
@@ -238,7 +284,7 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 				<span>{showingAllAccounts ? "All Accounts" : showingUnfinishedTransactions ? "New Transactions" : accounts[0].name}</span>
 				<IconButton button={{ onClick: handleBackClick }} src={"/icons/edit-grey-100.svg"} altText={"Navigate to Edit Account Page"} />
 			</header>
-			<main className={styles.main}>
+			<main data-test-id="account_transactions_subpage_main" className={styles.main}>
 				<div className={styles.balances}>
 					<span className={styles.totalLabel}>Total</span>
 					<span className={styles.totalBalance}>{workingBalanceString}</span>
@@ -258,6 +304,9 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 				</div>
 				{transactionItems}
 			</main>
+			<section data-test-id="account_transactions_subpage_subpage" className={classNames(subpageClasses)}>
+				{subpage}
+			</section>
 		</>
 	);
 }

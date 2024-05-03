@@ -53,7 +53,7 @@ export function AccountSelectionSubpage(props: AccountSelectionSubpagePropsType)
 
 	return (
 		<>
-			<header className={styles.header}>
+			<header data-test-id="account-selection-subpage-header" className={styles.header}>
 				<IconButton
 					button={{
 						onClick: handleBackClick,
