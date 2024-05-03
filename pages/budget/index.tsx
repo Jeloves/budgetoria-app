@@ -90,12 +90,6 @@ export default function BudgetPage() {
 		navigateToBudgetPage();
 	};
 
-	// Passed to AccountsPage
-	const handleConfirmNewAccount = async (newAccount: Account) => {
-		await createAccount(user!.uid, budget!.id, newAccount);
-		// TODO: update unassigned balance
-	};
-
 	// Passed to CreateTransactionPage
 	const handleCreateTransaction = (newTransaction: Transaction) => {
 		if (newTransaction.categoryID && newTransaction.accountID && newTransaction.date) {
@@ -259,8 +253,9 @@ export default function BudgetPage() {
 					subcategories={subcategories}
 					accounts={accounts}
 					transaction={new Transaction(uuidv4(), Timestamp.fromDate(new Date()), "", "", true, 0, false, "", "", "")}
-					unassignedBalance={budget ? budget.unassignedBalance : 0}
+					isCreatingTransaction={true}
 					handleCreateTransaction={handleCreateTransaction}
+					hideTransactionPage={null}
 				/>
 			</>
 		);

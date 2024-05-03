@@ -80,15 +80,15 @@ export function AccountsPage(props: AccountsPagePropsType) {
 	};
 	const navigateToUnfinishedTransactionsSubpage = () => {
 		showSubpage(
-			<AccountTransactionsSubpage categories={categories} subcategories={subcategories} accounts={accounts} showingAllAccounts={false} transactions={unfinishedTransactions} showingUnfinishedTransactions={true} handleBackClick={hideSubpage} />
+			<AccountTransactionsSubpage userID={userID} budgetID={budgetID} categories={categories} subcategories={subcategories} accounts={accounts} showingAllAccounts={false} transactions={unfinishedTransactions} showingUnfinishedTransactions={true} handleBackClick={hideSubpage}/>
 		);
 	};
 	const navigateToAllTransactionsSubpage = () => {
-		showSubpage(<AccountTransactionsSubpage categories={categories} subcategories={subcategories} accounts={accounts} showingAllAccounts={true} transactions={transactions} showingUnfinishedTransactions={false} handleBackClick={hideSubpage} />);
+		showSubpage(<AccountTransactionsSubpage userID={userID} budgetID={budgetID} categories={categories} subcategories={subcategories} accounts={accounts} showingAllAccounts={true} transactions={transactions} showingUnfinishedTransactions={false} handleBackClick={hideSubpage}/>);
 	};
 	const navigateToAccountTransactionsSubpage = (selectedAccount: Account, selectedTransactions: Transaction[]) => {
 		showSubpage(
-			<AccountTransactionsSubpage categories={categories} subcategories={subcategories} accounts={[selectedAccount]} showingAllAccounts={false} transactions={selectedTransactions} showingUnfinishedTransactions={false} handleBackClick={hideSubpage} />
+			<AccountTransactionsSubpage userID={userID} budgetID={budgetID} categories={categories} subcategories={subcategories} accounts={[selectedAccount]} showingAllAccounts={false} transactions={selectedTransactions} showingUnfinishedTransactions={false} handleBackClick={hideSubpage}/>
 		);
 	};
 	const navigateToCreateAccountSubpage = () => {

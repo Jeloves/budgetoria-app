@@ -5,7 +5,7 @@
 @use "@styles/main";
 @use "@styles/subpage";
 
-.header {
+.newTransactionHeader {
 	position: relative;
 
 	& span {
@@ -19,6 +19,14 @@
 		right: 0;
 		color: color.$green-500;
 		padding-right: space.$s2;
+	}
+}
+
+.existingTransactionHeader {
+	display: flex;
+	justify-content: space-between;
+	& button {
+		color: color.$green-500;
 	}
 }
 

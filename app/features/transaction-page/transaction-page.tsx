@@ -13,6 +13,8 @@ import { CategorySelectionSubpage } from "./category-selection-subpage/category-
 import { AccountSelectionSubpage } from "./account-selection-subpage/account-selection-subpage";
 import { DateSelectionSubpage } from "./date-selection-subpage/date-selection-subpage";
 import { formatCurrencyBasedOnOutflow } from "@/utils/currency";
+import { getUnassignedBalance } from "@/firebase/budgets";
+import { IconButton } from "../ui";
 
 export type TransactionPagePropsType = {
 	userID: string;
@@ -21,12 +23,14 @@ export type TransactionPagePropsType = {
 	subcategories: Subcategory[];
 	accounts: Account[];
 	transaction: Transaction;
-	unassignedBalance: number;
+	isCreatingTransaction: boolean;
 	handleCreateTransaction: (newTransaction: Transaction) => void;
+	hideTransactionPage: null | (() => void);
 };
 
 export function TransactionPage(props: TransactionPagePropsType) {
-	const { userID, budgetID, categories, subcategories, accounts, transaction, unassignedBalance, handleCreateTransaction } = props;
+	const { userID, budgetID, categories, subcategories, accounts, transaction, isCreatingTransaction, handleCreateTransaction, hideTransactionPage } = props;
+	const [unassignedBalance, setUnassignedBalance] = useState<number>(0);
 	const [dataListenerKey, setDataListenerKey] = useState<boolean>(false);
 	const [timestamp, setTimestamp] = useState<Timestamp>(transaction.date);
 	const [payee, setPayee] = useState<string>(transaction.payee);
@@ -38,6 +42,9 @@ export function TransactionPage(props: TransactionPagePropsType) {
 	const [accountID, setAccountID] = useState<string>(transaction.accountID);
 	const [subcategoryID, setSubcategoryID] = useState<string>(transaction.subcategoryID);
 	const [categoryID, setCategoryID] = useState<string>(transaction.categoryID);
+
+	// Header Display
+	const [headerClasses, setHeaderClasses] = useState<string[]>([styles.header]);
 
 	// Balance Display
 	const [balanceRenderKey, setBalanceRenderKey] = useState<1 | 0>(0);
@@ -58,6 +65,20 @@ export function TransactionPage(props: TransactionPagePropsType) {
 		};
 		fetchPayees();
 	}, [budgetID, dataListenerKey, userID]);
+
+	// Read unassigned balance from firebase
+	useEffect(() => {
+		const fetchUnassignedBalance = async () => {
+			const unassigned = await getUnassignedBalance(userID, budgetID);
+			setUnassignedBalance(unassigned);
+		};
+		fetchUnassignedBalance();
+	}, [budgetID, dataListenerKey, userID]);
+
+	// Styles header
+	useEffect(() => {
+		isCreatingTransaction ? setHeaderClasses([styles.header, styles.newTransactionHeader]) : setHeaderClasses([styles.header, styles.existingTransactionHeader]);
+	}, [isCreatingTransaction]);
 
 	// Updates Transaction Data
 	const createNewPayee = (newPayee: string) => {
@@ -117,7 +138,7 @@ export function TransactionPage(props: TransactionPagePropsType) {
 		// If still not a valid number, sets to 0
 		const isValidNumber = !isNaN(parseFloat(value));
 		const newBalance = isValidNumber ? parseFloat(value) * 1000000 : 0;
-		
+
 		setBalance(newBalance);
 		setBalanceString(formatCurrencyBasedOnOutflow(newBalance, outflow));
 		setBalanceRenderKey(balanceRenderKey === 0 ? 1 : 0);
@@ -152,8 +173,9 @@ export function TransactionPage(props: TransactionPagePropsType) {
 
 	return (
 		<>
-			<header className={styles.header}>
-				<span>Create Transaction</span>
+			<header className={classNames(headerClasses)}>
+				{!isCreatingTransaction && <IconButton button={{ onClick: hideTransactionPage! }} src={"/icons/arrow-left-grey-100.svg"} altText={"Navigate back to AccountTransactionsSubpage"} />}
+				<span>{isCreatingTransaction ? "Create Transaction" : "Transaction"}</span>
 				<button
 					onClick={() => {
 						handleCreateTransaction(new Transaction(transaction.id, timestamp, payee, memo, outflow, balance, approval, accountID, categoryID, subcategoryID));
@@ -169,7 +191,7 @@ export function TransactionPage(props: TransactionPagePropsType) {
 							className={outflow ? styles.flow : ""}
 							onClick={() => {
 								setOutflow(true);
-								setBalanceClasses([styles.balance])
+								setBalanceClasses([styles.balance]);
 							}}
 						>
 							- Outflow
@@ -178,7 +200,7 @@ export function TransactionPage(props: TransactionPagePropsType) {
 							className={outflow ? "" : styles.flow}
 							onClick={() => {
 								setOutflow(false);
-								setBalanceClasses([styles.balance, styles.inflow])
+								setBalanceClasses([styles.balance, styles.inflow]);
 							}}
 						>
 							+ Inflow
