@@ -15,7 +15,7 @@ const subcategories = [
 
 export async function createInitialBudget(userID: string) {
 	try {
-		const budget = new Budget(uuidv4(), "My Budget", Timestamp.fromDate(new Date()), "USD", "en-US", true, 0);
+		const budget = new Budget(uuidv4(), "My Budget", Timestamp.fromDate(new Date()), true, 0);
         const userRef = doc(firestore, collectionLabel.users, userID)
 		const budgetRef = doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budget.id);
         await setDoc(userRef, {

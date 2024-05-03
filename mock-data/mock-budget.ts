@@ -6,7 +6,7 @@ import { NIL as NIL_UUID } from "uuid";
 
 const budgetCreationDate = new Date(2024, 0, 1);
 
-const budget = new Budget(uuidv4(), "My Budget", Timestamp.fromDate(budgetCreationDate), "USD", "en-US", true, 0);
+const budget = new Budget(uuidv4(), "My Budget", Timestamp.fromDate(budgetCreationDate), true, 0);
 
 // Accounts
 const initialBalance_checkings: number = 8500;
