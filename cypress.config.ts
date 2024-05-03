@@ -1,5 +1,4 @@
 import { defineConfig } from "cypress";
-import { createBudget } from "./.firebase/budgets";
 
 export default defineConfig({
 	e2e: {

@@ -1,19 +1,17 @@
-// Import the functions you need from the SDKs you need
+import dotenv from 'dotenv';
 import { initializeApp } from "firebase/app";
-import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { getFirestore } from "firebase/firestore";
+dotenv.config();
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+
 const firebaseConfig = {
-	apiKey: "AIzaSyBh1M-BQ6HN_PPgBVQuDkZJ8-2aTmK0irU",
-	authDomain: "budgetoria.firebaseapp.com",
-	projectId: "budgetoria",
-	storageBucket: "budgetoria.appspot.com",
-	messagingSenderId: "713558167556",
-	appId: "1:713558167556:web:99f9ce1aacea51e4502551",
-	measurementId: "G-QG4KE52G5H",
+	apiKey: process.env.NEXT_PUBLIC_API_KEY,
+	authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
+	projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+	storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
+	messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
+	appId: process.env.NEXT_PUBLIC_APP_ID,
+	measurementId: process.env.NEXT_PUBLIC_MEASUREMENT_ID,	
 };
 
 export const collectionLabel = {
