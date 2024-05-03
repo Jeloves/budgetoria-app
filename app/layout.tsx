@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./layout.css"
+import dotenv from 'dotenv';
+dotenv.config();
+console.log("page is loaded")
 
 export const metadata: Metadata = {
 	title: "Create Next App",

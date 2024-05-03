@@ -1,6 +1,4 @@
 import styles from "./page.module.scss";
-import { redirect } from "next/navigation";
-import { getUser } from "@/firebase/auth";
 import { LoginPage } from "./features/login-page";
 
 export default function Home() {
