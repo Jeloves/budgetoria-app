@@ -1,12 +1,13 @@
 import React from "react";
-import { v4 as uuidv4 } from "uuid";
-import { NIL as NIL_UUID } from "uuid";
 import { AccountsPage } from "@/features/accounts-page/accounts-page";
 import { getMockData } from "@/mock-data/mock-budget";
 import { Account, Category, Subcategory, Transaction } from "@/firebase/models";
 import { createAccount, deleteAccount, getAccounts } from "@/firebase/accounts";
 import { createTransaction, deleteTransaction, getTransactions } from "@/firebase/transactions";
 import { sortAccountsAlphabetically } from "@/utils/sorting";
+import { firestore } from "@/firebase/firebase.config";
+import { connectFirestoreEmulator } from "firebase/firestore";
+import { clearAccountsAndTransactions } from "../../support/firebase";
 
 describe("<AccountsPage />", () => {
 	let userID: string;
@@ -17,21 +18,11 @@ describe("<AccountsPage />", () => {
 	let mockTransactions: Transaction[];
 
 	before(async () => {
+		connectFirestoreEmulator(firestore, '127.0.0.1', 8080);
+		
 		// Retrieving env variables
 		userID = Cypress.env("TEST_USER_ID");
 		budgetID = Cypress.env("TEST_BUDGET_ID");
-
-		// Deletes all accounts in firebase (in case of previous failed test)
-		const accounts = await getAccounts(userID, budgetID);
-		for (let account of accounts) {
-			deleteAccount(userID, budgetID, account.id);
-		}
-
-		// Deletes all transactions in firebase (in case of previous failed test)
-		const transactions = await getTransactions(userID, budgetID);
-		for (let transaction of transactions) {
-			deleteTransaction(userID, budgetID, transaction.id);
-		}
 
 		const mock = getMockData();
 		mockAccounts = mock.accounts;
@@ -42,16 +33,9 @@ describe("<AccountsPage />", () => {
 		sortAccountsAlphabetically(mockAccounts);
 	});
 
-	after(() => {
-		// Deletes all accounts from firebase
-		for (let account of mockAccounts) {
-			deleteAccount(userID, budgetID, account.id);
-		}
-
-		// Deletes all transactions from firebase
-		for (let transaction of mockTransactions) {
-			deleteTransaction(userID, budgetID, transaction.id);
-		}
+	after(async () => {
+		// Deletes all accounts and transactions in firebase
+		await clearAccountsAndTransactions(userID, budgetID);
 	});
 
 	context("Constant texts and images", () => {
