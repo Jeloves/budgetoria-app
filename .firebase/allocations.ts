@@ -3,7 +3,7 @@ import { collectionLabel } from "./firebase.config";
 import { firestore } from "./firebase.config";
 import { Allocation } from "./models";
 
-export async function getAllocations(userID: string, budgetID: string, month: number, year: number): Promise<Allocation[]> {
+export async function getAllocationsByDate(userID: string, budgetID: string, month: number, year: number): Promise<Allocation[]> {
 	try {
 		const allocationsSnapshot = await getDocs(collection(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.allocations));
 

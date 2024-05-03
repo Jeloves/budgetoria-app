@@ -46,8 +46,6 @@ export class Subcategory {
     id: string;
     name: string;
     categoryID: string;
-	assigned: number = 0;
-	available: number = 0;
     constructor(id: string, name: string, categoryID: string) {
         this.id = id;
         this.name = name;
