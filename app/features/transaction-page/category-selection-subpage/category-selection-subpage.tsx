@@ -106,7 +106,7 @@ export function CategorySelectionSubpage(props: CategorySelectionSubpagePropsTyp
 
 	return (
 		<>
-			<header className={styles.header}>
+			<header data-test-id="category-selection-subpage-header" className={styles.header}>
 				<IconButton
 					button={{
 						onClick: handleBackClick,

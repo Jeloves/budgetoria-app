@@ -77,7 +77,7 @@ export function PayeeSelectionSubpage(props: PayeeSelectionSubpagePropsType) {
 
 	return (
 		<>
-			<header className={styles.header}>
+			<header data-test-id="payee-selection-subpage-header" className={styles.header}>
 				<IconButton
 					button={{
 						onClick: handleBackClick,

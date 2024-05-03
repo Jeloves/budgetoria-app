@@ -24,8 +24,6 @@ export async function createInitialBudget(userID: string) {
 		await setDoc(budgetRef, {
 			name: budget.name,
 			dateCreated: budget.dateCreated,
-			currency: budget.currency,
-			locale: budget.locale,
 			selected: budget.selected,
 			unassignedBalance: budget.unassignedBalance,
 		});

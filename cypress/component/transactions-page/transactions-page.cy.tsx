@@ -135,7 +135,53 @@ describe("<TransactionsPage/>", () => {
 			cy.get('[data-test-id="transaction-date-item"] img').eq(1).should("not.exist");
 		});
 
-		it("displays the Calendar when Date TransactionDataItem is clicked", () => {
+		it("shows correct text and icons for Approval TransactionDataItem", () => {
+			cy.get('[data-test-id="transaction-approval-item"] h2').should("have.text", "Cleared");
+			cy.get('[data-test-id="transaction-approval-item"] img').should("have.attr", "src", "/icons/cleared-grey-100.svg");
+			cy.get('[data-test-id="transaction-approval-item"] span').click();
+			cy.get('[data-test-id="transaction-approval-item"] img').should("have.attr", "src", "/icons/cleared.svg");
+		});
+
+		it("shows correct text and icons for Memo TransactionDataItem", () => {
+			cy.get('[data-test-id="transaction-memo-item"] h2').should("have.text", "Memo");
+			cy.get('[data-test-id="transaction-memo-item"] img').should("have.attr", "src", "/icons/memo-grey-100.svg");
+            cy.get('[data-test-id="transaction-memo-textarea"]').should("have.attr", "placeholder", "Enter memo...");
+		});
+	});
+
+    context("Navigation buttons show subpage", () => {
+        beforeEach(() => {
+			cy.mount(
+				<TransactionPage
+					userID={userID}
+					budgetID={budgetID}
+					categories={mock.categories}
+					subcategories={mock.subcategories}
+					accounts={mock.accounts}
+					transaction={mock.emptyTransaction}
+					isCreatingTransaction={true}
+					handleCreateTransaction={(newTransaction: Transaction) => {}}
+					hideTransactionPage={null}
+				/>
+			);
+		});
+
+        it("navigates to Payee Selection Subpage", () => {
+            cy.get('[data-test-id="transaction-payee-item"]').click();
+            cy.get('[data-test-id="payee-selection-subpage-header"]').should("exist");
+        })
+
+        it("navigates to Category Selection Subpage", () => {
+            cy.get('[data-test-id="transaction-category-item"]').click();
+            cy.get('[data-test-id="category-selection-subpage-header"]').should("exist");
+        })
+
+        it("navigates to Account Selection Subpage", () => {
+            cy.get('[data-test-id="transaction-account-item"]').click();
+            cy.get('[data-test-id="account-selection-subpage-header"]').should("exist");
+        })
+
+        it("displays the Calendar when Date Selection is clicked", () => {
 			cy.get('[data-test-id="transaction-calendar-item"]')
 				.invoke("height")
 				.then((height) => {
@@ -156,18 +202,5 @@ describe("<TransactionsPage/>", () => {
 					}
 				});
 		});
-
-		it("shows correct text and icons for Approval TransactionDataItem", () => {
-			cy.get('[data-test-id="transaction-approval-item"] h2').should("have.text", "Cleared");
-			cy.get('[data-test-id="transaction-approval-item"] img').should("have.attr", "src", "/icons/cleared-grey-100.svg");
-			cy.get('[data-test-id="transaction-approval-item"] span').click();
-			cy.get('[data-test-id="transaction-approval-item"] img').should("have.attr", "src", "/icons/cleared.svg");
-		});
-
-		it("shows correct text and icons for Memo TransactionDataItem", () => {
-			cy.get('[data-test-id="transaction-memo-item"] h2').should("have.text", "Memo");
-			cy.get('[data-test-id="transaction-memo-item"] img').should("have.attr", "src", "/icons/memo-grey-100.svg");
-            cy.get('[data-test-id="transaction-memo-textarea"]').should("have.attr", "placeholder", "Enter memo...");
-		});
-	});
+    })
 });
