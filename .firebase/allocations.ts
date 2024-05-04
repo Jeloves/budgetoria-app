@@ -3,7 +3,7 @@ import { collectionLabel } from "./firebase.config";
 import { firestore } from "./firebase.config";
 import { Allocation } from "./models";
 
-export async function getAllocations(userID: string, budgetID: string, month: number, year: number): Promise<Allocation[]> {
+export async function getAllocationsByDate(userID: string, budgetID: string, month: number, year: number): Promise<Allocation[]> {
 	try {
 		const allocationsSnapshot = await getDocs(collection(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.allocations));
 
@@ -20,6 +20,19 @@ export async function getAllocations(userID: string, budgetID: string, month: nu
 	} catch (error) {
 		console.error("Failed to read allocations", error);
 		throw error;
+	}
+}
+
+export async function createAllocation(userID: string, budgetID: string, newAllocation: Allocation) {
+	try {
+		await setDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.allocations, newAllocation.id), {
+			year: newAllocation.year,
+			month: newAllocation.month,
+			balance: newAllocation.balance,
+			subcategoryID: newAllocation.subcategoryID
+		});
+	} catch (error) {
+		console.error("Failed to add new category", error);
 	}
 }
 
