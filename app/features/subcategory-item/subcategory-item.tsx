@@ -31,10 +31,6 @@ export function SubcategoryItem(props: SubcategoryItemPropsType) {
 
     const handleInputBlur = (event: React.FocusEvent<HTMLInputElement>) => {
         let value = event.target.value;
-        // Removes currency string if present
-        if (value.includes(currencyString)) {
-            value = value.replace(currencyString, "");
-        }
         // Removes non-number characters
         const nonCurrencyRegex = /[^0-9.]/g;
         value = value.replace(nonCurrencyRegex, "");
