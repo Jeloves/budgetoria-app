@@ -3,7 +3,7 @@
 // Then numbers (sorted by the left-most digit) For example, [1,11,12,]
 // Then letters
 
-import { Account } from "@/firebase/models";
+import { Account, Category, Subcategory } from "@/firebase/models";
 
 export function sortStringsAlphabetically(array: string[]) {
 	array.sort((a, b) => {
