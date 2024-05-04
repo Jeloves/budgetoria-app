@@ -47,3 +47,48 @@ export function sortAccountsAlphabetically(accounts: Account[]) {
 		}
 	});
 }
+
+
+export function sortCategoriesAlphabetically(categories: Category[]) {
+	categories.sort((a, b) => {
+
+		const isANumber = !isNaN(parseFloat(a.name));
+		const isBNumber = !isNaN(parseFloat(b.name));
+
+		if (isANumber && isBNumber) {
+			// Both are numbers, compare as numbers
+			return parseFloat(a.name[0]) - parseFloat(b.name[0]);
+		} else if (isANumber) {
+			// Only a is a number, place it before b
+			return -1;
+		} else if (isBNumber) {
+			// Only b is a number, place it before a
+			return 1;
+		} else {
+			// Both are non-letter characters or strings, compare as strings
+			return a.name.localeCompare(b.name);
+		}
+	});
+}
+
+export function sortSubcategoriesAlphabetically(subcategories: Subcategory[]) {
+	subcategories.sort((a, b) => {
+
+		const isANumber = !isNaN(parseFloat(a.name));
+		const isBNumber = !isNaN(parseFloat(b.name));
+
+		if (isANumber && isBNumber) {
+			// Both are numbers, compare as numbers
+			return parseFloat(a.name[0]) - parseFloat(b.name[0]);
+		} else if (isANumber) {
+			// Only a is a number, place it before b
+			return -1;
+		} else if (isBNumber) {
+			// Only b is a number, place it before a
+			return 1;
+		} else {
+			// Both are non-letter characters or strings, compare as strings
+			return a.name.localeCompare(b.name);
+		}
+	});
+}
