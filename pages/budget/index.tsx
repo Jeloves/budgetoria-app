@@ -24,6 +24,7 @@ import { TransactionPage } from "@/features/transaction-page/transaction-page";
 import { v4 as uuidv4 } from "uuid";
 import { Timestamp } from "firebase/firestore";
 import { sortCategoriesAlphabetically, sortSubcategoriesAlphabetically } from "@/utils/sorting";
+import { CategoryAllocation, assignAllocations } from "@/utils/allocate";
 
 export default function BudgetPage() {
 	const [user, setUser] = useState<User | null>(null);
@@ -35,6 +36,7 @@ export default function BudgetPage() {
 	const [transactions, setTransactions] = useState<Transaction[]>([]);
 	const [clearedTransactions, setClearedTransactions] = useState<Transaction[]>([]);
 	const [unclearedTransactions, setUnclearedTransactions] = useState<Transaction[]>([]);
+	const [categoryAllocations, setCategoryAllocations] = useState<CategoryAllocation[]>([]);
 
 	const [dataListenerKey, setDataListenerKey] = useState<boolean>(false);
 
@@ -108,6 +110,18 @@ export default function BudgetPage() {
 				const transactionsData = await getTransactionsByDate(user.uid, budget.id, month, year);
 				setTransactions(transactionsData);
 
+				// Calculating category and subcategory allocations
+				const categoryAllocationsData: CategoryAllocation[] = [];
+				for (const category of categoryData) {
+					const filteredTransactions = transactionsData.filter((transaction) => transaction.categoryID === category.id);
+					const filteredSubcategories = subcategoryData.filter((subcategory) => subcategory.categoryID === category.id);
+					const filteredAllocations = allocationData.filter((allocation) => {
+						return filteredSubcategories.some((subcategory) => subcategory.id === allocation.id);
+					});
+					const categoryAllocation = assignAllocations(user.uid, budget.id, category, filteredSubcategories, filteredAllocations, filteredTransactions, year, month);
+					categoryAllocationsData.push(categoryAllocation);
+				}
+				setCategoryAllocations(categoryAllocationsData);
 
 				setIsLoading(false);
 			};
@@ -199,25 +213,10 @@ export default function BudgetPage() {
 
 	const categoryItems: JSX.Element[] = [];
 	if (categories.length > 0) {
-		for (let i = 0; i < categories.length; i++) {
-			const category = categories[i];
+		for (let i = 0; i < categoryAllocations.length; i++) {
+			const categoryAllocation = categoryAllocations[i];
 
-			// Filtering necessary props for this CategoryItem.
-			const filteredSubcategories = subcategories.filter((subcategory) => {
-				return subcategory.categoryID === category.id;
-			});
-			const filteredAllocations = allocations.filter((allocation) => {
-				return filteredSubcategories.some((subcategory) => {
-					return subcategory.id === allocation.subcategoryID;
-				});
-			});
-			const filteredTransactions = clearedTransactions.filter((transaction) => {
-				return transaction.categoryID === category.id;
-			});
-
-			categoryItems.push(
-				<CategoryItem key={i} currencyString={"$"} category={category} subcategories={filteredSubcategories} allocations={filteredAllocations} transactions={filteredTransactions} updateSubcategoryAllocation={updateSubcategoryAllocation} />
-			);
+			categoryItems.push(<CategoryItem key={i} categoryAllocation={categoryAllocation} updateSubcategoryAllocation={updateSubcategoryAllocation} />);
 		}
 	}
 

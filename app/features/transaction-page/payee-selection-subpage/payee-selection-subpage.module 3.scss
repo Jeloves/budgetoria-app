@@ -1,0 +1,86 @@
+@use "@styles/color";
+@use "@styles/font";
+@use "@styles/space";
+@use "@styles/header";
+@use "@styles/main";
+
+.header {
+	position: relative;
+
+    & :first-child {
+		position: absolute;
+		left: 0;
+        transform: translateY(-50%);
+		color: color.$green-500;
+		padding-right: space.$s2;
+	}
+
+	& span {
+		position: absolute;
+		left: 50%;
+		transform: translateX(-50%);
+	}
+}
+
+.main {
+    background-color: color.$secondary-dark;
+
+    & img {
+        width: space.$s5;
+        height: space.$s5;
+    }
+}
+
+.filter {
+    display: flex;
+    gap: space.$s2;
+    background-color: color.$primary-dark;
+    box-sizing: border-box;
+    padding: space.$s2;
+    margin: space.$s2 space.$s2;
+    border-radius: space.$s4;
+
+    & input[type="text"] {
+		padding: 0;
+		outline: none;
+		background: none;
+		font: font.$text-regular;
+		color: color.$gray-100;
+        flex: 1;
+	}
+}
+
+.payeesContainer {
+    padding: 0 space.$s2;
+}
+
+.sortingChar {
+    text-transform: uppercase;
+    color: color.$gray-400;
+    box-sizing: border-box;
+    padding: space.$s4 0;
+    border-bottom: space.$s0-1 solid color.$gray-500;
+}
+
+.payee {
+    color: color.$gray-100;
+    font: font.$text-regular;
+    box-sizing: border-box;
+    padding: space.$s2 space.$s3 space.$s2 space.$s3;
+    border-bottom: space.$s0-1 solid color.$gray-500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.createPayee {
+    background-color: color.$green-500;
+    box-sizing: border-box;
+    padding: space.$s2;
+    border-radius: space.$s4;
+    color: color.$gray-100;
+    font: font.$text-medium;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

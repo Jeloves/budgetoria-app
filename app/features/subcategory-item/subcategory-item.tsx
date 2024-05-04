@@ -1,13 +1,12 @@
 import classNames from "classnames";
 import styles from "./subcategory-item.module.scss";
 import { useEffect, useState } from "react";
+import { SubcategoryAllocation } from "@/utils/allocate";
+import { Subcategory } from "@/firebase/models";
 
 export type SubcategoryItemPropsType = {
-	subcategoryID: string;
-	name: string;
+	subcategoryAllocation: SubcategoryAllocation;
 	currencyString: string;
-	assigned: number;
-	available: number;
 	updateCategoryAllocations: (changeInAssignedValue: number) => void;
 	updateSubcategoryAllocation: (subcategoryID: string, newBalance: number, changeInBalance: number) => void;
 };
@@ -17,9 +16,10 @@ type AvailableAllocationClassesType = {
 };
 
 export function SubcategoryItem(props: SubcategoryItemPropsType) {
-	const { subcategoryID, name, currencyString, assigned, available, updateCategoryAllocations, updateSubcategoryAllocation } = props;
-	const [assignedAllocation, setAssignedAllocation] = useState<number>(assigned);
-	const [availableAllocation, setAvailableAllocation] = useState<number>(available);
+	const { subcategoryAllocation, currencyString, updateCategoryAllocations, updateSubcategoryAllocation } = props;
+	const [subcategory, setSubcategory] = useState<Subcategory>(subcategoryAllocation.subcategory);
+	const [assignedAllocation, setAssignedAllocation] = useState<number>(subcategoryAllocation.assignedBalance);
+	const [availableAllocation, setAvailableAllocation] = useState<number>(subcategoryAllocation.availableBalance);
 	const [key, setKey] = useState<number>(0);
 	const [availableAllocationClasses, setAvailableAllocationClasses] = useState<AvailableAllocationClassesType>({ [styles.allocation]: true });
 
@@ -49,7 +49,7 @@ export function SubcategoryItem(props: SubcategoryItemPropsType) {
 			setAvailableAllocation(availableAllocation + changeInAssignedValue);
 			updateCategoryAllocations(changeInAssignedValue);
 			// Updating firebase
-			updateSubcategoryAllocation(subcategoryID, newAssigned, changeInAssignedValue);
+			updateSubcategoryAllocation(subcategory.id, newAssigned, changeInAssignedValue);
 		}
 		// Used to re-render this component
 		setKey(key === 0 ? 1 : 0);
@@ -65,7 +65,7 @@ export function SubcategoryItem(props: SubcategoryItemPropsType) {
 
 	return (
 		<section className={styles.subcategory}>
-			<span className={styles.subcategoryName}>{name}</span>
+			<span className={styles.subcategoryName}>{subcategory.name}</span>
 			<input className={styles.input} type="text" defaultValue={currencyString + (assignedAllocation / 1000000).toFixed(2)} onBlur={handleInputBlur} onKeyDown={handleEnterKeyDown} key={key} />
 			<div className={classNames(availableAllocationClasses)}>
 				<span>

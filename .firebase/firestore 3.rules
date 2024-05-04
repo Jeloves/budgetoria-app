@@ -1,0 +1,10 @@
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read, update, write, delete: if request.auth !=null;
+    }
+    match /users/{userId}/budgets/{document=**} {
+      allow read, create, update, write: if true;
+    }
+  }
+}

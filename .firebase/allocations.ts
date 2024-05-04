@@ -23,6 +23,19 @@ export async function getAllocationsByDate(userID: string, budgetID: string, mon
 	}
 }
 
+export async function createAllocation(userID: string, budgetID: string, allocation: Allocation) {
+	try {
+		await setDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.allocations, allocation.id), {
+			year: allocation.year,
+			month: allocation.month,
+			balance: allocation.balance,
+			subcategoryID: allocation.subcategoryID
+		});
+	} catch (error) {
+		console.error("Failed to create new allocation", error);
+	}
+}
+
 export async function updateAssignedAllocation(userID: string, budgetID: string, subcategoryID: string, month: number, year: number, newBalance: number) {
 	try {
 		const allocationsSnapshot = await getDocs(collection(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.allocations));

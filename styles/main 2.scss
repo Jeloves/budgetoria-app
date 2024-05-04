@@ -1,0 +1,23 @@
+@use "@styles/color";
+@use "@styles/font";
+@use "@styles/space";
+
+.main {
+	background-color: color.$secondary-dark;
+	box-sizing: border-box;
+	height: calc(100vh - space.$s15);	// 100vh - header.height
+	width: 100vw;
+	border-top: space.$s0-1 solid color.$gray-500;
+	position: absolute;
+	top: calc(space.$s15);
+	bottom: space.$s15;
+
+
+	& input[type="text"] {
+		margin: 0;
+		outline: none;
+		background: none;
+		box-sizing: border-box;
+		color: white;
+	}
+}

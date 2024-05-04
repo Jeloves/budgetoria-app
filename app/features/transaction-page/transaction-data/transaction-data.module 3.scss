@@ -1,0 +1,79 @@
+@use "@styles/color";
+@use "@styles/font";
+@use "@styles/space";
+
+.transactionData {
+	width: 100%;
+	min-height: space.$s16;
+	box-sizing: border-box;
+	display: grid;
+	align-items: center;
+	color: white;
+	padding: 0;
+	padding-top: space.$s2;
+	grid-template-rows: 1fr 1fr auto;
+	grid-template-columns: auto 1fr auto;
+	grid-template-areas:
+		"icon label arrow"
+		"icon selected arrow"
+		"icon border border";
+
+	& img {
+		width: space.$s5;
+		height: space.$s5;
+	}
+
+	& .iconContainer {
+		grid-area: icon;
+		height: 100%;
+		padding: 0 space.$s3;
+		margin-bottom: space.$s2;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	& h1 {
+		grid-area: label;
+		font: font.$label-small;
+		color: color.$gray-100;
+	}
+
+	& h2 {
+		grid-area: selected;
+		font: font.$text-regular;
+	}
+
+	& .arrow {
+		grid-area: arrow;
+		width: space.$s5;
+		height: space.$s5;
+		padding-right: space.$s1;
+	}
+
+	& .border {
+		grid-area: border;
+		padding: 0;
+		margin: 0;
+		margin-top: space.$s2;
+		grid-area: border;
+		background-color: color.$gray-500;
+		height: space.$s0-1;
+		border: none;
+		box-sizing: border-box;
+	}
+
+	& .unselected {
+		color: color.$gray-500;
+	}
+
+    & input[type="text"] {
+        grid-area: selected;
+        margin-right: space.$s8;
+        font: font.$text-regular;
+        color: white;
+        flex: 1;
+    }
+}
+
+
