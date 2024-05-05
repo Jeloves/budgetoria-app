@@ -29,7 +29,7 @@ export async function createAllocation(userID: string, budgetID: string, newAllo
 			year: newAllocation.year,
 			month: newAllocation.month,
 			balance: newAllocation.balance,
-			subcategoryID: newAllocation.subcategoryID
+			subcategoryID: newAllocation.subcategoryID,
 		});
 	} catch (error) {
 		console.error("Failed to add new category", error);
@@ -76,8 +76,8 @@ export async function deleteAllocationsBySubcategory(userID: string, budgetID: s
 		const querySnapshot = await getDocs(q);
 		// Deleting all queried docs
 		querySnapshot.forEach((doc) => {
-			console.log("hello", doc.data())
-		})
+			console.log("hello", doc.data());
+		});
 	} catch (error) {
 		console.error("Failed to delete allocation", error);
 	}

@@ -21,14 +21,10 @@ Default.args = {
 		assignedBalance: 250000000,
 		availableBalance: 200000000,
 	},
-	currencyString: "$",
-	updateCategoryAllocations: (changeInAssignedValue: number) => {
-		console.log("Change in assigned value", changeInAssignedValue);
-	},
-	updateSubcategoryAllocation: (subcategoryID: string, newBalance: number, changeInBalance: number) => {
+	handleUpdateAssignedAllocation: (changeInSubcategoryAssignedValue: number, newSubcategoryAssignedBalance: number, subcategoryID: string) => {
 		console.log("Updating subcategory allocation");
 		console.log("    subcatID", subcategoryID);
-		console.log("    newBalance", newBalance);
-		console.log("    changeInBalance", changeInBalance);
+		console.log("    newBalance", newSubcategoryAssignedBalance);
+		console.log("    changeInBalance", changeInSubcategoryAssignedValue);
 	},
 };
