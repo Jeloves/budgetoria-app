@@ -4,9 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { SubcategoryAllocation } from "@/utils/allocate";
 import { Subcategory } from "@/firebase/models";
 import { formatCurrency } from "@/utils/currency";
+import { getAllocationBySubcategory } from "@/firebase/allocations";
+import { getTransactionsBySubcategory } from "@/firebase/transactions";
 
 export type SubcategoryItemPropsType = {
-	subcategoryAllocation: SubcategoryAllocation;
+    subcategoryAllocation: SubcategoryAllocation;
 	handleUpdateAssignedAllocation: (changeInSubcategoryAssignedValue: number, newSubcategoryAssignedBalance: number, subcategoryID: string) => void;
 };
 
@@ -16,11 +18,10 @@ type AvailableAllocationClassesType = {
 
 export function SubcategoryItem(props: SubcategoryItemPropsType) {
 	const { subcategoryAllocation, handleUpdateAssignedAllocation } = props;
-	const [subcategory, setSubcategory] = useState<Subcategory>(subcategoryAllocation.subcategory);
 	const [assignedBalance, setAssignedBalance] = useState<number>(subcategoryAllocation.assignedBalance);
 	const [availableBalance, setAvailableBalance] = useState<number>(subcategoryAllocation.availableBalance);
-	const [key, setKey] = useState<number>(0);
 	const [availableAllocationClasses, setAvailableAllocationClasses] = useState<AvailableAllocationClassesType>({ [styles.allocation]: true });
+
 
 	// Styles available allocation
 	useEffect(() => {
@@ -82,13 +83,13 @@ export function SubcategoryItem(props: SubcategoryItemPropsType) {
 		event.currentTarget.value = formatCurrency(newAssignedBalance);
 
 		// Update category balances and firebase allocation doc
-		handleUpdateAssignedAllocation(changeInAssignedBalance, newAssignedBalance, subcategory.id);
+		handleUpdateAssignedAllocation(changeInAssignedBalance, newAssignedBalance, subcategoryAllocation.subcategory.id);
 	};
 
 	return (
 		<section className={styles.subcategory}>
-			<span className={styles.subcategoryName}>{subcategory.name}</span>
-			<input className={styles.input} ref={assignedBalanceInputReference} type="text" defaultValue={formatCurrency(assignedBalance)} onFocus={handleOnFocus} onBlur={handleOnBlur} onKeyDown={handleEnterKeyDown} key={key} />
+			<span className={styles.subcategoryName}>{subcategoryAllocation.subcategory.name}</span>
+			<input className={styles.input} ref={assignedBalanceInputReference} type="text" defaultValue={formatCurrency(assignedBalance)} onFocus={handleOnFocus} onBlur={handleOnBlur} onKeyDown={handleEnterKeyDown}/>
 			<div className={classNames(availableAllocationClasses)}>
 				<span>{formatCurrency(availableBalance)}</span>
 			</div>

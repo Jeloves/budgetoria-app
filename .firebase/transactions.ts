@@ -41,6 +41,32 @@ export async function getTransactionsByDate(userID: string, budgetID: string, mo
 	}
 }
 
+export async function getTransactionsBySubcategory(userID: string, budgetID: string, subcategoryID: string, month: number, year: number): Promise<Transaction[]> {
+	try {
+		// Retrieving transaction documents
+		const transactionsSnapshot = await getDocs(collection(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.transactions));
+
+		// Filters transactions by subcategoryID and date
+		const filteredTransactions: Transaction[] = [];
+		transactionsSnapshot.forEach((doc) => {
+			const data = doc.data();
+			const timestamp = data.date;
+			const milliseconds = timestamp.seconds * 1000 + Math.floor(timestamp.nanoseconds / 1000000);
+			const date = new Date(milliseconds);
+			const isCorrectDate = date.getMonth() === month && date.getFullYear() === year;
+
+			if (data.subcategoryID === subcategoryID && isCorrectDate) {
+				filteredTransactions.push(new Transaction(doc.id, data.date, data.payee, data.memo, data.outflow, data.balance, data.approval, data.accountID, data.categoryID, data.subcategoryID));
+			}
+		});
+
+		return filteredTransactions;
+	} catch (error) {
+		console.error("Failed to read transactions by subcategory: ", error);
+		throw error;
+	}
+}
+
 export async function createTransaction(userID: string, budgetID: string, newTransaction: Transaction) {
 	try {
 		await setDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.transactions, newTransaction.id), {

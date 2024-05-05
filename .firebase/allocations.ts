@@ -2,6 +2,7 @@ import { getDocs, collection, doc, setDoc, deleteDoc, getDoc, query, where } fro
 import { collectionLabel } from "./firebase.config";
 import { firestore } from "./firebase.config";
 import { Allocation } from "./models";
+import { v4 as uuidv4 } from "uuid";
 
 export async function getAllocationsByDate(userID: string, budgetID: string, month: number, year: number): Promise<Allocation[]> {
 	try {
@@ -19,6 +20,37 @@ export async function getAllocationsByDate(userID: string, budgetID: string, mon
 		return filteredAllocations;
 	} catch (error) {
 		console.error("Failed to read allocations", error);
+		throw error;
+	}
+}
+
+export async function getAllocationBySubcategory(userID: string, budgetID: string, subcategoryID: string, year: number, month: number): Promise<Allocation> {
+	try {
+		// Retrieving allocation documents
+		const allocationsSnapshot = await getDocs(collection(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.allocations));
+
+		// Finds corresponding allocation
+		let targetAllocation: Allocation | null = null;
+		allocationsSnapshot.forEach((doc) => {
+			const data = doc.data();
+			if (data.subcategoryID === subcategoryID) {
+				targetAllocation = new Allocation(doc.id, data.year, data.month, data.balance, data.subcategoryID);
+			}
+		});
+
+		// If no allocation is found, creates a new $0.00 allocation
+		if (targetAllocation) {
+			console.log("allocation found")
+			return targetAllocation;
+		} else {
+			console.log("creating new allocation")
+			const newAllocation = new Allocation(uuidv4(), year, month, 0, subcategoryID);
+			await createAllocation(userID, budgetID, newAllocation);
+			return newAllocation;
+		}
+
+	} catch (error) {
+		console.error("Failed to read allocation by subcategory", error);
 		throw error;
 	}
 }

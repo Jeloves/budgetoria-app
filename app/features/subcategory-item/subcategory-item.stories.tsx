@@ -17,7 +17,7 @@ export const Default = Template.bind({});
 
 Default.args = {
 	subcategoryAllocation: {
-		subcategory: new Subcategory("subcatID", "Food", "catID"),
+		subcategory: new Subcategory("subcatID", "Food", "categoryID"),
 		assignedBalance: 250000000,
 		availableBalance: 200000000,
 	},

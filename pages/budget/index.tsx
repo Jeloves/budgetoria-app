@@ -48,6 +48,9 @@ export default function BudgetPage() {
 	});
 
 	const [headerKey, setHeaderKey] = useState<0 | 1>(0);
+    const refreshHeader = () => {
+        setHeaderKey(headerKey === 0 ? 1 : 0)
+    }
 
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -107,43 +110,27 @@ export default function BudgetPage() {
 		}
 	}, [budget, categoriesDataKey, month, user, year]);
 
-    // Fetches allocations 
-    useEffect(() => {
-        if (budget && user) {
-            const fetch = async () => {
-                const transactionsData = await getTransactionsByDate(user.uid, budget.id, month, year);
-				setTransactions(transactionsData);
-            }
-            fetch();
-        }
-    },[budget, month, user, year])
-
-    // Fetches transactions
-    useEffect(() => {
-        if (budget && user) {
-            const fetch = async () => {
-                const allocationData = await getAllocationsByDate(user.uid, budget.id, month, year);
-                setAllocations(allocationData);
-            }
-            fetch();
-        }
-    },[budget, month, user, year])
-
-	// Fetches unassigned balance
-	const [unassignedBalanceDataKey, setUnassignedBalanceDataKey] = useState<boolean>(false);
-	const refreshUnassignedBalance = () => {
-		setUnassignedBalanceDataKey(!unassignedBalanceDataKey);
-		setHeaderKey(headerKey === 0 ? 1 : 0);
-	};
+	// Fetches allocations
 	useEffect(() => {
 		if (budget && user) {
 			const fetch = async () => {
-				const unassigned = await getUnassignedBalance(user.uid, budget.id);
-				setUnassignedBalance(unassigned);
+				const transactionsData = await getTransactionsByDate(user.uid, budget.id, month, year);
+				setTransactions(transactionsData);
 			};
 			fetch();
 		}
-	}, [budget, user, unassignedBalanceDataKey]);
+	}, [budget, month, user, year]);
+
+	// Fetches transactions
+	useEffect(() => {
+		if (budget && user) {
+			const fetch = async () => {
+				const allocationData = await getAllocationsByDate(user.uid, budget.id, month, year);
+				setAllocations(allocationData);
+			};
+			fetch();
+		}
+	}, [budget, month, user, year]);
 
 	// Fetches subcollections when budget changes
 	useEffect(() => {
@@ -225,33 +212,9 @@ export default function BudgetPage() {
 		for (let i = 0; i < categories.length; i++) {
 			const category = categories[i];
 
-            const filteredSubcategories = subcategories.filter(subcategory => subcategory.categoryID === category.id);
-            const filteredAllocations = allocations.filter((allocation) => {
-                return filteredSubcategories.some(subcategory => subcategory.id === allocation.subcategoryID);
-            })
-            const filteredTransactions = transactions.filter((transaction) => {
-                if (transaction.categoryID === category.id) {
-                    return true;
-                } else if (filteredSubcategories.some(subcategory => subcategory.id === transaction.subcategoryID)) {
-                    return true;
-                } else {
-                    return false;
-                }
-            })
+			const filteredSubcategories = subcategories.filter((subcategory) => subcategory.categoryID === category.id);
 
-			categoryItems.push(
-				<CategoryItem
-					userID={user!.uid}
-					budgetID={budget!.id}
-					year={year}
-					month={month}
-					category={category}
-					filteredSubcategories={filteredSubcategories}
-					filteredAllocations={filteredAllocations}
-					filteredTransactions={filteredTransactions}
-					refreshUnassignedBalance={refreshUnassignedBalance}
-				/>
-			);
+			categoryItems.push(<CategoryItem userID={user!.uid} budgetID={budget!.id} year={year} month={month} category={category} filteredSubcategories={filteredSubcategories} refreshUnassignedBalance={refreshHeader} />);
 		}
 	}
 
@@ -262,7 +225,7 @@ export default function BudgetPage() {
 		pageContent.push(
 			<header key={headerKey} className={styles.budgetPageHeader}>
 				<Topbar month={month} year={year} dateInterval={dateInterval} handleDateChangeOnClick={handleDateChangeOnClick} handleEditCategoriesClick={handleEditCategoriesClick} handleShowOptions={showOptions} />
-				<Unassigned currency={"USD"} unassignedBalance={unassignedBalance} />
+				<Unassigned userID={user ? user.uid : ""} budgetID={budget ? budget.id : ""} />
 			</header>
 		) &&
 		pageContent.push(
