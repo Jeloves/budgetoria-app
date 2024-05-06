@@ -10,17 +10,13 @@ import { createAccount, getAccounts } from "@/firebase/accounts";
 import { CreateAccountSubpage } from "./create-account-subpage/create-account-subpage";
 import { createTransaction, getTransactions } from "@/firebase/transactions";
 import { sortAccountsAlphabetically } from "@/utils/sorting";
+import { updateUnassignedBalance } from "@/firebase/budgets";
 
 export type AccountsPagePropsType = {
 	userID: string;
 	budgetID: string;
 	categories: Category[];
 	subcategories: Subcategory[];
-};
-
-type NewAccountData = {
-	name: string;
-	initialBalance: number;
 };
 
 export function AccountsPage(props: AccountsPagePropsType) {
@@ -64,8 +60,13 @@ export function AccountsPage(props: AccountsPagePropsType) {
 	const [subpage, setSubpage] = useState<JSX.Element | null>(null);
 	const [subpageClasses, setSubpageClasses] = useState<string[]>([styles.subpage]);
 
+	// Passed to CreateAccountSubpage
 	const handleCreateAccount = (newAccount: Account) => {
+		// Updates firebase 
 		createAccount(userID, budgetID, newAccount);
+		updateUnassignedBalance(userID, budgetID, newAccount.initialBalance);
+
+		// Refreshes page
 		setAccountsDataKey(!accountsDataKey);
 		hideSubpage();
 	};
