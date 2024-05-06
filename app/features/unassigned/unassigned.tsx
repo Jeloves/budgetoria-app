@@ -12,8 +12,6 @@ export function Unassigned(props: UnassignedPropsType) {
 	const { userID, budgetID } = props;
 
 	const [unassignedBalance, setUnassignedBalance] = useState<number>(0);
-
-	// Fetches unassigned balance
 	useEffect(() => {
 		const fetch = async () => {
 			const unassigned = await getUnassignedBalance(userID, budgetID);
@@ -21,7 +19,6 @@ export function Unassigned(props: UnassignedPropsType) {
 		};
 		fetch();
 	});
-
 	return (
 		<>
 			<section className={styles.unassigned}>

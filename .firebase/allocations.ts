@@ -40,10 +40,8 @@ export async function getAllocationBySubcategory(userID: string, budgetID: strin
 
 		// If no allocation is found, creates a new $0.00 allocation
 		if (targetAllocation) {
-			console.log("allocation found")
 			return targetAllocation;
 		} else {
-			console.log("creating new allocation")
 			const newAllocation = new Allocation(uuidv4(), year, month, 0, subcategoryID);
 			await createAllocation(userID, budgetID, newAllocation);
 			return newAllocation;

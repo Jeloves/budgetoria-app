@@ -3,11 +3,9 @@ import { IconButton } from "../ui";
 import styles from "./category-item.module.scss";
 import { SubcategoryItem } from "../subcategory-item";
 import { useEffect, useState } from "react";
-import { CategoryAllocation, SubcategoryAllocation, assignAllocations } from "@/utils/allocate";
 import { getAllocationBySubcategory, updateAssignedAllocation } from "@/firebase/allocations";
 import { updateUnassignedBalance } from "@/firebase/budgets";
-import { Allocation, Category, Subcategory, Transaction } from "@/firebase/models";
-import { cloneDeep } from "lodash";
+import { Category, Subcategory } from "@/firebase/models";
 import { formatCurrency } from "@/utils/currency";
 import { getTransactionsBySubcategory } from "@/firebase/transactions";
 
@@ -21,12 +19,19 @@ export type CategoryItemPropsType = {
 	refreshUnassignedBalance: () => void;
 };
 
+export type SubcategoryAllocation = {
+    subcategory: Subcategory;
+    assignedBalance: number;
+    availableBalance: number;
+};
+
 export function CategoryItem(props: CategoryItemPropsType) {
 	const { userID, budgetID, year, month, category, filteredSubcategories, refreshUnassignedBalance } = props;
 
-    const [totalAssignedBalance, setTotalAssignedBalance] = useState<number>(0);
-    const [totalAvailableBalance, setTotalAvailableBalance] = useState<number>(0);
-    const [subcategoryAllocations, setSubcategoryAllocations] = useState<SubcategoryAllocation[]>([]);
+	const [totalAssignedBalance, setTotalAssignedBalance] = useState<number>(0);
+	const [totalAvailableBalance, setTotalAvailableBalance] = useState<number>(0);
+
+	const [subcategoryAllocations, setSubcategoryAllocations] = useState<SubcategoryAllocation[]>([]);
 
 	// Calculates balances and SubcategoryAllocations
 	useEffect(() => {
@@ -58,26 +63,28 @@ export function CategoryItem(props: CategoryItemPropsType) {
 				totalAvailable += available;
 			}
 
-            setTotalAssignedBalance(totalAssigned);
-            setTotalAvailableBalance(totalAvailable);
-            setSubcategoryAllocations(subcategoryAllocations);
+			setTotalAssignedBalance(totalAssigned);
+			setTotalAvailableBalance(totalAvailable);
+			setSubcategoryAllocations(subcategoryAllocations);
 		};
 		fetch();
-	}, [budgetID, filteredSubcategories, month, userID, year]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [userID, budgetID, month, year]);
 
 	const handleShowSubcategoriesOnClick = () => {};
 
-	const handleUpdateAssignedAllocation = (changeInSubcategoryAssignedBalance: number, newSubcategoryAssignedBalance: number, subcategoryID: string) => {
+	const handleUpdateAssignedAllocation = async (changeInSubcategoryAssignedBalance: number, newSubcategoryAssignedBalance: number, subcategoryID: string) => {
 		if (changeInSubcategoryAssignedBalance !== 0) {
-		    // Updates allocation doc in firebase
+			// Updates allocation doc in firebase
 			updateAssignedAllocation(userID, budgetID, subcategoryID, month, year, newSubcategoryAssignedBalance);
-
-            // Updates total balances
-            setTotalAssignedBalance(totalAssignedBalance + changeInSubcategoryAssignedBalance);
-            setTotalAvailableBalance(totalAvailableBalance + changeInSubcategoryAssignedBalance);
 
 			// Updates unassigned balance in firebase
 			updateUnassignedBalance(userID, budgetID, changeInSubcategoryAssignedBalance * -1);
+			refreshUnassignedBalance();
+
+			// Updates total balances
+			setTotalAssignedBalance((totalAssignedBalance) => totalAssignedBalance + changeInSubcategoryAssignedBalance);
+			setTotalAvailableBalance((totalAvailableBalance) => totalAvailableBalance + changeInSubcategoryAssignedBalance);
 		}
 	};
 
@@ -85,7 +92,7 @@ export function CategoryItem(props: CategoryItemPropsType) {
 	for (let i = 0; i < subcategoryAllocations.length; i++) {
 		const subcategoryAllocation = subcategoryAllocations[i];
 
-		subcategoryItems.push(<SubcategoryItem subcategoryAllocation={subcategoryAllocation} handleUpdateAssignedAllocation={handleUpdateAssignedAllocation} />);
+		subcategoryItems.push(<SubcategoryItem key={i} subcategoryAllocation={subcategoryAllocation} handleUpdateAssignedAllocation={handleUpdateAssignedAllocation} />);
 	}
 
 	return (

@@ -1,11 +1,8 @@
 import classNames from "classnames";
 import styles from "./subcategory-item.module.scss";
 import { useEffect, useRef, useState } from "react";
-import { SubcategoryAllocation } from "@/utils/allocate";
-import { Subcategory } from "@/firebase/models";
+import { SubcategoryAllocation } from "../category-item/category-item";
 import { formatCurrency } from "@/utils/currency";
-import { getAllocationBySubcategory } from "@/firebase/allocations";
-import { getTransactionsBySubcategory } from "@/firebase/transactions";
 
 export type SubcategoryItemPropsType = {
     subcategoryAllocation: SubcategoryAllocation;

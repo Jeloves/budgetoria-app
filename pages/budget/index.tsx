@@ -5,9 +5,9 @@ import { useEffect, useState } from "react";
 import { auth } from "@/firebase/auth";
 import { User } from "firebase/auth/cordova";
 import { getSelectedBudget, getUnassignedBalance, updateUnassignedBalance } from "@/firebase/budgets";
-import { getAllocationsByDate, updateAssignedAllocation } from "@/firebase/allocations";
+import { getAllocationBySubcategory, getAllocationsByDate, updateAssignedAllocation } from "@/firebase/allocations";
 import { getCategories, getSubcategories } from "@/firebase/categories";
-import { createTransaction, getTransactionsByDate } from "@/firebase/transactions";
+import { createTransaction, getTransactionsByDate, getTransactionsBySubcategory } from "@/firebase/transactions";
 import { Account, Allocation, Budget, Category, Subcategory, Transaction } from "@/firebase/models";
 import { Topbar } from "@/features/topbar/topbar";
 import { Unassigned } from "@/features/unassigned";
@@ -24,7 +24,6 @@ import { TransactionPage } from "@/features/transaction-page/transaction-page";
 import { v4 as uuidv4 } from "uuid";
 import { Timestamp } from "firebase/firestore";
 import { sortCategoriesAlphabetically, sortSubcategoriesAlphabetically } from "@/utils/sorting";
-import { CategoryAllocation, assignAllocations } from "@/utils/allocate";
 
 export default function BudgetPage() {
 	const [user, setUser] = useState<User | null>(null);
@@ -48,9 +47,6 @@ export default function BudgetPage() {
 	});
 
 	const [headerKey, setHeaderKey] = useState<0 | 1>(0);
-    const refreshHeader = () => {
-        setHeaderKey(headerKey === 0 ? 1 : 0)
-    }
 
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -76,6 +72,12 @@ export default function BudgetPage() {
 		};
 		fetchBudgetData();
 	}, [user, dataListenerKey]);
+
+	// unassigned balance
+	const [unassignedRenderKey, setUnassignedRenderKey] = useState<1 | 0>(0);
+	const refreshUnassignedBalance = () => {
+		setUnassignedRenderKey(unassignedRenderKey === 0 ? 1 : 0);
+	};
 
 	// Fetches accounts
 	useEffect(() => {
@@ -214,7 +216,7 @@ export default function BudgetPage() {
 
 			const filteredSubcategories = subcategories.filter((subcategory) => subcategory.categoryID === category.id);
 
-			categoryItems.push(<CategoryItem userID={user!.uid} budgetID={budget!.id} year={year} month={month} category={category} filteredSubcategories={filteredSubcategories} refreshUnassignedBalance={refreshHeader} />);
+			categoryItems.push(<CategoryItem key={i} userID={user!.uid} budgetID={budget!.id} year={year} month={month} category={category} filteredSubcategories={filteredSubcategories} refreshUnassignedBalance={refreshUnassignedBalance} />);
 		}
 	}
 
@@ -225,7 +227,7 @@ export default function BudgetPage() {
 		pageContent.push(
 			<header key={headerKey} className={styles.budgetPageHeader}>
 				<Topbar month={month} year={year} dateInterval={dateInterval} handleDateChangeOnClick={handleDateChangeOnClick} handleEditCategoriesClick={handleEditCategoriesClick} handleShowOptions={showOptions} />
-				<Unassigned userID={user ? user.uid : ""} budgetID={budget ? budget.id : ""} />
+				<Unassigned key={unassignedRenderKey} userID={user ? user.uid : ""} budgetID={budget ? budget.id : ""} />
 			</header>
 		) &&
 		pageContent.push(
