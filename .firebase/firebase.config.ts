@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
 dotenv.config();
 
 

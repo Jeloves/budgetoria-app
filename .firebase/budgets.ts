@@ -20,14 +20,13 @@ export async function getBudgets(userID: string): Promise<Budget[]> {
 }
 
 export async function createBudget(userID: string, budgetID: string) {
-
-	const newBudget = new Budget(budgetID, "Mock Budget", Timestamp.fromDate(new Date()), true, 0.00);
+	const newBudget = new Budget(budgetID, "Mock Budget", Timestamp.fromDate(new Date()), true, 0.0);
 	try {
 		await setDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, newBudget.id), {
 			name: newBudget.name,
 			dateCreated: newBudget.dateCreated,
 			selected: newBudget.selected,
-			unassignedBalance: newBudget.unassignedBalance
+			unassignedBalance: newBudget.unassignedBalance,
 		});
 	} catch (error) {
 		console.error("Failed to add new budget", error);
@@ -40,7 +39,7 @@ export async function createTestBudget(userID: string, budget: Budget) {
 			name: budget.name,
 			dateCreated: budget.dateCreated,
 			selected: budget.selected,
-			unassignedBalance: budget.unassignedBalance
+			unassignedBalance: budget.unassignedBalance,
 		});
 	} catch (error) {
 		console.error("Failed to create test budget", error);
@@ -82,24 +81,25 @@ export async function getUnassignedBalance(userID: string, budgetID: string): Pr
 	}
 }
 
-export async function updateUnassignedBalance(userID: string, changeInBalance: number) {
+export async function updateUnassignedBalance(userID: string, budgetID: string, changeInBalance: number) {
 	try {
-		const budgetsSnapshot = await getDocs(collection(firestore, collectionLabel.users, userID, collectionLabel.budgets));
-		const budgetDoc = budgetsSnapshot.docs.find((doc) => {
-			const data = doc.data();
-			return data.selected;
-		});
+		const budgetRef = doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID);
+		const budgetSnapshot = await getDoc(budgetRef);
 
-		if (budgetDoc) {
-			const unassignedBalance = budgetDoc.data().unassignedBalance;
-			const budgetRef = doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetDoc.id);
-			updateDoc(budgetRef, { unassignedBalance: unassignedBalance + changeInBalance });
+		if (budgetSnapshot) {
+			const data = budgetSnapshot.data();
+			if (data) {
+				updateDoc(budgetRef, {
+					unassignedBalance: data.unassignedBalance + changeInBalance,
+				});
+			} else {
+				throw new Error("Budget data does not exist.");
+			}
 		} else {
-			throw new Error("Cannot find a selected budget.");
+			throw new Error("Budget snapshot does not exist.");
 		}
 	} catch (error) {
 		console.error("Failed to update unassigned balance: ", error);
 		throw error;
 	}
 }
-

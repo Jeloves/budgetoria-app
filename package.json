@@ -10,7 +10,7 @@
     "lint": "next lint",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "cypress": "firebase emulators:start & sleep 3 && open http://127.0.0.1:9000/firestore & npx cypress open"
+    "cypress": "firebase emulators:start --project budgetoria & sleep 3 && open http://127.0.0.1:9000/firestore & npx cypress open"
   },
   "dependencies": {
     "classnames": "^2.5.1",
