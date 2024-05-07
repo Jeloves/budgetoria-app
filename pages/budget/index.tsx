@@ -7,7 +7,7 @@ import { User } from "firebase/auth/cordova";
 import { getSelectedBudget, getUnassignedBalance, updateUnassignedBalance } from "@/firebase/budgets";
 import { getAllocationBySubcategory, getAllocationsByDate, updateAssignedAllocation } from "@/firebase/allocations";
 import { getCategories, getSubcategories } from "@/firebase/categories";
-import { createTransaction, getTransactionsByDate, getTransactionsBySubcategory } from "@/firebase/transactions";
+import { createTransaction, getTransactionsByDate, getTransactionsBySubcategory, updateTransaction } from "@/firebase/transactions";
 import { Account, Allocation, Budget, Category, Subcategory, Transaction } from "@/firebase/models";
 import { Topbar } from "@/features/topbar/topbar";
 import { Unassigned } from "@/features/unassigned";
@@ -15,19 +15,28 @@ import { CategoryItem } from "@/features/category-item";
 import { EditPage } from "@/features/edit-page";
 import { AccountsPage } from "@/features/accounts-page";
 import classNames from "classnames";
-import { getAccounts } from "@/firebase/accounts";
+import { getAccounts, updateAccountBalance } from "@/firebase/accounts";
 import { NavigationBar } from "@/features/navigation-bar";
 import { getDateInterval } from "@/utils/getDateInterval";
 import { DateIntervalType } from "@/features/date-picker/date-picker";
 import { Options } from "@/features/options";
 import { TransactionPage } from "@/features/transaction-page/transaction-page";
 import { v4 as uuidv4 } from "uuid";
+import { NIL as NIL_UUID } from "uuid";
 import { Timestamp } from "firebase/firestore";
 import { sortCategoriesAlphabetically, sortSubcategoriesAlphabetically } from "@/utils/sorting";
+
+export type BudgetData = {
+	userID: string;
+	budgetID: string;
+	year: number;
+	month: number;
+};
 
 export default function BudgetPage() {
 	const [user, setUser] = useState<User | null>(null);
 	const [budget, setBudget] = useState<Budget | null>(null);
+	const [budgetData, setBudgetData] = useState<BudgetData>({ userID: "", budgetID: "", year: -1, month: -1 });
 	const [unassignedBalance, setUnassignedBalance] = useState<number>(0);
 	const [accounts, setAccounts] = useState<Account[]>([]);
 	const [allocations, setAllocations] = useState<Allocation[]>([]);
@@ -73,6 +82,18 @@ export default function BudgetPage() {
 		fetchBudgetData();
 	}, [user, dataListenerKey]);
 
+	// Sets budgetData object
+	useEffect(() => {
+		if (budget && user) {
+			setBudgetData({
+				userID: user.uid,
+				budgetID: budget.id,
+				year: year,
+				month: month,
+			});
+		}
+	}, [budget, user, year, month]);
+
 	// unassigned balance
 	const [unassignedRenderKey, setUnassignedRenderKey] = useState<1 | 0>(0);
 	const refreshUnassignedBalance = () => {
@@ -90,7 +111,7 @@ export default function BudgetPage() {
 		}
 	}, [budget, user]);
 
-	// Fetches categories, subcategories, and assigns allocations
+	// Fetches categories and subcategories
 	const [categoriesDataKey, setCategoriesDataKey] = useState<boolean>(false);
 	const refreshCategories = () => {
 		setCategoriesDataKey(!categoriesDataKey);
@@ -200,9 +221,19 @@ export default function BudgetPage() {
 
 	// Passed to CreateTransactionPage
 	const handleCreateTransaction = (newTransaction: Transaction) => {
-		if (newTransaction.categoryID && newTransaction.accountID && newTransaction.date) {
-			createTransaction(user!.uid, budget!.id, newTransaction);
-			// TODO: update unassigned balance
+		if (newTransaction.categoryID && newTransaction.accountID && newTransaction.timestamp) {
+			// Creates transaction doc
+			createTransaction(budgetData.userID, budgetData.budgetID, newTransaction);
+
+			// Updates account balance
+			const changeInBalance = newTransaction.outflow ? -1 * newTransaction.balance : newTransaction.balance;
+			updateAccountBalance(budgetData.userID, budgetData.budgetID, newTransaction.accountID, changeInBalance);
+
+			// Updates unassigned balance IF transaction is categorized under unassigned category
+			if (newTransaction.categoryID === NIL_UUID) {
+				updateUnassignedBalance(budgetData.userID, budgetData.budgetID, newTransaction.getBalance());
+			}
+
 			navigateToBudgetPage();
 		} else {
 			alert("A transaction requires a selected category, account, and date.");
@@ -240,7 +271,7 @@ export default function BudgetPage() {
 	page === "Accounts" &&
 		pageContent.push(
 			<>
-				<AccountsPage key={"accountsPage"} userID={user!.uid} budgetID={budget!.id} categories={categories} subcategories={subcategories} />
+				<AccountsPage key={"accountsPage"} budgetData={budgetData} categories={categories} subcategories={subcategories} />
 			</>
 		);
 
@@ -258,11 +289,9 @@ export default function BudgetPage() {
 			<>
 				<TransactionPage
 					key={"createTransactionPage"}
-					userID={user ? user.uid : ""}
-					budgetID={budget ? budget.id : ""}
+					budgetData={budgetData}
 					categories={categories}
 					subcategories={subcategories}
-					accounts={accounts}
 					transaction={new Transaction(uuidv4(), Timestamp.fromDate(new Date()), "", "", true, 0, false, "", "", "")}
 					isCreatingTransaction={true}
 					handleCreateTransaction={handleCreateTransaction}

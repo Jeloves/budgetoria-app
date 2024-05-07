@@ -27,4 +27,4 @@ export const collectionLabel = {
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
 export const firestore = getFirestore(app);
-
+//connectFirestoreEmulator(firestore, "127.0.0.1", 8080);

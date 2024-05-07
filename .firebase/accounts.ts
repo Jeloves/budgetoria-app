@@ -1,4 +1,4 @@
-import { getDocs, collection, doc, setDoc, deleteDoc, getDoc } from "firebase/firestore";
+import { getDocs, collection, doc, setDoc, deleteDoc, getDoc, updateDoc } from "firebase/firestore";
 import { firestore, collectionLabel } from "./firebase.config";
 import { Account } from "./models";
 
@@ -37,5 +37,28 @@ export async function deleteAccount(userID: string, budgetID: string, accountID:
 		await deleteDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.accounts, accountID));
 	} catch (error) {
 		console.error("Failed to delete account", error);
+	}
+}
+
+export async function updateAccountBalance(userID: string, budgetID: string, accountID: string, changeInBalance: number) {
+	try {
+		const accountRef = doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.accounts, accountID);
+		const accountSnapshot = await getDoc(accountRef);
+
+		if (accountSnapshot) {
+			const data = accountSnapshot.data();
+			if (data) {
+				updateDoc(accountRef, {
+					balance: data.balance + changeInBalance,
+				});
+			} else {
+				throw new Error("Transaction data does not exist.");
+			}
+		} else {
+			throw new Error("Transaction snapshot does not exist.");
+		}
+	} catch (error) {
+		console.error("Failed to update account balance: ", error);
+		throw error;
 	}
 }

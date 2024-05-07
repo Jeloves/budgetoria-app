@@ -11,16 +11,16 @@ import { CreateAccountSubpage } from "./create-account-subpage/create-account-su
 import { createTransaction, getTransactions } from "@/firebase/transactions";
 import { sortAccountsAlphabetically } from "@/utils/sorting";
 import { updateUnassignedBalance } from "@/firebase/budgets";
+import { BudgetData } from "pages/budget";
 
 export type AccountsPagePropsType = {
-	userID: string;
-	budgetID: string;
+	budgetData: BudgetData;
 	categories: Category[];
 	subcategories: Subcategory[];
 };
 
 export function AccountsPage(props: AccountsPagePropsType) {
-	const { userID, budgetID, categories, subcategories } = props;
+	const { budgetData, categories, subcategories } = props;
 	const [accountsDataKey, setAccountsDataKey] = useState<boolean>(false);
 	const [transactionsDataKey, setTransactionsDataKey] = useState<boolean>(false);
 	const [accounts, setAccounts] = useState<Account[]>([]);
@@ -30,17 +30,17 @@ export function AccountsPage(props: AccountsPagePropsType) {
 	// Retrieves accounts
 	useEffect(() => {
 		const fetchData = async () => {
-			const accountsData = await getAccounts(userID, budgetID);
+			const accountsData = await getAccounts(budgetData.userID, budgetData.budgetID);
 			sortAccountsAlphabetically(accountsData);
 			setAccounts(accountsData);
 		};
 		fetchData();
-	}, [accountsDataKey, budgetID, userID]);
+	}, [accountsDataKey, budgetData.budgetID, budgetData.userID]);
 
 	// Retrieves transactions
 	useEffect(() => {
 		const fetchData = async () => {
-			const transactionsData = await getTransactions(userID, budgetID);
+			const transactionsData = await getTransactions(budgetData.userID, budgetData.budgetID);
 			setTransactions(transactionsData);
 
 			// Sets unfinished transactions
@@ -54,7 +54,7 @@ export function AccountsPage(props: AccountsPagePropsType) {
 			setUnfinishedTransactions(unfinishedTransactions);
 		};
 		fetchData();
-	}, [transactionsDataKey, budgetID, userID]);
+	}, [transactionsDataKey, budgetData.budgetID, budgetData.userID]);
 
 	const [accountsPageRenderKey, setAccountsPageRenderKey] = useState<0 | 1>(0);
 	const [subpage, setSubpage] = useState<JSX.Element | null>(null);
@@ -63,8 +63,8 @@ export function AccountsPage(props: AccountsPagePropsType) {
 	// Passed to CreateAccountSubpage
 	const handleCreateAccount = (newAccount: Account) => {
 		// Updates firebase 
-		createAccount(userID, budgetID, newAccount);
-		updateUnassignedBalance(userID, budgetID, newAccount.initialBalance);
+		createAccount(budgetData.userID, budgetData.budgetID, newAccount);
+		updateUnassignedBalance(budgetData.userID, budgetData.budgetID, newAccount.initialBalance);
 
 		// Refreshes page
 		setAccountsDataKey(!accountsDataKey);
@@ -81,15 +81,15 @@ export function AccountsPage(props: AccountsPagePropsType) {
 	};
 	const navigateToUnfinishedTransactionsSubpage = () => {
 		showSubpage(
-			<AccountTransactionsSubpage userID={userID} budgetID={budgetID} categories={categories} subcategories={subcategories} accounts={accounts} showingAllAccounts={false} transactions={unfinishedTransactions} showingUnfinishedTransactions={true} handleBackClick={hideSubpage}/>
+			<AccountTransactionsSubpage budgetData={budgetData} categories={categories} subcategories={subcategories} accounts={accounts} showingAllAccounts={false} showingUnfinishedTransactions={true} handleBackClick={hideSubpage}/>
 		);
 	};
 	const navigateToAllTransactionsSubpage = () => {
-		showSubpage(<AccountTransactionsSubpage userID={userID} budgetID={budgetID} categories={categories} subcategories={subcategories} accounts={accounts} showingAllAccounts={true} transactions={transactions} showingUnfinishedTransactions={false} handleBackClick={hideSubpage}/>);
+		showSubpage(<AccountTransactionsSubpage budgetData={budgetData} categories={categories} subcategories={subcategories} accounts={accounts} showingAllAccounts={true} showingUnfinishedTransactions={false} handleBackClick={hideSubpage}/>);
 	};
 	const navigateToAccountTransactionsSubpage = (selectedAccount: Account, selectedTransactions: Transaction[]) => {
 		showSubpage(
-			<AccountTransactionsSubpage userID={userID} budgetID={budgetID} categories={categories} subcategories={subcategories} accounts={[selectedAccount]} showingAllAccounts={false} transactions={selectedTransactions} showingUnfinishedTransactions={false} handleBackClick={hideSubpage}/>
+			<AccountTransactionsSubpage budgetData={budgetData} categories={categories} subcategories={subcategories} accounts={[selectedAccount]} showingAllAccounts={false} showingUnfinishedTransactions={false} handleBackClick={hideSubpage}/>
 		);
 	};
 	const navigateToCreateAccountSubpage = () => {
