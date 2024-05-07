@@ -12,6 +12,7 @@ describe("<TransactionsPage/>", () => {
 	const mock = getMockData();
 	let userID = uuidv4();
 	let budgetID = mock.budget.id;
+	let budgetData = { userID: userID, budgetID: budgetID, year: 2024, month: 0 };
 
 	before(async () => {
 		connectFirestoreEmulator(firestore, "127.0.0.1", 8080);
@@ -24,11 +25,9 @@ describe("<TransactionsPage/>", () => {
 		beforeEach(() => {
 			cy.mount(
 				<TransactionPage
-					userID={userID}
-					budgetID={budgetID}
+					budgetData={budgetData}
 					categories={mock.categories}
 					subcategories={mock.subcategories}
-					accounts={mock.accounts}
 					transaction={mock.emptyTransaction}
 					isCreatingTransaction={true}
 					handleCreateTransaction={(newTransaction: Transaction) => {}}
@@ -153,11 +152,9 @@ describe("<TransactionsPage/>", () => {
         beforeEach(() => {
 			cy.mount(
 				<TransactionPage
-					userID={userID}
-					budgetID={budgetID}
+					budgetData={budgetData}
 					categories={mock.categories}
 					subcategories={mock.subcategories}
-					accounts={mock.accounts}
 					transaction={mock.emptyTransaction}
 					isCreatingTransaction={true}
 					handleCreateTransaction={(newTransaction: Transaction) => {}}
