@@ -10,8 +10,10 @@ import { getAccountNameByID, getCategoryNameByID, getSubcategoryNameByID } from 
 import { formatCurrencyBasedOnOutflow } from "@/utils/currency";
 import { TransactionPage } from "@/features/transaction-page/transaction-page";
 import { updateTransaction } from "@/firebase/transactions";
+import { BudgetData } from "pages/budget";
 
 export type AccountTransactionsSubpagePropsType = {
+	budgetData: BudgetData;
 	userID: string;
 	budgetID: string;
 	categories: Category[];
@@ -26,7 +28,7 @@ export type AccountTransactionsSubpagePropsType = {
 type DateTransactionsMap = Map<string, Transaction[]>;
 
 export function AccountTransactionsSubpage(props: AccountTransactionsSubpagePropsType) {
-	const { userID, budgetID, accounts, showingAllAccounts, categories, subcategories, showingUnfinishedTransactions, handleBackClick } = props;
+	const { budgetData, userID, budgetID, accounts, showingAllAccounts, categories, subcategories, showingUnfinishedTransactions, handleBackClick } = props;
 
 	const [transactions, setTransactions] = useState<Transaction[]>(props.transactions);
 	const [clearedTransactions, setClearedTransactions] = useState<Transaction[]>([]);
@@ -216,6 +218,7 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 	const navigateToTransactionSubpage = (selectedTransaction: Transaction) => {
 		showSubpage(
 			<TransactionPage
+				budgetData={budgetData}
 				userID={userID}
 				budgetID={budgetID}
 				categories={categories}

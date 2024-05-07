@@ -25,9 +25,17 @@ import { v4 as uuidv4 } from "uuid";
 import { Timestamp } from "firebase/firestore";
 import { sortCategoriesAlphabetically, sortSubcategoriesAlphabetically } from "@/utils/sorting";
 
+export type BudgetData = {
+	userID: string;
+	budgetID: string;
+	year: number;
+	month: number;
+};
+
 export default function BudgetPage() {
 	const [user, setUser] = useState<User | null>(null);
 	const [budget, setBudget] = useState<Budget | null>(null);
+	const [budgetData, setBudgetData] = useState<BudgetData>({ userID: "", budgetID: "", year: -1, month: -1 });
 	const [unassignedBalance, setUnassignedBalance] = useState<number>(0);
 	const [accounts, setAccounts] = useState<Account[]>([]);
 	const [allocations, setAllocations] = useState<Allocation[]>([]);
@@ -73,6 +81,18 @@ export default function BudgetPage() {
 		fetchBudgetData();
 	}, [user, dataListenerKey]);
 
+	// Sets budgetData object
+	useEffect(() => {
+		if (budget && user) {
+			setBudgetData({
+				userID: user.uid,
+				budgetID: budget.id,
+				year: year,
+				month: month,
+			});
+		}
+	}, [budget, user, year, month]);
+
 	// unassigned balance
 	const [unassignedRenderKey, setUnassignedRenderKey] = useState<1 | 0>(0);
 	const refreshUnassignedBalance = () => {
@@ -90,7 +110,7 @@ export default function BudgetPage() {
 		}
 	}, [budget, user]);
 
-	// Fetches categories, subcategories, and assigns allocations
+	// Fetches categories and subcategories
 	const [categoriesDataKey, setCategoriesDataKey] = useState<boolean>(false);
 	const refreshCategories = () => {
 		setCategoriesDataKey(!categoriesDataKey);
@@ -201,8 +221,9 @@ export default function BudgetPage() {
 	// Passed to CreateTransactionPage
 	const handleCreateTransaction = (newTransaction: Transaction) => {
 		if (newTransaction.categoryID && newTransaction.accountID && newTransaction.date) {
+			// Updates firebase
 			createTransaction(user!.uid, budget!.id, newTransaction);
-			// TODO: update unassigned balance
+
 			navigateToBudgetPage();
 		} else {
 			alert("A transaction requires a selected category, account, and date.");
@@ -258,6 +279,7 @@ export default function BudgetPage() {
 			<>
 				<TransactionPage
 					key={"createTransactionPage"}
+					budgetData={budgetData}
 					userID={user ? user.uid : ""}
 					budgetID={budget ? budget.id : ""}
 					categories={categories}

@@ -15,8 +15,10 @@ import { DateSelectionSubpage } from "./date-selection-subpage/date-selection-su
 import { formatCurrencyBasedOnOutflow } from "@/utils/currency";
 import { getUnassignedBalance } from "@/firebase/budgets";
 import { IconButton } from "../ui";
+import { BudgetData } from "pages/budget";
 
 export type TransactionPagePropsType = {
+	budgetData: BudgetData,
 	userID: string;
 	budgetID: string;
 	categories: Category[];
@@ -29,7 +31,7 @@ export type TransactionPagePropsType = {
 };
 
 export function TransactionPage(props: TransactionPagePropsType) {
-	const { userID, budgetID, categories, subcategories, accounts, transaction, isCreatingTransaction, handleCreateTransaction, hideTransactionPage } = props;
+	const { budgetData, userID, budgetID, categories, subcategories, accounts, transaction, isCreatingTransaction, handleCreateTransaction, hideTransactionPage } = props;
 	const [unassignedBalance, setUnassignedBalance] = useState<number>(0);
 	const [dataListenerKey, setDataListenerKey] = useState<boolean>(false);
 	const [timestamp, setTimestamp] = useState<Timestamp>(transaction.date);
@@ -164,7 +166,7 @@ export function TransactionPage(props: TransactionPagePropsType) {
 		showSubpage(<PayeeSelectionSubpage selectedPayee={payee} payees={payees} handleBackClick={hideSubpage} createNewPayee={createNewPayee} selectPayee={selectPayee} />);
 	};
 	const navigateToCategorySelectionSubpage = () => {
-		showSubpage(<CategorySelectionSubpage selectedSubcategoryID={subcategoryID} categories={categories} subcategories={subcategories} unassignedBalance={unassignedBalance} handleBackClick={hideSubpage} selectSubcategory={selectSubcategory} />);
+		showSubpage(<CategorySelectionSubpage budgetData={budgetData} selectedSubcategoryID={subcategoryID} categories={categories} subcategories={subcategories} unassignedBalance={unassignedBalance} handleBackClick={hideSubpage} selectSubcategory={selectSubcategory} />);
 	};
 	const navigateToAccountSelectionSubpage = () => {
 		showSubpage(<AccountSelectionSubpage selectedAccountID={accountID} accounts={accounts} handleBackClick={hideSubpage} selectAccount={selectAccount} />);
