@@ -24,6 +24,5 @@ Default.args = {
 	subcategories: mock.subcategories,
 	accounts: mock.accounts,
 	showingAllAccounts: true,
-	transactions: mock.transactions,
 	handleBackClick: () => {alert("Returning to AccountsPage")}
 };
