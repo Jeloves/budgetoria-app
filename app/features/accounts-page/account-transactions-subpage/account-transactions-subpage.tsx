@@ -9,28 +9,25 @@ import { cloneDeep } from "lodash";
 import { getAccountNameByID, getCategoryNameByID, getSubcategoryNameByID } from "@/utils/getByID";
 import { formatCurrencyBasedOnOutflow } from "@/utils/currency";
 import { TransactionPage } from "@/features/transaction-page/transaction-page";
-import { updateTransaction } from "@/firebase/transactions";
+import { getTransactions, getTransactionsByAccount, getUnfinishedTransactions, updateTransaction } from "@/firebase/transactions";
 import { BudgetData } from "pages/budget";
+import { updateUnassignedBalance } from "@/firebase/budgets";
+import { DateTransactionsMap, sortTransactionsIntoTimestampMap } from "@/utils/sorting";
 
 export type AccountTransactionsSubpagePropsType = {
 	budgetData: BudgetData;
-	userID: string;
-	budgetID: string;
 	categories: Category[];
 	subcategories: Subcategory[];
 	accounts: Account[];
 	showingAllAccounts: boolean;
-	transactions: Transaction[];
 	showingUnfinishedTransactions: boolean;
 	handleBackClick: () => void;
 };
 
-type DateTransactionsMap = Map<string, Transaction[]>;
-
 export function AccountTransactionsSubpage(props: AccountTransactionsSubpagePropsType) {
-	const { budgetData, userID, budgetID, accounts, showingAllAccounts, categories, subcategories, showingUnfinishedTransactions, handleBackClick } = props;
+	const { budgetData, accounts, showingAllAccounts, categories, subcategories, showingUnfinishedTransactions, handleBackClick } = props;
 
-	const [transactions, setTransactions] = useState<Transaction[]>(props.transactions);
+	const [transactions, setTransactions] = useState<Transaction[]>([]);
 	const [clearedTransactions, setClearedTransactions] = useState<Transaction[]>([]);
 	const [unclearedTransactions, setUnclearedTransactions] = useState<Transaction[]>([]);
 
@@ -43,10 +40,32 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 
 	const [filter, setFilter] = useState<string>("");
 	const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>(transactions);
-	const [dateTransactionsMap, setDateTransactionsMap] = useState<DateTransactionsMap>(new Map());
+	const [timestampTransactionsMap, setTimestampTransactionsMap] = useState<DateTransactionsMap>(new Map());
 
 	const [subpage, setSubpage] = useState<JSX.Element | null>(null);
 	const [subpageClasses, setSubpageClasses] = useState<string[]>([styles.subpage]);
+
+	// Fetches transactions
+	useEffect(() => {
+		const fetch = async () => {
+			// If showing all accounts, retrieves all transactions
+			if (showingAllAccounts) {
+				const transactionsData: Transaction[] = await getTransactions(budgetData.userID, budgetData.budgetID);
+				setTransactions(transactionsData);
+			}
+			// If showing unfinished transactions, retrieves unfinished transactions
+			else if (showingUnfinishedTransactions) {
+				const transactionsData: Transaction[] = await getUnfinishedTransactions(budgetData.userID, budgetData.budgetID);
+				setTransactions(transactionsData);
+			}
+			// If showing specific account, retrieves corresponding transactions
+			else {
+				const transactionsData: Transaction[] = await getTransactionsByAccount(budgetData.userID, budgetData.budgetID, accounts[0].id);
+				setTransactions(transactionsData);
+			}
+		};
+		fetch();
+	}, [accounts, budgetData, showingAllAccounts, showingUnfinishedTransactions]);
 
 	// Separates cleared from uncleared transactions
 	useEffect(() => {
@@ -141,7 +160,7 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 				}
 				// Filter for date
 				else if (
-					transaction.date
+					transaction.timestamp
 						.toDate()
 						.toLocaleDateString("en-US", {
 							weekday: "long",
@@ -181,21 +200,12 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 			initialTransactions.push(new Transaction(transactionID, date, payee, memo, outflow, balance, approval, accountID, categoryID, subcategoryID));
 		}
 
-		// Grouping transactions by date in descending order
+		// Combining initialTransactions with transactions
 		const allTransactions = filteredTransactions.concat(initialTransactions);
-		allTransactions.sort((a, b) => b.date.toMillis() - a.date.toMillis());
-		const newDateTransactionsMap: DateTransactionsMap = new Map();
-		for (const transaction of allTransactions) {
-			const dateISOString = transaction.date.toDate().toISOString();
-			if (newDateTransactionsMap.has(dateISOString)) {
-				const updatedTransactions = cloneDeep(newDateTransactionsMap.get(dateISOString));
-				updatedTransactions!.push(transaction);
-				newDateTransactionsMap.set(dateISOString, updatedTransactions!);
-			} else {
-				newDateTransactionsMap.set(dateISOString, [transaction]);
-			}
-		}
-		setDateTransactionsMap(newDateTransactionsMap);
+
+		// Grouping transactions by timestamp in descending order
+		const map: DateTransactionsMap = sortTransactionsIntoTimestampMap(allTransactions);
+		setTimestampTransactionsMap(map);
 	}, [filteredTransactions, accounts]);
 
 	// Opens transaction subpage
@@ -208,22 +218,34 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 		setSubpageClasses([styles.subpage, styles.hide]);
 	};
 	const handleUpdateTransaction = (updatedTransaction: Transaction) => {
+		// Calculates change in transaction balance
+		const targetTransactionIndex = transactions.findIndex((transaction) => transaction.id === updatedTransaction.id);
+		const oldBalance = transactions[targetTransactionIndex].getBalance();
+
+		const newBalance = updatedTransaction.getBalance();
+		const changeInBalance = newBalance - oldBalance;
+
+		// Updates transactions useState
 		const updatedTransactions: Transaction[] = cloneDeep(transactions);
-		const targetIndex = transactions.findIndex(transaction => transaction.id === updatedTransaction.id);
-		updatedTransactions[targetIndex] = updatedTransaction;
+		updatedTransactions[targetTransactionIndex] = updatedTransaction;
 		setTransactions(updatedTransactions);
-		updateTransaction(userID, budgetID, updatedTransaction);
+
+		// Updates transaction doc
+		updateTransaction(budgetData.userID, budgetData.budgetID, updatedTransaction);
+
+		// Updates unassigned balance IF transaction is categorized under unassigned category
+		if (updatedTransaction.categoryID === NIL_UUID) {
+			updateUnassignedBalance(budgetData.userID, budgetData.budgetID, changeInBalance);
+		}
+
 		hideSubpage();
 	};
 	const navigateToTransactionSubpage = (selectedTransaction: Transaction) => {
 		showSubpage(
 			<TransactionPage
 				budgetData={budgetData}
-				userID={userID}
-				budgetID={budgetID}
 				categories={categories}
 				subcategories={subcategories}
-				accounts={accounts}
 				transaction={selectedTransaction}
 				isCreatingTransaction={false}
 				handleCreateTransaction={handleUpdateTransaction}
@@ -239,19 +261,24 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 
 	// Generates filtered transaction elements
 	const transactionItems: JSX.Element[] = [];
-	dateTransactionsMap.forEach((transactions, dateISOString) => {
-		const dateString = new Date(dateISOString).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
-
-		transactionItems.push(<div className={styles.date}>{dateString}</div>);
+	let childKey = 0;
+	let transactionItemIndex = 0;
+	timestampTransactionsMap.forEach((transactions, dateString) => {
+		transactionItems.push(
+			<div key={childKey} className={styles.date}>
+				{dateString}
+			</div>
+		);
+		childKey++;
 		for (let i = 0; i < transactions.length; i++) {
 			const transaction = transactions[i];
 			const payeeString = transaction.payee;
 			const subcategoryNameString = getSubcategoryNameByID(transaction.subcategoryID, subcategories);
 			const accountNameString = getAccountNameByID(transaction.accountID, accounts);
-
-			// Formatting strings for transaction data
 			transactionItems.push(
 				<div
+					data-test-id={`account_transaction_item_${transactionItemIndex}`}
+					key={childKey}
 					className={styles.transaction}
 					onClick={() => {
 						navigateToTransactionSubpage(transaction);
@@ -260,12 +287,20 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 					<div className={styles.select}>
 						<span />
 					</div>
-					<span className={styles.payee}>{payeeString ? payeeString : "Payee Needed"}</span>
-					<span className={styles.subcategory}>{subcategoryNameString ? subcategoryNameString : "Category Needed"}</span>
+					<span data-test-id={`account_transaction_item_${transactionItemIndex}_payee`} className={styles.payee}>
+						{payeeString ? payeeString : "Payee Needed"}
+					</span>
+					<span data-test-id={`account_transaction_item_${transactionItemIndex}_subcategory`} className={styles.subcategory}>
+						{subcategoryNameString ? subcategoryNameString : "Category Needed"}
+					</span>
 					<span className={styles.balanceContainer}>
 						<div className={styles.balance}>
 							{formatCurrencyBasedOnOutflow(transaction.balance, transaction.outflow)}
-							{(showingAllAccounts || showingUnfinishedTransactions) && <div className={styles.accountName}>{accountNameString ? accountNameString : "Account Needed"}</div>}
+							{(showingAllAccounts || showingUnfinishedTransactions) && (
+								<div data-test-id={`account_transaction_item_${transactionItemIndex}_account`} className={styles.accountName}>
+									{accountNameString ? accountNameString : "Account Needed"}
+								</div>
+							)}
 						</div>
 						{transaction.approval ? (
 							// eslint-disable-next-line @next/next/no-img-element
@@ -277,6 +312,8 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 					</span>
 				</div>
 			);
+			transactionItemIndex++;
+			childKey++;
 		}
 	});
 

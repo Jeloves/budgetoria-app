@@ -72,7 +72,7 @@ export class Allocation {
 
 export class Transaction {
     id: string;
-    date: Timestamp;
+    timestamp: Timestamp;
     payee: string;
     memo: string;
     outflow: boolean;
@@ -81,9 +81,9 @@ export class Transaction {
     accountID: string;
     categoryID: string;
     subcategoryID: string;
-    constructor(id: string, date: Timestamp, payee: string, memo: string, outflow: boolean, balance: number, approval: boolean, accountID: string, categoryID: string, subcategoryID: string) {
+    constructor(id: string, timestamp: Timestamp, payee: string, memo: string, outflow: boolean, balance: number, approval: boolean, accountID: string, categoryID: string, subcategoryID: string) {
         this.id = id;
-        this.date = date;
+        this.timestamp = timestamp;
         this.payee = payee;
         this.memo = memo;
         this.outflow = outflow;
@@ -92,5 +92,9 @@ export class Transaction {
         this.accountID = accountID;
         this.categoryID = categoryID;
         this.subcategoryID = subcategoryID;
+    }
+
+    public getBalance(): number {
+        return this.outflow ? -1 * this.balance : this.balance;
     }
 }

@@ -16,14 +16,12 @@ import { formatCurrencyBasedOnOutflow } from "@/utils/currency";
 import { getUnassignedBalance } from "@/firebase/budgets";
 import { IconButton } from "../ui";
 import { BudgetData } from "pages/budget";
+import { getAccounts } from "@/firebase/accounts";
 
 export type TransactionPagePropsType = {
-	budgetData: BudgetData,
-	userID: string;
-	budgetID: string;
+	budgetData: BudgetData;
 	categories: Category[];
 	subcategories: Subcategory[];
-	accounts: Account[];
 	transaction: Transaction;
 	isCreatingTransaction: boolean;
 	handleCreateTransaction: (newTransaction: Transaction) => void;
@@ -31,10 +29,13 @@ export type TransactionPagePropsType = {
 };
 
 export function TransactionPage(props: TransactionPagePropsType) {
-	const { budgetData, userID, budgetID, categories, subcategories, accounts, transaction, isCreatingTransaction, handleCreateTransaction, hideTransactionPage } = props;
+	const { budgetData, categories, subcategories, transaction, isCreatingTransaction, handleCreateTransaction, hideTransactionPage } = props;
 	const [unassignedBalance, setUnassignedBalance] = useState<number>(0);
+	const [accounts, setAccounts] = useState<Account[]>([]);
+
+
 	const [dataListenerKey, setDataListenerKey] = useState<boolean>(false);
-	const [timestamp, setTimestamp] = useState<Timestamp>(transaction.date);
+	const [timestamp, setTimestamp] = useState<Timestamp>(transaction.timestamp);
 	const [payee, setPayee] = useState<string>(transaction.payee);
 	const [payees, setPayees] = useState<string[]>([]);
 	const [memo, setMemo] = useState<string>(transaction.memo);
@@ -44,6 +45,8 @@ export function TransactionPage(props: TransactionPagePropsType) {
 	const [accountID, setAccountID] = useState<string>(transaction.accountID);
 	const [subcategoryID, setSubcategoryID] = useState<string>(transaction.subcategoryID);
 	const [categoryID, setCategoryID] = useState<string>(transaction.categoryID);
+
+
 
 	// Header Display
 	const [headerClasses, setHeaderClasses] = useState<string[]>([styles.header]);
@@ -62,20 +65,29 @@ export function TransactionPage(props: TransactionPagePropsType) {
 	// Read payees from firebase
 	useEffect(() => {
 		const fetchPayees = async () => {
-			const payeeData = await getPayees(userID, budgetID);
+			const payeeData = await getPayees(budgetData.userID, budgetData.budgetID);
 			setPayees(payeeData);
 		};
 		fetchPayees();
-	}, [budgetID, dataListenerKey, userID]);
+	}, [budgetData.budgetID, dataListenerKey, budgetData.userID]);
 
 	// Read unassigned balance from firebase
 	useEffect(() => {
 		const fetchUnassignedBalance = async () => {
-			const unassigned = await getUnassignedBalance(userID, budgetID);
+			const unassigned = await getUnassignedBalance(budgetData.userID, budgetData.budgetID);
 			setUnassignedBalance(unassigned);
 		};
 		fetchUnassignedBalance();
-	}, [budgetID, dataListenerKey, userID]);
+	}, [budgetData.budgetID, dataListenerKey, budgetData.userID]);
+
+	// Fetches accounts
+	useEffect(() => {
+		const fetch = async () => {
+			const accountsData = await getAccounts(budgetData.userID, budgetData.budgetID);
+			setAccounts(accountsData);
+		};
+		fetch();
+	});
 
 	// Formats balanceString when balance or outflow changes
 	useEffect(() => {
@@ -92,7 +104,7 @@ export function TransactionPage(props: TransactionPagePropsType) {
 	// Updates Transaction Data
 	const createNewPayee = (newPayee: string) => {
 		// Creates payee doc in firebase
-		createPayee(userID, budgetID, newPayee);
+		createPayee(budgetData.userID, budgetData.budgetID, newPayee);
 		// Sets as the selected payee
 		setPayee(newPayee);
 		// Resets the page
@@ -131,6 +143,7 @@ export function TransactionPage(props: TransactionPagePropsType) {
 	const handleMemoOnChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
 		setMemo(event.currentTarget.value);
 	};
+
 	// Updates Transaction balance
 	// TODO - implement a better way to input in currency values
 	const handleEnterKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -166,7 +179,17 @@ export function TransactionPage(props: TransactionPagePropsType) {
 		showSubpage(<PayeeSelectionSubpage selectedPayee={payee} payees={payees} handleBackClick={hideSubpage} createNewPayee={createNewPayee} selectPayee={selectPayee} />);
 	};
 	const navigateToCategorySelectionSubpage = () => {
-		showSubpage(<CategorySelectionSubpage budgetData={budgetData} selectedSubcategoryID={subcategoryID} categories={categories} subcategories={subcategories} unassignedBalance={unassignedBalance} handleBackClick={hideSubpage} selectSubcategory={selectSubcategory} />);
+		showSubpage(
+			<CategorySelectionSubpage
+				budgetData={budgetData}
+				selectedSubcategoryID={subcategoryID}
+				categories={categories}
+				subcategories={subcategories}
+				unassignedBalance={unassignedBalance}
+				handleBackClick={hideSubpage}
+				selectSubcategory={selectSubcategory}
+			/>
+		);
 	};
 	const navigateToAccountSelectionSubpage = () => {
 		showSubpage(<AccountSelectionSubpage selectedAccountID={accountID} accounts={accounts} handleBackClick={hideSubpage} selectAccount={selectAccount} />);
