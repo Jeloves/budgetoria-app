@@ -1,4 +1,4 @@
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, getRedirectResult, signInWithRedirect, signInWithPopup, signOut, deleteUser } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, getRedirectResult, signInWithRedirect, signInWithPopup, signOut, deleteUser, connectAuthEmulator } from "firebase/auth";
 import { app } from "@/firebase/firebase.config";
 import { GoogleAuthProvider } from "firebase/auth";
 
@@ -101,3 +101,4 @@ export function signOutUser() {
 export function getUser() {
 	return auth.currentUser;
 }
+
