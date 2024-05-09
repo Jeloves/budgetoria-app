@@ -139,7 +139,6 @@ describe("<AccountsPage />", () => {
 		});
 	});
 
-
 	context("AccountTransactionsSubpage", () => {
 		beforeEach(() => {
 			cy.mount(<AccountsPage budgetData={budgetData} categories={mockCategories} subcategories={mockSubcategories} />);
@@ -160,6 +159,10 @@ describe("<AccountsPage />", () => {
 				cy.get(`[data-test-id="account_transaction_item_${i}_subcategory`).should("have.text", expectedSubcategory);
 				cy.get(`[data-test-id="account_transaction_item_${i}_account`).should("not.exist");
 			}
+
+			cy.get(`[data-test-id="account_transaction_item_${checkingsTransactions.length}_payee`).should("have.text", "Starting Balance");
+			cy.get(`[data-test-id="account_transaction_item_${checkingsTransactions.length}_subcategory`).should("have.text", "Ready to Assign");
+			cy.get(`[data-test-id="account_transaction_item_${checkingsTransactions.length}_account`).should("not.exist");
 		});
 
 		it("shows correct data for 'Credit' AccountTransactions subpage", () => {
@@ -176,6 +179,10 @@ describe("<AccountsPage />", () => {
 				cy.get(`[data-test-id="account_transaction_item_${i}_subcategory`).should("have.text", expectedSubcategory);
 				cy.get(`[data-test-id="account_transaction_item_${i}_account`).should("not.exist");
 			}
+
+			cy.get(`[data-test-id="account_transaction_item_${creditTransactions.length}_payee`).should("have.text", "Starting Balance");
+			cy.get(`[data-test-id="account_transaction_item_${creditTransactions.length}_subcategory`).should("have.text", "Ready to Assign");
+			cy.get(`[data-test-id="account_transaction_item_${creditTransactions.length}_account`).should("not.exist");
 		});
 
 		it("shows correct data for 'Savings' AccountTransactions subpage", () => {
@@ -192,6 +199,10 @@ describe("<AccountsPage />", () => {
 				cy.get(`[data-test-id="account_transaction_item_${i}_subcategory`).should("have.text", expectedSubcategory);
 				cy.get(`[data-test-id="account_transaction_item_${i}_account`).should("not.exist");
 			}
+
+			cy.get(`[data-test-id="account_transaction_item_${savingsTransactions.length}_payee`).should("have.text", "Starting Balance");
+			cy.get(`[data-test-id="account_transaction_item_${savingsTransactions.length}_subcategory`).should("have.text", "Ready to Assign");
+			cy.get(`[data-test-id="account_transaction_item_${savingsTransactions.length}_account`).should("not.exist");
 		});
 	});
 });
