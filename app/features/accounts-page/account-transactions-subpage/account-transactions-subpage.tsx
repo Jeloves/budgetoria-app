@@ -294,7 +294,7 @@ export function AccountTransactionsSubpage(props: AccountTransactionsSubpageProp
 						{subcategoryNameString ? subcategoryNameString : "Category Needed"}
 					</span>
 					<span className={styles.balanceContainer}>
-						<div className={styles.balance}>
+						<div data-test-id={`account_transaction_item_${transactionItemIndex}_balance`} className={styles.balance}>
 							{formatCurrencyBasedOnOutflow(transaction.balance, transaction.outflow)}
 							{(showingAllAccounts || showingUnfinishedTransactions) && (
 								<div data-test-id={`account_transaction_item_${transactionItemIndex}_account`} className={styles.accountName}>

@@ -38,3 +38,4 @@ firestore-debug.log*
 next-env.d.ts
 
 *storybook.log
+firestore-debug.log
