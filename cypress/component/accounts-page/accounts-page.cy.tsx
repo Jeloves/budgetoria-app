@@ -12,6 +12,7 @@ import { BudgetData } from "pages/budget";
 import { getAccountNameByID, getSubcategoryNameByID } from "@/utils/getByID";
 import { cloneDeep } from "lodash";
 import { mock } from "node:test";
+import { formatCurrencyBasedOnOutflow } from "@/utils/currency";
 
 describe("<AccountsPage />", () => {
 	let userID: string;
@@ -139,7 +140,6 @@ describe("<AccountsPage />", () => {
 		});
 	});
 
-
 	context("AccountTransactionsSubpage", () => {
 		beforeEach(() => {
 			cy.mount(<AccountsPage budgetData={budgetData} categories={mockCategories} subcategories={mockSubcategories} />);
@@ -154,12 +154,17 @@ describe("<AccountsPage />", () => {
 				const transaction = checkingsTransactions[i];
 				const expectedPayee = transaction.payee === "" ? "Payee Needed" : transaction.payee;
 				const expectedSubcategory = transaction.subcategoryID === "" ? "Category Needed" : getSubcategoryNameByID(transaction.subcategoryID, mockSubcategories);
-				const expectedAccount = transaction.accountID === "" ? "Account Needed" : getAccountNameByID(transaction.accountID, mockAccounts);
+				const expectedBalance = formatCurrencyBasedOnOutflow(transaction.balance, transaction.outflow);
 
 				cy.get(`[data-test-id="account_transaction_item_${i}_payee`).should("have.text", expectedPayee);
 				cy.get(`[data-test-id="account_transaction_item_${i}_subcategory`).should("have.text", expectedSubcategory);
+				cy.get(`[data-test-id="account_transaction_item_${i}_balance`).should("have.text", expectedBalance);
 				cy.get(`[data-test-id="account_transaction_item_${i}_account`).should("not.exist");
 			}
+
+			cy.get(`[data-test-id="account_transaction_item_${checkingsTransactions.length}_payee`).should("have.text", "Starting Balance");
+			cy.get(`[data-test-id="account_transaction_item_${checkingsTransactions.length}_subcategory`).should("have.text", "Ready to Assign");
+			cy.get(`[data-test-id="account_transaction_item_${checkingsTransactions.length}_account`).should("not.exist");
 		});
 
 		it("shows correct data for 'Credit' AccountTransactions subpage", () => {
@@ -171,11 +176,17 @@ describe("<AccountsPage />", () => {
 				const transaction = creditTransactions[i];
 				const expectedPayee = transaction.payee === "" ? "Payee Needed" : transaction.payee;
 				const expectedSubcategory = transaction.subcategoryID === "" ? "Category Needed" : getSubcategoryNameByID(transaction.subcategoryID, mockSubcategories);
+				const expectedBalance = formatCurrencyBasedOnOutflow(transaction.balance, transaction.outflow);
 
 				cy.get(`[data-test-id="account_transaction_item_${i}_payee`).should("have.text", expectedPayee);
 				cy.get(`[data-test-id="account_transaction_item_${i}_subcategory`).should("have.text", expectedSubcategory);
+				cy.get(`[data-test-id="account_transaction_item_${i}_balance`).should("have.text", expectedBalance);
 				cy.get(`[data-test-id="account_transaction_item_${i}_account`).should("not.exist");
 			}
+
+			cy.get(`[data-test-id="account_transaction_item_${creditTransactions.length}_payee`).should("have.text", "Starting Balance");
+			cy.get(`[data-test-id="account_transaction_item_${creditTransactions.length}_subcategory`).should("have.text", "Ready to Assign");
+			cy.get(`[data-test-id="account_transaction_item_${creditTransactions.length}_account`).should("not.exist");
 		});
 
 		it("shows correct data for 'Savings' AccountTransactions subpage", () => {
@@ -187,11 +198,21 @@ describe("<AccountsPage />", () => {
 				const transaction = savingsTransactions[i];
 				const expectedPayee = transaction.payee === "" ? "Payee Needed" : transaction.payee;
 				const expectedSubcategory = transaction.subcategoryID === "" ? "Category Needed" : getSubcategoryNameByID(transaction.subcategoryID, mockSubcategories);
+				const expectedBalance = formatCurrencyBasedOnOutflow(transaction.balance, transaction.outflow);
 
 				cy.get(`[data-test-id="account_transaction_item_${i}_payee`).should("have.text", expectedPayee);
 				cy.get(`[data-test-id="account_transaction_item_${i}_subcategory`).should("have.text", expectedSubcategory);
+				cy.get(`[data-test-id="account_transaction_item_${i}_balance`).should("have.text", expectedBalance);
 				cy.get(`[data-test-id="account_transaction_item_${i}_account`).should("not.exist");
 			}
+
+			cy.get(`[data-test-id="account_transaction_item_${savingsTransactions.length}_payee`).should("have.text", "Starting Balance");
+			cy.get(`[data-test-id="account_transaction_item_${savingsTransactions.length}_subcategory`).should("have.text", "Ready to Assign");
+			cy.get(`[data-test-id="account_transaction_item_${savingsTransactions.length}_account`).should("not.exist");
 		});
 	});
 });
+
+/*
+const expectedAccount = transaction.accountID === "" ? "Account Needed" : getAccountNameByID(transaction.accountID, mockAccounts);
+*/
