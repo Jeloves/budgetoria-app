@@ -85,7 +85,7 @@ export function SubcategoryItem(props: SubcategoryItemPropsType) {
 
 	return (
 		<section className={styles.subcategory}>
-			<span className={styles.subcategoryName}>{subcategoryAllocation.subcategory.name}</span>
+			<span data-test-id={`subcategory_item_${subcategoryAllocation.subcategory.name}`} className={styles.subcategoryName}>{subcategoryAllocation.subcategory.name}</span>
 			<input className={styles.input} ref={assignedBalanceInputReference} type="text" defaultValue={formatCurrency(assignedBalance)} onFocus={handleOnFocus} onBlur={handleOnBlur} onKeyDown={handleEnterKeyDown}/>
 			<div className={classNames(availableAllocationClasses)}>
 				<span>{formatCurrency(availableBalance)}</span>
