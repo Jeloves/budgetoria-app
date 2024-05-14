@@ -1,7 +1,6 @@
 import { auth } from "@/firebase/auth";
 import { firestore } from "@/firebase/firebase.config";
 import { connectAuthEmulator } from "firebase/auth";
-import firebase from "firebase/compat/app";
 import { connectFirestoreEmulator } from "firebase/firestore";
 
 describe("Budget Page", () => {
@@ -9,17 +8,22 @@ describe("Budget Page", () => {
 
 	before(() => {
 		baseURL = Cypress.env("BASE_URL");
+		connectFirestoreEmulator(firestore, "127.0.0.1", 8080);
 		cy.visit(baseURL);
 	});
 
+	it("logs in and changes something", () => {
 
-	it("passes", () => {
-		//connectFirestoreEmulator(firestore, "127.0.0.1", 8080);
-    //connectAuthEmulator(auth, "http://127.0.0.1:9099");
+
+		cy.get('[data-test-id="signup-button"]').click();
+
+		cy.get("[data-test-id='input-email']").type("testemail@email.com");
+		cy.get("[data-test-id='input-password']").type("testpassword1234")
+		cy.get("[data-test-id='submit-button']").click();
+
+		cy.get("[data-test-id='subcategory_item_Gas']").should('have.text', "Gas")
+		cy.wait(5000);
+
 	});
 
-	// TODO - figure out how to connect to auth emulator from within Cypress tests
-	// Current Problems
-	///		- when placed at the last line of their respective files, these connectEmulator() functions work
-	///		- Cannot use auth object within Cypress file without an invalid-api-key error
 });
