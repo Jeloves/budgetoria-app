@@ -1,29 +1,29 @@
 import { useEffect, useState } from "react";
 import styles from "./unassigned.module.scss";
+import { getUnassignedBalance } from "@/firebase/budgets";
+import { formatCurrency } from "@/utils/currency";
 
 type UnassignedPropsType = {
-	currency: string;
-	unassignedBalance: number;
+	userID: string;
+	budgetID: string;
 };
 
-const currencySymbols = new Map([
-	["USD", "$"],
-	["EUR", "€"],
-	["GBP", "£"],
-	["JPY", "¥"],
-	["CAD", "$"],
-]);
-
 export function Unassigned(props: UnassignedPropsType) {
-	const { currency, unassignedBalance } = props;
+	const { userID, budgetID } = props;
 
+	const [unassignedBalance, setUnassignedBalance] = useState<number>(0);
+	useEffect(() => {
+		const fetch = async () => {
+			const unassigned = await getUnassignedBalance(userID, budgetID);
+			setUnassignedBalance(unassigned);
+		};
+		fetch();
+	});
 	return (
 		<>
 			<section className={styles.unassigned}>
 				<div>
-					<data>
-						{currencySymbols.get(currency)} {(unassignedBalance! / 1000000).toFixed(2)}
-					</data>
+					<data>{formatCurrency(unassignedBalance)}</data>
 					<label>Ready to Assign</label>
 				</div>
 			</section>

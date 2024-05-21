@@ -1,28 +1,35 @@
 import React from "react";
 import { AccountsPage } from "@/features/accounts-page/accounts-page";
-import { getMockData } from "@/mock-data/mock-budget";
+import { getMockData } from "../../support/mock";
 import { Account, Category, Subcategory, Transaction } from "@/firebase/models";
-import { createAccount, deleteAccount, getAccounts } from "@/firebase/accounts";
-import { createTransaction, deleteTransaction, getTransactions } from "@/firebase/transactions";
+import { createAccount } from "@/firebase/accounts";
+import { createTransaction } from "@/firebase/transactions";
 import { sortAccountsAlphabetically } from "@/utils/sorting";
 import { firestore } from "@/firebase/firebase.config";
-import { connectFirestoreEmulator } from "firebase/firestore";
+import { Timestamp, connectFirestoreEmulator } from "firebase/firestore";
 import { clearAccountsAndTransactions } from "../../support/firebase";
+import { BudgetData } from "pages/budget";
+import { getAccountNameByID, getSubcategoryNameByID } from "@/utils/getByID";
+import { cloneDeep } from "lodash";
+import { mock } from "node:test";
+import { formatCurrencyBasedOnOutflow } from "@/utils/currency";
 
 describe("<AccountsPage />", () => {
 	let userID: string;
 	let budgetID: string;
+	let budgetData: BudgetData;
 	let mockAccounts: Account[];
 	let mockCategories: Category[];
 	let mockSubcategories: Subcategory[];
 	let mockTransactions: Transaction[];
 
-	before(async () => {
-		connectFirestoreEmulator(firestore, '127.0.0.1', 8080);
-		
+	before(() => {
+		connectFirestoreEmulator(firestore, "127.0.0.1", 8080);
+
 		// Retrieving env variables
 		userID = Cypress.env("TEST_USER_ID");
 		budgetID = Cypress.env("TEST_BUDGET_ID");
+		budgetData = { userID: userID, budgetID: budgetID, year: 2024, month: 0 };
 
 		const mock = getMockData();
 		mockAccounts = mock.accounts;
@@ -30,29 +37,27 @@ describe("<AccountsPage />", () => {
 		mockSubcategories = mock.subcategories;
 		mockTransactions = mock.transactions;
 
+		// Adding accounts to firebase (deleted after tests)
+		for (let account of mockAccounts) {
+			createAccount(userID, budgetID, account);
+		}
+
+		// Adding transactions to firebase (deleted after tests)
+		for (let transaction of mockTransactions) {
+			createTransaction(userID, budgetID, transaction);
+		}
+
 		sortAccountsAlphabetically(mockAccounts);
 	});
 
-	after(async () => {
+	after(() => {
 		// Deletes all accounts and transactions in firebase
-		await clearAccountsAndTransactions(userID, budgetID);
+		clearAccountsAndTransactions(userID, budgetID);
 	});
 
 	context("Constant texts and images", () => {
-		before(() => {
-			// Adding accounts to firebase (deleted after tests)
-			for (let account of mockAccounts) {
-				createAccount(userID, budgetID, account);
-			}
-
-			// Adding transactions to firebase (deleted after tests)
-			for (let transaction of mockTransactions) {
-				createTransaction(userID, budgetID, transaction);
-			}
-		});
-
 		beforeEach(() => {
-			cy.mount(<AccountsPage userID={userID} budgetID={budgetID} categories={mockCategories} subcategories={mockSubcategories} />);
+			cy.mount(<AccountsPage budgetData={budgetData} categories={mockCategories} subcategories={mockSubcategories} />);
 		});
 
 		it("shows 'Accounts' as the header text", () => {
@@ -83,7 +88,7 @@ describe("<AccountsPage />", () => {
 
 	context("New user's first navigation", () => {
 		beforeEach(() => {
-			cy.mount(<AccountsPage userID={userID} budgetID={budgetID} categories={[]} subcategories={[]} />);
+			cy.mount(<AccountsPage budgetData={budgetData} categories={[]} subcategories={[]} />);
 		});
 
 		it("shows '$0.00' as the total balance amount", () => {
@@ -99,20 +104,8 @@ describe("<AccountsPage />", () => {
 	});
 
 	context("Shows correct user data", () => {
-		before(() => {
-			// Adding accounts to firebase (deleted after tests)
-			for (let account of mockAccounts) {
-				createAccount(userID, budgetID, account);
-			}
-
-			// Adding transactions to firebase (deleted after tests)
-			for (let transaction of mockTransactions) {
-				createTransaction(userID, budgetID, transaction);
-			}
-		});
-
 		beforeEach(() => {
-			cy.mount(<AccountsPage userID={userID} budgetID={budgetID} categories={mockCategories} subcategories={mockSubcategories} />);
+			cy.mount(<AccountsPage budgetData={budgetData} categories={mockCategories} subcategories={mockSubcategories} />);
 		});
 
 		it("shows the correct total balance", () => {
@@ -147,36 +140,79 @@ describe("<AccountsPage />", () => {
 		});
 	});
 
-	context("Navigation buttons show subpage", () => {
-		before(() => {
-			// Adding accounts to firebase (deleted after tests)
-			for (let account of mockAccounts) {
-				createAccount(userID, budgetID, account);
-			}
-
-			// Adding transactions to firebase (deleted after tests)
-			for (let transaction of mockTransactions) {
-				createTransaction(userID, budgetID, transaction);
-			}
-		});
-
+	context("AccountTransactionsSubpage", () => {
 		beforeEach(() => {
-			cy.mount(<AccountsPage userID={userID} budgetID={budgetID} categories={mockCategories} subcategories={mockSubcategories} />);
+			cy.mount(<AccountsPage budgetData={budgetData} categories={mockCategories} subcategories={mockSubcategories} />);
 		});
 
-		it('opens subpage when "New Transactions" button is clicked', () => {
-			cy.get('[data-test-id="unfinished_transactions_button"]').should("exist").click();
-			cy.get('[data-test-id="account_transactions_subpage_header"]').should("exist");
+		it("shows correct data for 'Checkings' AccountTransactions subpage", () => {
+			const checkingsTransactions = mockTransactions.filter((transaction) => transaction.accountID === mockAccounts[0].id);
+
+			cy.get('[data-test-id="account_item_0"]').click();
+			cy.wait(300);
+			for (let i = 0; i < checkingsTransactions.length; i++) {
+				const transaction = checkingsTransactions[i];
+				const expectedPayee = transaction.payee === "" ? "Payee Needed" : transaction.payee;
+				const expectedSubcategory = transaction.subcategoryID === "" ? "Category Needed" : getSubcategoryNameByID(transaction.subcategoryID, mockSubcategories);
+				const expectedBalance = formatCurrencyBasedOnOutflow(transaction.balance, transaction.outflow);
+
+				cy.get(`[data-test-id="account_transaction_item_${i}_payee`).should("have.text", expectedPayee);
+				cy.get(`[data-test-id="account_transaction_item_${i}_subcategory`).should("have.text", expectedSubcategory);
+				cy.get(`[data-test-id="account_transaction_item_${i}_balance`).should("have.text", expectedBalance);
+				cy.get(`[data-test-id="account_transaction_item_${i}_account`).should("not.exist");
+			}
+
+			cy.get(`[data-test-id="account_transaction_item_${checkingsTransactions.length}_payee`).should("have.text", "Starting Balance");
+			cy.get(`[data-test-id="account_transaction_item_${checkingsTransactions.length}_subcategory`).should("have.text", "Ready to Assign");
+			cy.get(`[data-test-id="account_transaction_item_${checkingsTransactions.length}_account`).should("not.exist");
 		});
 
-		it('opens subpage when "All Accounts" button is clicked', () => {
-			cy.get('[data-test-id="all_accounts_button"]').should("exist").click();
-			cy.get('[data-test-id="account_transactions_subpage_header"]').should("exist");
+		it("shows correct data for 'Credit' AccountTransactions subpage", () => {
+			const creditTransactions = mockTransactions.filter((transaction) => transaction.accountID === mockAccounts[1].id);
+
+			cy.get('[data-test-id="account_item_1"]').click();
+			cy.wait(300);
+			for (let i = 0; i < creditTransactions.length; i++) {
+				const transaction = creditTransactions[i];
+				const expectedPayee = transaction.payee === "" ? "Payee Needed" : transaction.payee;
+				const expectedSubcategory = transaction.subcategoryID === "" ? "Category Needed" : getSubcategoryNameByID(transaction.subcategoryID, mockSubcategories);
+				const expectedBalance = formatCurrencyBasedOnOutflow(transaction.balance, transaction.outflow);
+
+				cy.get(`[data-test-id="account_transaction_item_${i}_payee`).should("have.text", expectedPayee);
+				cy.get(`[data-test-id="account_transaction_item_${i}_subcategory`).should("have.text", expectedSubcategory);
+				cy.get(`[data-test-id="account_transaction_item_${i}_balance`).should("have.text", expectedBalance);
+				cy.get(`[data-test-id="account_transaction_item_${i}_account`).should("not.exist");
+			}
+
+			cy.get(`[data-test-id="account_transaction_item_${creditTransactions.length}_payee`).should("have.text", "Starting Balance");
+			cy.get(`[data-test-id="account_transaction_item_${creditTransactions.length}_subcategory`).should("have.text", "Ready to Assign");
+			cy.get(`[data-test-id="account_transaction_item_${creditTransactions.length}_account`).should("not.exist");
 		});
 
-		it('opens subpage when "Add Accounts" button is clicked', () => {
-			cy.get('[data-test-id="add_accounts_button"]').should("exist").click();
-			cy.get('[data-test-id="create_account_subpage_header"]').should("exist");
+		it("shows correct data for 'Savings' AccountTransactions subpage", () => {
+			const savingsTransactions = mockTransactions.filter((transaction) => transaction.accountID === mockAccounts[2].id);
+
+			cy.get('[data-test-id="account_item_2"]').click();
+			cy.wait(300);
+			for (let i = 0; i < savingsTransactions.length; i++) {
+				const transaction = savingsTransactions[i];
+				const expectedPayee = transaction.payee === "" ? "Payee Needed" : transaction.payee;
+				const expectedSubcategory = transaction.subcategoryID === "" ? "Category Needed" : getSubcategoryNameByID(transaction.subcategoryID, mockSubcategories);
+				const expectedBalance = formatCurrencyBasedOnOutflow(transaction.balance, transaction.outflow);
+
+				cy.get(`[data-test-id="account_transaction_item_${i}_payee`).should("have.text", expectedPayee);
+				cy.get(`[data-test-id="account_transaction_item_${i}_subcategory`).should("have.text", expectedSubcategory);
+				cy.get(`[data-test-id="account_transaction_item_${i}_balance`).should("have.text", expectedBalance);
+				cy.get(`[data-test-id="account_transaction_item_${i}_account`).should("not.exist");
+			}
+
+			cy.get(`[data-test-id="account_transaction_item_${savingsTransactions.length}_payee`).should("have.text", "Starting Balance");
+			cy.get(`[data-test-id="account_transaction_item_${savingsTransactions.length}_subcategory`).should("have.text", "Ready to Assign");
+			cy.get(`[data-test-id="account_transaction_item_${savingsTransactions.length}_account`).should("not.exist");
 		});
 	});
 });
+
+/*
+const expectedAccount = transaction.accountID === "" ? "Account Needed" : getAccountNameByID(transaction.accountID, mockAccounts);
+*/

@@ -18,6 +18,7 @@ export async function getTransactions(userID: string, budgetID: string): Promise
 		throw error;
 	}
 }
+
 export async function getTransactionsByDate(userID: string, budgetID: string, month: number, year: number): Promise<Transaction[]> {
 	try {
 		const transactionsSnapshot = await getDocs(collection(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.transactions));
@@ -28,7 +29,7 @@ export async function getTransactionsByDate(userID: string, budgetID: string, mo
 		});
 
 		const filteredTransactions: Transaction[] = transactions.filter((transaction) => {
-			const timestamp = transaction.date;
+			const timestamp = transaction.timestamp;
 			const milliseconds = timestamp.seconds * 1000 + Math.floor(timestamp.nanoseconds / 1000000);
 			const date = new Date(milliseconds);
 			return date.getMonth() === month && date.getFullYear() === year;
@@ -41,10 +42,79 @@ export async function getTransactionsByDate(userID: string, budgetID: string, mo
 	}
 }
 
+export async function getTransactionsBySubcategory(userID: string, budgetID: string, subcategoryID: string, month: number, year: number): Promise<Transaction[]> {
+	try {
+		// Retrieving transaction documents
+		const transactionsSnapshot = await getDocs(collection(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.transactions));
+
+		// Filters transactions by subcategoryID and date
+		const filteredTransactions: Transaction[] = [];
+		transactionsSnapshot.forEach((doc) => {
+			const data = doc.data();
+			const timestamp = data.date;
+			const milliseconds = timestamp.seconds * 1000 + Math.floor(timestamp.nanoseconds / 1000000);
+			const date = new Date(milliseconds);
+			const isCorrectDate = date.getMonth() === month && date.getFullYear() === year;
+
+			if (data.subcategoryID === subcategoryID && isCorrectDate) {
+				filteredTransactions.push(new Transaction(doc.id, data.date, data.payee, data.memo, data.outflow, data.balance, data.approval, data.accountID, data.categoryID, data.subcategoryID));
+			}
+		});
+
+		return filteredTransactions;
+	} catch (error) {
+		console.error("Failed to read transactions by subcategory: ", error);
+		throw error;
+	}
+}
+
+export async function getTransactionsByAccount(userID: string, budgetID: string, accountID: string): Promise<Transaction[]> {
+	try {
+		// Retrieving transaction documents
+		const transactionsSnapshot = await getDocs(collection(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.transactions));
+
+		// Filters transactions by accountID
+		const filteredTransactions: Transaction[] = [];
+		transactionsSnapshot.forEach((doc) => {
+			const data = doc.data();
+			if (data.accountID === accountID) {
+				filteredTransactions.push(new Transaction(doc.id, data.date, data.payee, data.memo, data.outflow, data.balance, data.approval, data.accountID, data.categoryID, data.subcategoryID));
+			}
+		});
+
+		return filteredTransactions;
+	} catch (error) {
+		console.error("Failed to read transactions by account: ", error);
+		throw error;
+	}
+}
+
+export async function getUnfinishedTransactions(userID: string, budgetID: string): Promise<Transaction[]> {
+	try {
+		// Retrieving transaction documents
+		const transactionsSnapshot = await getDocs(collection(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.transactions));
+
+		// Filters transactions without a selected payee, account, category, or subcategory
+		const filteredTransactions: Transaction[] = [];
+		transactionsSnapshot.forEach((doc) => {
+			const data = doc.data();
+			const isUnfinished = data.accountID === "" || data.payee === "" || data.categoryID === "" || data.subcategory === "";
+			if (isUnfinished) {
+				filteredTransactions.push(new Transaction(doc.id, data.date, data.payee, data.memo, data.outflow, data.balance, data.approval, data.accountID, data.categoryID, data.subcategoryID));
+			}
+		});
+
+		return filteredTransactions;
+	} catch (error) {
+		console.error("Failed to read unfinished transactions: ", error);
+		throw error;
+	}
+}
+
 export async function createTransaction(userID: string, budgetID: string, newTransaction: Transaction) {
 	try {
 		await setDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.transactions, newTransaction.id), {
-			date: newTransaction.date,
+			date: newTransaction.timestamp,
 			payee: newTransaction.payee,
 			memo: newTransaction.memo,
 			outflow: newTransaction.outflow,
@@ -70,7 +140,7 @@ export async function deleteTransaction(userID: string, budgetID: string, transa
 export async function updateTransaction(userID: string, budgetID: string, transaction: Transaction) {
 	try {
 		await setDoc(doc(firestore, collectionLabel.users, userID, collectionLabel.budgets, budgetID, collectionLabel.transactions, transaction.id), {
-			date: transaction.date,
+			date: transaction.timestamp,
 			payee: transaction.payee,
 			memo: transaction.memo,
 			outflow: transaction.outflow,

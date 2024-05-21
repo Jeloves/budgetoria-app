@@ -24,8 +24,8 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-firebase-debug.log
-firestore-debug.log
+firebase-debug.log*
+firestore-debug.log*
 
 # local env files
 .env*.local
@@ -38,3 +38,4 @@ firestore-debug.log
 next-env.d.ts
 
 *storybook.log
+firestore-debug.log

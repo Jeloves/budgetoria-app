@@ -41,3 +41,4 @@ export const app = isTesting ? initializeApp(firebaseEmulatorConfig) : initializ
 export const firestore = getFirestore(app);
 
 isTesting && connectFirestoreEmulator(firestore, process.env.NEXT_PUBLIC_FIRESTORE_EMULATOR_HOST!, parseFloat(process.env.NEXT_PUBLIC_FIRESTORE_EMULATOR_PORT!));
+

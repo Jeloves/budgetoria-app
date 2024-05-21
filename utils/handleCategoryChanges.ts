@@ -92,7 +92,7 @@ async function deleteCategories(userID: string, budgetID: string, allocations: A
 		});
 		for (const allocation of filteredAllocations) {
 			await deleteAllocation(userID, budgetID, allocation.id);
-			await updateUnassignedBalance(userID, allocation.balance);
+			await updateUnassignedBalance(userID, budgetID, allocation.balance);
 		}
 	}
 }

@@ -1,58 +1,99 @@
 import classNames from "classnames";
 import { IconButton } from "../ui";
 import styles from "./category-item.module.scss";
-import { Allocation, Category, Subcategory, Transaction } from "@/firebase/models";
 import { SubcategoryItem } from "../subcategory-item";
-import { useState } from "react";
-import { calculateCategoryItemData } from "@/utils/calculateCategoryItemData";
+import { useEffect, useState } from "react";
+import { getAllocationBySubcategory, updateAssignedAllocation } from "@/firebase/allocations";
+import { updateUnassignedBalance } from "@/firebase/budgets";
+import { Category, Subcategory } from "@/firebase/models";
+import { formatCurrency } from "@/utils/currency";
+import { getTransactionsBySubcategory } from "@/firebase/transactions";
 
 export type CategoryItemPropsType = {
-	currencyString: string;
+	userID: string;
+	budgetID: string;
+	year: number;
+	month: number;
 	category: Category;
-	subcategories: Subcategory[];
-	allocations: Allocation[];
-	transactions: Transaction[];
-	updateSubcategoryAllocation: (subcategoryID: string, newBalance: number, changeInBalance: number) => void;
+	filteredSubcategories: Subcategory[];
+	refreshUnassignedBalance: () => void;
+};
+
+export type SubcategoryAllocation = {
+    subcategory: Subcategory;
+    assignedBalance: number;
+    availableBalance: number;
 };
 
 export function CategoryItem(props: CategoryItemPropsType) {
-	const { currencyString, category, subcategories, allocations, transactions, updateSubcategoryAllocation } = props;
-	const data = calculateCategoryItemData(subcategories, allocations, transactions);
-	const [totalAssignedBalance, setTotalAssignedBalance] = useState<number>(data.categoryAssignedBalance);
-	const [totalAvailableBalance, setTotalAvailableBalance] = useState<number>(data.categoryAvailableBalance);
+	const { userID, budgetID, year, month, category, filteredSubcategories, refreshUnassignedBalance } = props;
+
+	const [totalAssignedBalance, setTotalAssignedBalance] = useState<number>(0);
+	const [totalAvailableBalance, setTotalAvailableBalance] = useState<number>(0);
+
+	const [subcategoryAllocations, setSubcategoryAllocations] = useState<SubcategoryAllocation[]>([]);
+
+	// Calculates balances and SubcategoryAllocations
+	useEffect(() => {
+		const fetch = async () => {
+			const subcategoryAllocations: SubcategoryAllocation[] = [];
+			let totalAssigned = 0;
+			let totalAvailable = 0;
+
+			for (const subcategory of filteredSubcategories) {
+				// Calculates subcategory's balances
+				const allocation = await getAllocationBySubcategory(userID, budgetID, subcategory.id, year, month);
+				const transactions = await getTransactionsBySubcategory(userID, budgetID, subcategory.id, month, year);
+
+				const assigned = allocation.balance;
+				let available = assigned;
+				for (const transaction of transactions) {
+					transaction.outflow ? (available -= transaction.balance) : (available += transaction.balance);
+				}
+
+				// Creates subcategory allocation
+				subcategoryAllocations.push({
+					subcategory: subcategory,
+					assignedBalance: assigned,
+					availableBalance: available,
+				});
+
+				// Updates category balances
+				totalAssigned += assigned;
+				totalAvailable += available;
+			}
+
+			setTotalAssignedBalance(totalAssigned);
+			setTotalAvailableBalance(totalAvailable);
+			setSubcategoryAllocations(subcategoryAllocations);
+		};
+		fetch();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [userID, budgetID, month, year]);
 
 	const handleShowSubcategoriesOnClick = () => {};
 
-	const updateCategoryAllocations = (changeInAssignedValue: number) => {
-		if (changeInAssignedValue !== 0) {
-			const newAssigned = totalAssignedBalance + changeInAssignedValue;
-			const newAvailable = totalAvailableBalance + changeInAssignedValue;
-			setTotalAssignedBalance(newAssigned);
-			setTotalAvailableBalance(newAvailable);
+	const handleUpdateAssignedAllocation = async (changeInSubcategoryAssignedBalance: number, newSubcategoryAssignedBalance: number, subcategoryID: string) => {
+		if (changeInSubcategoryAssignedBalance !== 0) {
+			// Updates allocation doc in firebase
+			updateAssignedAllocation(userID, budgetID, subcategoryID, month, year, newSubcategoryAssignedBalance);
+
+			// Updates unassigned balance in firebase
+			updateUnassignedBalance(userID, budgetID, changeInSubcategoryAssignedBalance * -1);
+			refreshUnassignedBalance();
+
+			// Updates total balances
+			setTotalAssignedBalance((totalAssignedBalance) => totalAssignedBalance + changeInSubcategoryAssignedBalance);
+			setTotalAvailableBalance((totalAvailableBalance) => totalAvailableBalance + changeInSubcategoryAssignedBalance);
 		}
 	};
 
 	const subcategoryItems: JSX.Element[] = [];
-	for (let i = 0; i < subcategories.length; i++) {
-		const subcategory = subcategories[i];
-		const subcategoryAllocations = data.subcategoryAllocations.find((allocationObject) => {
-			return allocationObject.subcategoryID === subcategory.id;
-		});
+	for (let i = 0; i < subcategoryAllocations.length; i++) {
+		const subcategoryAllocation = subcategoryAllocations[i];
 
-		subcategoryItems.push(
-			<SubcategoryItem
-				key={i}
-				subcategoryID={subcategory.id}
-				name={subcategory.name}
-				currencyString={currencyString}
-				assigned={subcategoryAllocations!.subcategoryAssignedBalance}
-				available={subcategoryAllocations!.subcategoryAvailableBalance}
-				updateCategoryAllocations={updateCategoryAllocations}
-				updateSubcategoryAllocation={updateSubcategoryAllocation}
-			/>
-		);
+		subcategoryItems.push(<SubcategoryItem key={i} subcategoryAllocation={subcategoryAllocation} handleUpdateAssignedAllocation={handleUpdateAssignedAllocation} />);
 	}
-
 
 	return (
 		<>
@@ -63,13 +104,11 @@ export function CategoryItem(props: CategoryItemPropsType) {
 				</span>
 				<div className={classNames(styles.allocation)}>
 					<span>Assigned</span>
-					{currencyString}
-					{(totalAssignedBalance / 1000000).toFixed(2)}
+					{formatCurrency(totalAssignedBalance)}
 				</div>
 				<div className={classNames(styles.allocation)}>
 					<span>Available</span>
-					{currencyString}
-					{(totalAvailableBalance / 1000000).toFixed(2)}
+					{formatCurrency(totalAvailableBalance)}
 				</div>
 			</section>
 			<div>{subcategoryItems}</div>
