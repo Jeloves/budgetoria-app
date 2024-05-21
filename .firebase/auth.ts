@@ -1,11 +1,12 @@
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, getRedirectResult, signInWithRedirect, signInWithPopup, signOut, deleteUser, connectAuthEmulator } from "firebase/auth";
-import { app } from "@/firebase/firebase.config";
+import { app, isTesting } from "@/firebase/firebase.config";
 import { GoogleAuthProvider } from "firebase/auth";
 
 // https://firebase.google.com/docs/reference/js/auth#autherrorcodes <-- list of error codes for firebase auth
 
 const firebaseApp = app;
 export const auth = getAuth();
+isTesting && connectAuthEmulator(auth, process.env.NEXT_PUBLIC_AUTH_EMULATOR_DOMAIN!);
 
 const errorMessages = [
 	{ errorCode: "auth/email-already-in-use", message: "Email is already in use." },
@@ -101,5 +102,3 @@ export function signOutUser() {
 export function getUser() {
 	return auth.currentUser;
 }
-
-//connectAuthEmulator(auth, "http://127.0.0.1:9099");
