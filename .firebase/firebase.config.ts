@@ -1,9 +1,9 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 import { initializeApp } from "firebase/app";
 import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
 dotenv.config();
 
-export const isTesting = false;
+export const isTesting = true;
 
 const firebaseConfig = {
 	apiKey: process.env.NEXT_PUBLIC_API_KEY,
@@ -12,7 +12,7 @@ const firebaseConfig = {
 	storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
 	messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
 	appId: process.env.NEXT_PUBLIC_APP_ID,
-	measurementId: process.env.NEXT_PUBLIC_MEASUREMENT_ID,	
+	measurementId: process.env.NEXT_PUBLIC_MEASUREMENT_ID,
 };
 
 const firebaseEmulatorConfig = {
@@ -22,8 +22,8 @@ const firebaseEmulatorConfig = {
 	storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
 	messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
 	appId: process.env.NEXT_PUBLIC_APP_ID,
-	measurementId: process.env.NEXT_PUBLIC_MEASUREMENT_ID,	
-}
+	measurementId: process.env.NEXT_PUBLIC_MEASUREMENT_ID,
+};
 
 export const collectionLabel = {
 	users: "users",
@@ -40,4 +40,4 @@ export const collectionLabel = {
 export const app = isTesting ? initializeApp(firebaseEmulatorConfig) : initializeApp(firebaseConfig);
 export const firestore = getFirestore(app);
 
-isTesting && connectFirestoreEmulator(firestore, '127.0.0.1', 8080);
+isTesting && connectFirestoreEmulator(firestore, process.env.NEXT_PUBLIC_FIRESTORE_EMULATOR_HOST!, parseFloat(process.env.NEXT_PUBLIC_FIRESTORE_EMULATOR_PORT!));
