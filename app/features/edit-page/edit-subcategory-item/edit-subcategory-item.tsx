@@ -23,7 +23,7 @@ export function EditSubcategoryItem(props: EditSubcategoryItemPropsType) {
 
 	return (
 		<>
-			<div className={styles.editSubcategoryItem}>
+			<div  data-test-id="edit-subcategory-item" className={styles.editSubcategoryItem}>
 				<input type="text" onKeyDown={handleUpdateSubcategoryNameKeyDown} defaultValue={subcategory.name} />
 				<IconButton
 					button={{

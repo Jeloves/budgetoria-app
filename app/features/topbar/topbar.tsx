@@ -50,7 +50,7 @@ export function Topbar(props: TopbarPropsType) {
 
 	return (
 		<>
-			<section className={styles.topbarContainer}>
+			<section data-test-id="topbar" className={styles.topbarContainer}>
 				<IconButton button={{ onClick: handleShowOptions }} src="/icons/ellipsis.svg" altText="Button to open Side Navigation" />
 				{dateDisplay}
 				<IconButton button={{ onClick: handleEditCategoriesClick }} src="/icons/edit.svg" altText="Button to edit categories" />

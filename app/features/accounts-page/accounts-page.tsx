@@ -107,7 +107,7 @@ export function AccountsPage(props: AccountsPagePropsType) {
 
 		accountItems.push(
 			<div
-				data-test-id={`account_item_${i}`}
+				data-test-id={`account-item-${i}`}
 				key={`account_item_${i}`}
 				className={styles.accountItem}
 				onClick={() => {
@@ -122,7 +122,7 @@ export function AccountsPage(props: AccountsPagePropsType) {
 	// Adds "Budget" heading for list of accounts
 	const totalBalanceString = totalAccountBalance >= 0 ? "$" + (totalAccountBalance / 1000000).toFixed(2) : "-$" + (totalAccountBalance / -1000000).toFixed(2);
 	accountItems.unshift(
-		<div data-test-id={`total_item`} key={"total_item"} className={classNames(styles.accountItem, styles.totalItem)}>
+		<div data-test-id={`total-item`} key={"total_item"} className={classNames(styles.accountItem, styles.totalItem)}>
 			<span key={"total_item_name"}>Budget</span>
 			<span key={"total_item_balance"}>{totalBalanceString}</span>
 		</div>
