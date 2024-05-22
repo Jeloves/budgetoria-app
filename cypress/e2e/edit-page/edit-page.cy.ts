@@ -16,74 +16,119 @@ describe("Editing Categories Test", () => {
 		cy.get("main").should("exist");
 	});
 
-	context("Deleting subcategories", () => {
+	context("Deleting categories and subcategories", () => {
 		beforeEach(() => {
 			cy.visit(url + "/budget");
+			cy.get('[data-test-id="topbar"] button').eq(2).click();
 		});
 
 		it("Deletes individual subcategories", () => {
-            cy.visit(url + "/budget");
-            cy.get('[data-test-id="topbar"] button').eq(2).click();
-            
-            const initialSubcategories = ["Electricity", "Gas", "Crunchyroll", "Videogames"];
-    
-            // Deletes first subcategory (Electricity)
-            cy.get('[data-test-id="edit-subcategory-item"]')
-                .eq(0)
-                .within(() => {
-                    cy.get("button").eq(0).click();
-                });
-    
-            for (let i = 0; i < 4; i++) {
-                if (i < 3) {
-                    cy.get('[data-test-id="edit-subcategory-item"]')
-                        .eq(i)
-                        .within(() => {
-                            cy.get("input").should("have.value", initialSubcategories[i + 1]);
-                        });
-                } else {
-                    cy.get('[data-test-id="edit-subcategory-item"]').eq(i).should("not.exist");
-                }
-            }
-    
-            // Deletes last subcategory (Videogames)
-            cy.get('[data-test-id="edit-subcategory-item"]')
-                .eq(2)
-                .within(() => {
-                    cy.get("button").eq(0).click();
-                });
-    
-            for (let i = 0; i < 4; i++) {
-                if (i < 2) {
-                    cy.get('[data-test-id="edit-subcategory-item"]')
-                        .eq(i)
-                        .within(() => {
-                            cy.get("input").should("have.value", initialSubcategories[i + 1]);
-                        });
-                } else {
-                    cy.get('[data-test-id="edit-subcategory-item"]').eq(i).should("not.exist");
-                }
-            }
-    
-            // Categories should be unaffected
-            cy.get('[data-test-id="edit-category-item"]').eq(0).should("exist");
-            cy.get('[data-test-id="edit-category-item"]').eq(1).should("exist");
+			const initialSubcategories = ["Electricity", "Gas", "Crunchyroll", "Videogames"];
 
-            // Returns to budget-page
-            cy.get("header button").eq(1).click();
+			// Deletes first subcategory (Electricity)
+			cy.get('[data-test-id="edit-subcategory-item"]')
+				.eq(0)
+				.within(() => {
+					cy.get("button").eq(0).click();
+				});
 
-            // Checks the budget page is updated (thus, firebase is updated)
-            for (let i = 0; i < 4; i++) {
-                if (i < 2) {
-                    cy.get('[data-test-id="subcategory-item"]').eq(i).within(() => {
-                        cy.get("span").eq(0).should("have.text", initialSubcategories[i+1]);
-                    });
-                } else {
-                    cy.get('[data-test-id="subcategory-item"]').eq(i).should("not.exist")
-                }
-            }
-            cy.get('[data-test-id="category-item"]').eq(0).should("exist");
-            cy.get('[data-test-id="category-item"]').eq(1).should("exist");
-        });
+			for (let i = 0; i < 4; i++) {
+				if (i < 3) {
+					cy.get('[data-test-id="edit-subcategory-item"]')
+						.eq(i)
+						.within(() => {
+							cy.get("input").should("have.value", initialSubcategories[i + 1]);
+						});
+				} else {
+					cy.get('[data-test-id="edit-subcategory-item"]').eq(i).should("not.exist");
+				}
+			}
+
+			// Deletes last subcategory (Videogames)
+			cy.get('[data-test-id="edit-subcategory-item"]')
+				.eq(2)
+				.within(() => {
+					cy.get("button").eq(0).click();
+				});
+
+			for (let i = 0; i < 4; i++) {
+				if (i < 2) {
+					cy.get('[data-test-id="edit-subcategory-item"]')
+						.eq(i)
+						.within(() => {
+							cy.get("input").should("have.value", initialSubcategories[i + 1]);
+						});
+				} else {
+					cy.get('[data-test-id="edit-subcategory-item"]').eq(i).should("not.exist");
+				}
+			}
+
+			// Categories should be unaffected
+			cy.get('[data-test-id="edit-category-item"]').eq(0).should("exist");
+			cy.get('[data-test-id="edit-category-item"]').eq(1).should("exist");
+
+			// Returns to budget-page
+			cy.get("header button").eq(1).click();
+
+			// Checks the budget page is updated (thus, firebase is updated)
+			for (let i = 0; i < 4; i++) {
+				if (i < 2) {
+					cy.get('[data-test-id="subcategory-item"]')
+						.eq(i)
+						.within(() => {
+							cy.get("span")
+								.eq(0)
+								.should("have.text", initialSubcategories[i + 1]);
+						});
+				} else {
+					cy.get('[data-test-id="subcategory-item"]').eq(i).should("not.exist");
+				}
+			}
+			cy.get('[data-test-id="category-item"]').eq(0).should("exist");
+			cy.get('[data-test-id="category-item"]').eq(1).should("exist");
+		});
+
+		it("Deletes categories with nested subcategories", () => {
+			const initialCategories = ["Essential", "Nonessential"];
+			const initialSubcategories = ["Gas", "Crunchyroll"];
+
+			// Deleting first category
+			cy.get('[data-test-id="edit-category-item"')
+				.eq(0)
+				.within(() => {
+					cy.get("button").eq(0).click();
+				});
+
+			cy.get('[data-test-id="edit-category-item"')
+				.eq(0)
+				.within(() => {
+					cy.get("input").should("have.value", initialCategories[1]);
+				});
+			cy.get('[data-test-id="edit-subcategory-item"')
+				.eq(0)
+				.within(() => {
+					cy.get("input").should("have.value", initialSubcategories[1]);
+				});
+
+			cy.get('[data-test-id="edit-category-item"').eq(1).should("not.exist");
+			cy.get('[data-test-id="edit-subcategory-item"').eq(1).should("not.exist");
+
+			// Deleting final category
+			cy.get('[data-test-id="edit-category-item"')
+				.eq(0)
+				.within(() => {
+					cy.get("button").eq(0).click();
+				});
+
+			cy.get('[data-test-id="edit-category-item"').should("not.exist");
+			cy.get('[data-test-id="edit-subcategory-item"').should("not.exist");
+
+			// Returns to budget-page
+			cy.get("header button").eq(1).click();
+
+			// Checks the budget page is updated (thus, firebase is updated)
+            cy.get('[data-test-id="category-item"').should("not.exist");
+            cy.get('[data-test-id="subcategory-item"').should("not.exist");
+		});
 	});
 });
