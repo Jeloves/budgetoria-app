@@ -66,7 +66,7 @@ export function EditCategoryItem(props: EditCategoryItemPropsType) {
 		);
 	}
 
-	let newSubcategoryItem: JSX.Element = (
+	let subcategoryTemplate: JSX.Element = (
 		<div data-test-id="subcategory-template" className={styles.emptySubcategory}>
 			<input type="text" onKeyDown={handleCreateSubcategoryKeyDown} />
 			<IconButton
@@ -98,7 +98,7 @@ export function EditCategoryItem(props: EditCategoryItemPropsType) {
 			</div>
 
 			<div key={mainKey}>
-				{isShowingEmptySubcategory && newSubcategoryItem}
+				{isShowingEmptySubcategory && subcategoryTemplate}
 				{subcategoryEditItems}
 			</div>
 		</>
