@@ -16,6 +16,7 @@ export default defineConfig({
 
 	env: {
 		BASE_URL: "https://budgetoria-app.vercel.app",
+		LOCAL_URL: "http://localhost:3000",
 		TEST_EMAIL: "cypress_testing@email.com",
 		TEST_PASSWORD: "aa5a3671-b39e-4e8b-87af-077467cb722f",
 		TEST_USER_ID: "a5v885wvVKVOtjjEkOCqKbbAGq82",

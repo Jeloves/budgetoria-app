@@ -1,5 +1,7 @@
 import { deleteAccount, getAccounts } from "@/firebase/accounts";
+import { createUser } from "@/firebase/auth";
 import { firestore, collectionLabel } from "@/firebase/firebase.config";
+import { createInitialBudget } from "@/firebase/initial-budget";
 import { Account, Budget, Transaction } from "@/firebase/models";
 import { deleteTransaction, getTransactions } from "@/firebase/transactions";
 import { setDoc, doc, deleteDoc } from "firebase/firestore";
@@ -50,6 +52,17 @@ export async function createBudget(userID: string, budget: Budget) {
 	} catch (error) {
 		console.error("Failed to create test budget", error);
 	}
+}
+
+export async function createMockUser(email: string, password: string) {
+    createUser(email, password).then(
+        (userID) => {
+            createInitialBudget(userID as string);
+        },
+        (error) => {
+            console.error("Failed to create mock user", error)
+        }
+    );
 }
 
 async function clearFirestoreEmulator() {

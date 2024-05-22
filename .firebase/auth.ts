@@ -1,6 +1,7 @@
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, getRedirectResult, signInWithRedirect, signInWithPopup, signOut, deleteUser, connectAuthEmulator } from "firebase/auth";
 import { app, isTesting } from "@/firebase/firebase.config";
 import { GoogleAuthProvider } from "firebase/auth";
+import { createInitialBudget } from "./initial-budget";
 
 // https://firebase.google.com/docs/reference/js/auth#autherrorcodes <-- list of error codes for firebase auth
 
