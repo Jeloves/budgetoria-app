@@ -200,7 +200,7 @@ export function EditPage(props: EditPagePropsType) {
 			<input type="text" onKeyDown={handleCreateCategory} />
 			<IconButton
 				button={{
-					onClick: () => {},
+					onClick: handleShowCategoryTemplate,
 				}}
 				src={"/icons/circled-minus.svg"}
 				altText={"Button to cancel new category"}
