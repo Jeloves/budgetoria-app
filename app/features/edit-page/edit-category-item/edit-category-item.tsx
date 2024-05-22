@@ -83,7 +83,7 @@ export function EditCategoryItem(props: EditCategoryItemPropsType) {
 
 	return (
 		<>
-			<div className={styles.editCategoryItem}>
+			<div data-test-id="edit-category-item" className={styles.editCategoryItem}>
 				<input type="text" onKeyDown={handleUpdateCategoryNameKeyDown} defaultValue={category.name} />
 				<IconButton
 					button={{

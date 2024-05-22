@@ -5,7 +5,7 @@ import { SubcategoryAllocation } from "../category-item/category-item";
 import { formatCurrency } from "@/utils/currency";
 
 export type SubcategoryItemPropsType = {
-    subcategoryAllocation: SubcategoryAllocation;
+	subcategoryAllocation: SubcategoryAllocation;
 	handleUpdateAssignedAllocation: (changeInSubcategoryAssignedValue: number, newSubcategoryAssignedBalance: number, subcategoryID: string) => void;
 };
 
@@ -18,7 +18,6 @@ export function SubcategoryItem(props: SubcategoryItemPropsType) {
 	const [assignedBalance, setAssignedBalance] = useState<number>(subcategoryAllocation.assignedBalance);
 	const [availableBalance, setAvailableBalance] = useState<number>(subcategoryAllocation.availableBalance);
 	const [availableAllocationClasses, setAvailableAllocationClasses] = useState<AvailableAllocationClassesType>({ [styles.allocation]: true });
-
 
 	// Styles available allocation
 	useEffect(() => {
@@ -84,9 +83,11 @@ export function SubcategoryItem(props: SubcategoryItemPropsType) {
 	};
 
 	return (
-		<section className={styles.subcategory}>
-			<span data-test-id={`subcategory_item_${subcategoryAllocation.subcategory.name}`} className={styles.subcategoryName}>{subcategoryAllocation.subcategory.name}</span>
-			<input className={styles.input} ref={assignedBalanceInputReference} type="text" defaultValue={formatCurrency(assignedBalance)} onFocus={handleOnFocus} onBlur={handleOnBlur} onKeyDown={handleEnterKeyDown}/>
+		<section data-test-id="subcategory-item" className={styles.subcategory}>
+			<span data-test-id={`subcategory_item_${subcategoryAllocation.subcategory.name}`} className={styles.subcategoryName}>
+				{subcategoryAllocation.subcategory.name}
+			</span>
+			<input className={styles.input} ref={assignedBalanceInputReference} type="text" defaultValue={formatCurrency(assignedBalance)} onFocus={handleOnFocus} onBlur={handleOnBlur} onKeyDown={handleEnterKeyDown} />
 			<div className={classNames(availableAllocationClasses)}>
 				<span>{formatCurrency(availableBalance)}</span>
 			</div>

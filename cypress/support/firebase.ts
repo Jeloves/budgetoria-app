@@ -51,3 +51,38 @@ export async function createBudget(userID: string, budget: Budget) {
 		console.error("Failed to create test budget", error);
 	}
 }
+
+async function clearFirestoreEmulator() {
+    try {
+        const response = await fetch('http://127.0.0.1:8080/emulator/v1/projects/budgetoria/databases/(default)/documents', {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error clearing Firestore emulator: ${response.statusText}`);
+        }
+
+        console.log('Firestore emulator data cleared.');
+    } catch (error) {
+        console.error('Failed to clear Firestore emulator:', error);
+    }
+}
+async function clearAuthEmulator() {
+    try {
+        const response = await fetch('http://127.0.0.1:9099/emulator/v1/projects/budgetoria/accounts', {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error clearing Auth emulator: ${response.statusText}`);
+        }
+
+        console.log('Auth emulator data cleared.');
+    } catch (error) {
+        console.error('Failed to clear Auth emulator:', error);
+    }
+}
+export async function clearEmulators() {
+    await clearFirestoreEmulator();
+    await clearAuthEmulator();
+}

@@ -20,9 +20,9 @@ export type CategoryItemPropsType = {
 };
 
 export type SubcategoryAllocation = {
-    subcategory: Subcategory;
-    assignedBalance: number;
-    availableBalance: number;
+	subcategory: Subcategory;
+	assignedBalance: number;
+	availableBalance: number;
 };
 
 export function CategoryItem(props: CategoryItemPropsType) {
@@ -97,7 +97,7 @@ export function CategoryItem(props: CategoryItemPropsType) {
 
 	return (
 		<>
-			<section className={styles.category}>
+			<section data-test-id="category-item" className={styles.category}>
 				<span className={styles.categoryName}>
 					<IconButton button={{ onClick: handleShowSubcategoriesOnClick }} src={"/icons/arrow-down.svg"} altText={"Button to show subcategories"} />
 					{category.name}

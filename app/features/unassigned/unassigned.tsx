@@ -21,7 +21,7 @@ export function Unassigned(props: UnassignedPropsType) {
 	});
 	return (
 		<>
-			<section className={styles.unassigned}>
+			<section data-test-id="unassigned-balance" className={styles.unassigned}>
 				<div>
 					<data>{formatCurrency(unassignedBalance)}</data>
 					<label>Ready to Assign</label>

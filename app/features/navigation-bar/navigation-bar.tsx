@@ -23,7 +23,7 @@ export function NavigationBar(props: NavigationBarPropsType) {
 	};
 
 	return (
-		<section className={styles.navigation}>
+		<section data-test-id="navigation-bar" className={styles.navigation}>
 			<button className={(selectedPage === "Budget" || selectedPage === "Edit") ? styles.budgetSelected : ""} onClick={budgetOnClick}>
 				{/*eslint-disable-next-line @next/next/no-img-element*/}
 				<img src={(selectedPage === "Budget" || selectedPage === "Edit") ? "/icons/cash-grey-100.svg" : "/icons/cash.svg"} alt="Navigation to BudgetPage" />
