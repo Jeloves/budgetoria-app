@@ -1,10 +1,13 @@
 import { getSubcategories } from "@/firebase/categories";
+import { getMockData } from "../../support/mock";
 import { v4 as uuidv4 } from "uuid";
+import { Subcategory } from "@/firebase/models";
 
 describe("Editing Categories Test", () => {
 	const url = Cypress.env("LOCAL_URL");
 	const email = uuidv4() + "@email.com";
 	const password = uuidv4();
+	const mock = getMockData();
 
 	it("Signs up a mock user", () => {
 		cy.visit(url);
@@ -127,8 +130,86 @@ describe("Editing Categories Test", () => {
 			cy.get("header button").eq(1).click();
 
 			// Checks the budget page is updated (thus, firebase is updated)
-            cy.get('[data-test-id="category-item"').should("not.exist");
-            cy.get('[data-test-id="subcategory-item"').should("not.exist");
+			cy.get('[data-test-id="category-item"').should("not.exist");
+			cy.get('[data-test-id="subcategory-item"').should("not.exist");
+		});
+	});
+
+	context("Creating new categories and subcategories", () => {
+		beforeEach(() => {
+			cy.visit(url + "/budget");
+			cy.get('[data-test-id="topbar"] button').eq(2).click();
+		});
+
+		it("Creates individual categories", () => {
+			// Creating all but the first mock.category
+			for (let i = 1; i < mock.categories.length; i++) {
+				cy.get("header button").eq(0).click();
+				cy.get('[data-test-id="category-template"] input').type(mock.categories[i].name + "{enter}");
+			}
+
+			for (let i = 1; i < mock.categories.length; i++) {
+				cy.get('[data-test-id="edit-category-item"]')
+					.eq(i - 1)
+					.within(() => {
+						cy.get("input").should("have.value", mock.categories[i].name);
+					});
+			}
+
+			// Returns to budget-page
+			cy.get("header button").eq(1).click();
+
+			// Checks the budget page is updated (thus, firebase is updated)
+			for (let i = 1; i < mock.categories.length; i++) {
+				cy.get('[data-test-id="category-item"]')
+					.eq(i - 1)
+					.within(() => {
+						cy.get("span").contains(mock.categories[i].name);
+					});
+			}
+		});
+
+		it("Creates individual subcategories", () => {
+			// Creating subcategories for all but the first mock.category
+			for (let i = 1; i < mock.categories.length; i++) {
+				const filteredSubcategories = mock.subcategories.filter((subcategory) => subcategory.categoryID === mock.categories[i].id);
+
+				for (let subcategory of filteredSubcategories) {
+					cy.get('[data-test-id="edit-category-item"')
+						.eq(i - 1)
+						.within(() => {
+							cy.get("button").eq(1).click();
+						});
+					cy.get('[data-test-id="subcategory-template"] input').type(subcategory.name + "{enter}");
+				}
+			}
+
+			const expectedSubcategories: Subcategory[] = [];
+			for (let i=1; i<mock.categories.length; i++) {
+				const category = mock.categories[i];
+				const filteredSubcategories = mock.subcategories.filter(subcategory => subcategory.categoryID === category.id);
+				for (let subcategory of filteredSubcategories) {
+					expectedSubcategories.push(subcategory)
+				}
+			}
+
+			for (let i=0; i<expectedSubcategories.length; i++) {
+				cy.get('[data-test-id="edit-subcategory-item"').eq(i).within(() => {
+					cy.get("input").should("have.value", expectedSubcategories[i].name);
+				})
+			}
+
+			// Returns to budget-page
+			cy.get("header button").eq(1).click();
+
+			// Checks the budget page is updated (thus, firebase is updated)
+			for (let i = 0; i < expectedSubcategories.length; i++) {
+				cy.get('[data-test-id="subcategory-item"]')
+					.eq(i)
+					.within(() => {
+						cy.get("span").eq(0).contains(expectedSubcategories[i].name);
+					});
+			}
 		});
 	});
 });
