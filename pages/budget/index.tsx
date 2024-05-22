@@ -279,7 +279,7 @@ export default function BudgetPage() {
 	page === "Edit" &&
 		pageContent.push(
 			<>
-				<EditPage key={"editPage"} userID={user ? user.uid : ""} budgetID={budget ? budget.id : ""} categories={categories} subcategories={subcategories} handleFinishEdits={handleFinishEdits} />
+				<EditPage key={"editPage"} budgetData={budgetData} categories={categories} subcategories={subcategories} handleFinishEdits={handleFinishEdits} />
 			</>
 		);
 

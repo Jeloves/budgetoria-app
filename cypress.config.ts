@@ -29,5 +29,7 @@ export default defineConfig({
 			measurementId: "G-QG4KE52G5H",
 		},
 		FIRESTORE_EMULATOR_HOST: "localhost:8080",
+		FIRESTORE_EMULATOR_IP: "127.0.0.1",
+		FIRESTORE_EMULATOR_PORT: "8080",
 	},
 });
