@@ -345,6 +345,16 @@ describe("Editing Categories Test", () => {
 				.within(() => {
 					cy.get("input").should("not.have.value", "Crunchyroll");
 				});
+
+			cy.get("header button").eq(1).click();
+			const expectedSubcategoryNames = ["Crunchyroll", "Gas", "Student Loans", "Food", "Ice Cream", "Weed", "Netflix", "Video Games"];
+			for (let i = 0; i < 7; i++) {
+				cy.get('[data-test-id="subcategory-item"]')
+					.eq(i)
+					.within(() => {
+						cy.get("span").eq(0).should("have.text", expectedSubcategoryNames[i]);
+					});
+			}
 		});
 	});
 });
