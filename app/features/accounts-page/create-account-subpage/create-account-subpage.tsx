@@ -86,11 +86,11 @@ export function CreateAccountSubpage(props: CreateAccountSubpagePropsType) {
 				<label>Enter the starting balance for the account</label>
 				<div className={styles.balance}>
 					<div className={styles.flowContainer}>
-						<div className={outflow ? styles.outflow : ""}>
+						<div data-test-id="outflow-button" className={outflow ? styles.outflow : ""}>
 							<IconButton button={{ onClick: handleSwitchToOutflow }} src={outflow ? "/icons/minus-gray-100.svg" : "/icons/minus-gray-500.svg"} altText={"Button to make a negative balance"} />
 						</div>
-						<hr className={styles.border}/>
-						<div className={outflow ? "" : styles.inflow}>
+
+						<div data-test-id="inflow-button" className={outflow ? "" : styles.inflow}>
 							<IconButton button={{ onClick: handleSwitchToInflow}} src={outflow ? "/icons/plus-gray-500.svg" : "/icons/plus-gray-100.svg"} altText={"Button to make a positive balance"} />
 						</div>
 					</div>
