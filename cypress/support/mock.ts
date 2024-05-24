@@ -1,6 +1,6 @@
 import { Account, Allocation, Budget, Category, Subcategory, Transaction } from "@/firebase/models";
 import { getAccountByID } from "@/utils/getByID";
-import { sortTransactionsByTimestamp } from "@/utils/sorting";
+import { sortCategoriesAlphabetically, sortSubcategoriesAlphabetically, sortTransactionsByTimestamp } from "@/utils/sorting";
 import { Timestamp } from "firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
 import { NIL as NIL_UUID } from "uuid";
@@ -182,7 +182,6 @@ const timestamp_february15_8am = Timestamp.fromDate(new Date(2024, 1, 15, 8));
 const timestamp_february15_8_30am = Timestamp.fromDate(new Date(2024, 1, 15, 8, 30));
 const timestamp_february15_8pm = Timestamp.fromDate(new Date(2024, 1, 15, 20));
 
-
 // Cleared, Credit, Outflow, Essential, Food
 const transaction_food_february = new Transaction(uuidv4(), timestamp_february1_8am, "Weis Markets", "Groceries", true, transactionBalance_food_february * 1000000, true, account_credit.id, category_essential.id, subcategory_food.id);
 // Uncleared, Credit, Outflow, Essential, Gas
@@ -214,11 +213,44 @@ const transaction_iceCream_february = new Transaction(
 	subcategory_iceCream.id
 );
 // Uncleared, Checkings, Inflow, Nonessential, Weed
-const transaction_weed_february = new Transaction(uuidv4(), timestamp_february10_8am, "Curaleaf", "Refunded for bad product", false, transactionBalance_weed_february * 1000000, false, account_checkings.id, category_nonessential.id, subcategory_weed.id);
+const transaction_weed_february = new Transaction(
+	uuidv4(),
+	timestamp_february10_8am,
+	"Curaleaf",
+	"Refunded for bad product",
+	false,
+	transactionBalance_weed_february * 1000000,
+	false,
+	account_checkings.id,
+	category_nonessential.id,
+	subcategory_weed.id
+);
 // Cleared, Savings, Outflow, Nonessential, Videogames
-const transaction_videoGames_february = new Transaction(uuidv4(), timestamp_february10_8pm, "Steam", "ProjectZomboid", true, transactionBalance_videoGames_february * 1000000, true, account_savings.id, category_nonessential.id, subcategory_videoGames.id);
+const transaction_videoGames_february = new Transaction(
+	uuidv4(),
+	timestamp_february10_8pm,
+	"Steam",
+	"ProjectZomboid",
+	true,
+	transactionBalance_videoGames_february * 1000000,
+	true,
+	account_savings.id,
+	category_nonessential.id,
+	subcategory_videoGames.id
+);
 // Uncleared, Checkings, Outflow, Subscriptions, Crunchyroll
-const transaction_crunchyroll_february = new Transaction(uuidv4(), timestamp_february15_8am, "Crunchyroll", "", true, transactionBalance_crunchyroll_february * 1000000, false, account_checkings.id, category_subscriptions.id, subcategory_crunchyroll.id);
+const transaction_crunchyroll_february = new Transaction(
+	uuidv4(),
+	timestamp_february15_8am,
+	"Crunchyroll",
+	"",
+	true,
+	transactionBalance_crunchyroll_february * 1000000,
+	false,
+	account_checkings.id,
+	category_subscriptions.id,
+	subcategory_crunchyroll.id
+);
 // Cleared, Checkings, Outflow, Subscriptions, Netflix
 const transaction_netflix_february = new Transaction(uuidv4(), timestamp_february15_8pm, "Netflix", "", true, transactionBalance_netflix_february * 1000000, true, account_checkings.id, category_subscriptions.id, subcategory_netflix.id);
 
@@ -257,6 +289,8 @@ const transactions = [
 	transaction_unfinished4_february,
 ];
 
+const categories = [category_essential, category_nonessential, category_subscriptions];
+const subcategories = [subcategory_crunchyroll, subcategory_food, subcategory_gas, subcategory_iceCream, subcategory_netflix, subcategory_studentLoans, subcategory_videoGames, subcategory_weed];
 for (let account of accounts) {
 	const filteredTransactions = transactions.filter((transaction) => transaction.accountID === account.id);
 	for (let transaction of filteredTransactions) {
@@ -269,23 +303,15 @@ for (let account of accounts) {
 }
 
 export function getMockData() {
-    sortTransactionsByTimestamp(transactions)
-    
+	sortTransactionsByTimestamp(transactions);
+	sortCategoriesAlphabetically(categories);
+	sortSubcategoriesAlphabetically(subcategories);
 	return {
 		budget: budget,
 		accounts: accounts,
-		categories: [category_essential, category_nonessential, category_subscriptions],
-		subcategories: [subcategory_crunchyroll, subcategory_food, subcategory_gas, subcategory_gas, subcategory_iceCream, subcategory_netflix, subcategory_studentLoans, subcategory_videoGames, subcategory_weed],
-		allocations: [
-			allocation_crunchyroll_january,
-			allocation_food_jan,
-			allocation_gas_january,
-			allocation_iceCream_january,
-			allocation_netflix_january,
-			allocation_studentLoans_january,
-			allocation_videoGames_january,
-			allocation_weed_january,
-		],
+		categories: categories,
+		subcategories: subcategories,
+		allocations: [allocation_crunchyroll_january, allocation_food_jan, allocation_gas_january, allocation_iceCream_january, allocation_netflix_january, allocation_studentLoans_january, allocation_videoGames_january, allocation_weed_january],
 		transactions: transactions,
 	};
 }

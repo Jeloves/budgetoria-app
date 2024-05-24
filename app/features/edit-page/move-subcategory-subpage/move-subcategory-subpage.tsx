@@ -19,6 +19,7 @@ export function MoveSubcategorySubpage(props: MoveSubcategorySubpagePropsType) {
 
 		categoryItems.push(
 			<div
+				data-test-id={`category-selection-${i}`}
 				key={i}
 				className={classNames(categoryItemClasses)}
 				onClick={() => {

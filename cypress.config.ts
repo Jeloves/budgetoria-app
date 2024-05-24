@@ -1,6 +1,7 @@
 import { defineConfig } from "cypress";
 
 export default defineConfig({
+  projectId: 't1c42o',
 	e2e: {
 		setupNodeEvents(on, config) {
 		},
@@ -15,6 +16,7 @@ export default defineConfig({
 
 	env: {
 		BASE_URL: "https://budgetoria-app.vercel.app",
+		LOCAL_URL: "http://localhost:3000",
 		TEST_EMAIL: "cypress_testing@email.com",
 		TEST_PASSWORD: "aa5a3671-b39e-4e8b-87af-077467cb722f",
 		TEST_USER_ID: "a5v885wvVKVOtjjEkOCqKbbAGq82",
@@ -29,5 +31,7 @@ export default defineConfig({
 			measurementId: "G-QG4KE52G5H",
 		},
 		FIRESTORE_EMULATOR_HOST: "localhost:8080",
+		FIRESTORE_EMULATOR_IP: "127.0.0.1",
+		FIRESTORE_EMULATOR_PORT: "8080",
 	},
 });

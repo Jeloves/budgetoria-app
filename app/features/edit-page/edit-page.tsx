@@ -6,17 +6,16 @@ import styles from "./edit-page.module.scss";
 import { useEffect, useState } from "react";
 import classNames from "classnames";
 import { v4 as uuidv4 } from "uuid";
-import { handleCategoryChanges } from "@/utils/handleCategoryChanges";
 import { EditPageHeader } from "./edit-page-header/edit-page-header";
 import { createCategory, createSubcategory, deleteCategory, deleteSubcategory, updateCategory, updateSubcategory } from "@/firebase/categories";
 import { cloneDeep } from "lodash";
 import { deleteAllocationsBySubcategory } from "@/firebase/allocations";
 import { MoveSubcategoryHeader } from "./move-subcategory-subpage/move-subcategory-header";
 import { MoveSubcategorySubpage } from "./move-subcategory-subpage/move-subcategory-subpage";
+import { BudgetData } from "pages/budget";
 
 export type EditPagePropsType = {
-	userID: string;
-	budgetID: string;
+	budgetData: BudgetData;
 	categories: Category[];
 	subcategories: Subcategory[];
 	handleFinishEdits: () => void;
@@ -42,7 +41,7 @@ export interface UpdatedCategoryNames {
 }
 
 export function EditPage(props: EditPagePropsType) {
-	const { userID, budgetID, handleFinishEdits } = props;
+	const { budgetData, handleFinishEdits } = props;
 	const [renderKey, setRenderKey] = useState<number>(0);
 	const [isShowingCategoryTemplate, setIsShowingCategoryTemplate] = useState<boolean>(false);
 	const [categories, setCategories] = useState<Category[]>(props.categories);
@@ -70,7 +69,7 @@ export function EditPage(props: EditPagePropsType) {
 				updatedCategories.sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
 				setCategories(updatedCategories);
 				// Creates new category doc in firebase
-				createCategory(userID, budgetID, newCategory);
+				createCategory(budgetData.userID, budgetData.budgetID, newCategory);
 				// Hides category template
 				handleShowCategoryTemplate();
 			} else {
@@ -83,7 +82,7 @@ export function EditPage(props: EditPagePropsType) {
 		const updatedCategories = [...categories].filter((category) => category.id !== targetCategoryID);
 		setCategories(updatedCategories);
 		// Deleting category doc from firebase
-		deleteCategory(userID, budgetID, targetCategoryID);
+		deleteCategory(budgetData.userID, budgetData.budgetID, targetCategoryID);
 
 		// Deleting subcategories
 		const deletedSubcategories: Subcategory[] = [];
@@ -99,9 +98,9 @@ export function EditPage(props: EditPagePropsType) {
 
 		for (let subcategory of deletedSubcategories) {
 			// Deleting subcategory docs from firebase
-			deleteSubcategory(userID, budgetID, subcategory.id);
+			deleteSubcategory(budgetData.userID, budgetData.budgetID, subcategory.id);
 			// Deleting allocation docs with target subcategoryID
-			deleteAllocationsBySubcategory(userID, budgetID, subcategory.id);
+			deleteAllocationsBySubcategory(budgetData.userID, budgetData.budgetID, subcategory.id);
 		}
 	};
 	const handleUpdateCategoryName = (targetCategory: Category, newName: string) => {
@@ -111,7 +110,7 @@ export function EditPage(props: EditPagePropsType) {
 		if (updatedCategories[targetIndex].name !== newName) {
 			updatedCategories[targetIndex].name = newName;
 			// Updating category doc in firebase
-			updateCategory(userID, budgetID, updatedCategories[targetIndex]);
+			updateCategory(budgetData.userID, budgetData.budgetID, updatedCategories[targetIndex]);
 			// Sorting and re-rendering categories
 			updatedCategories.sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
 			setCategories(updatedCategories);
@@ -127,13 +126,13 @@ export function EditPage(props: EditPagePropsType) {
 		updatedSubcategories.sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
 		setSubcategories(updatedSubcategories);
 		// Creates new subcategory doc in firebase
-		createSubcategory(userID, budgetID, newSubcategory);
+		createSubcategory(budgetData.userID, budgetData.budgetID, newSubcategory);
 	};
 	const handleDeleteSubcategory = (targetSubcategoryID: string) => {
 		// Deleting the target subcategory
 		const updatedSubcategories = [...subcategories].filter((subcategory) => subcategory.id !== targetSubcategoryID);
 		setSubcategories(updatedSubcategories);
-		deleteSubcategory(userID, budgetID, targetSubcategoryID);
+		deleteSubcategory(budgetData.userID, budgetData.budgetID, targetSubcategoryID);
 
 		// Deleting allocations of the target subcategory
 	};
@@ -144,7 +143,7 @@ export function EditPage(props: EditPagePropsType) {
 		if (updatedSubcategories[targetIndex].name !== newName) {
 			updatedSubcategories[targetIndex].name = newName;
 			// Updating subcategory doc in firebase
-			updateSubcategory(userID, budgetID, updatedSubcategories[targetIndex]);
+			updateSubcategory(budgetData.userID, budgetData.budgetID, updatedSubcategories[targetIndex]);
 			// Sorting and re-rendering categories
 			updatedSubcategories.sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
 			setSubcategories(updatedSubcategories);
@@ -167,7 +166,7 @@ export function EditPage(props: EditPagePropsType) {
 		updatedSubcategories[targetIndex].categoryID = newCategory.id;
 		setSubcategories(updatedSubcategories);
 		// Updating subcategory doc in firebase
-		updateSubcategory(userID, budgetID, updatedSubcategories[targetIndex]);
+		updateSubcategory(budgetData.userID, budgetData.budgetID, updatedSubcategories[targetIndex]);
 		hideSubpage();
 	};
 
@@ -197,11 +196,11 @@ export function EditPage(props: EditPagePropsType) {
 
 	// Element for adding new category
 	const categoryTemplate = (
-		<div className={styles.emptyCategory}>
+		<div data-test-id="category-template" className={styles.emptyCategory}>
 			<input type="text" onKeyDown={handleCreateCategory} />
 			<IconButton
 				button={{
-					onClick: () => {},
+					onClick: handleShowCategoryTemplate,
 				}}
 				src={"/icons/circled-minus.svg"}
 				altText={"Button to cancel new category"}
