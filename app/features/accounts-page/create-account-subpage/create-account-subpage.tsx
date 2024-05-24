@@ -39,9 +39,16 @@ export function CreateAccountSubpage(props: CreateAccountSubpagePropsType) {
 			const indexOfDecimalPoint = newInitialBalance.indexOf(".");
 			const substringBeforeDecimal = newInitialBalance.substring(0, indexOfDecimalPoint);
 			const substringAfterDecimal = newInitialBalance.substring(indexOfDecimalPoint + 1, newInitialBalance.length + 1);
-			const substringAfterDecimalReplaced = substringAfterDecimal.replaceAll(".", "");
+			let substringAfterDecimalReplaced = substringAfterDecimal.replaceAll(".", "");
+			// Removes any number after the hundredths place
+			if (substringAfterDecimalReplaced.length > 2) {
+				substringAfterDecimalReplaced = substringAfterDecimalReplaced.substring(0, 2);
+			}
 			newInitialBalance = substringBeforeDecimal + "." + substringAfterDecimalReplaced;
 		}
+
+		// Removes any number after the hundredths place
+		const charsAfterDecimal = newInitialBalance.slice()
 
 		if (newInitialBalance === "") {
 			event.target.value = "";
