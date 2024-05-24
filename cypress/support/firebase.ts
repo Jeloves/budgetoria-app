@@ -54,17 +54,6 @@ export async function createBudget(userID: string, budget: Budget) {
 	}
 }
 
-export async function createMockUser(email: string, password: string) {
-    createUser(email, password).then(
-        (userID) => {
-            createInitialBudget(userID as string);
-        },
-        (error) => {
-            console.error("Failed to create mock user", error)
-        }
-    );
-}
-
 async function clearFirestoreEmulator() {
     try {
         const response = await fetch('http://127.0.0.1:8080/emulator/v1/projects/budgetoria/databases/(default)/documents', {
