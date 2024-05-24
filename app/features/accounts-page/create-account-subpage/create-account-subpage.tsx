@@ -66,7 +66,7 @@ export function CreateAccountSubpage(props: CreateAccountSubpagePropsType) {
 
 	return (
 		<>
-			<header data-test-id="create_account_subpage_header"  className={styles.header}>
+			<header className={styles.header}>
 				<IconButton button={{ onClick: handleBackClick }} src={"/icons/arrow-left-grey-100.svg"} altText={"Button to navigate back to Accounts Page"} />
 				<span>Create Account</span>
 				<button className={styles.finish} onClick={handleCreateAccountClick}>
