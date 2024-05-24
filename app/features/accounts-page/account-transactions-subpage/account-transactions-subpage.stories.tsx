@@ -3,7 +3,7 @@ import { Meta, StoryFn } from "@storybook/react";
 import { AccountTransactionsSubpage, AccountTransactionsSubpagePropsType } from "./account-transactions-subpage";
 import { Account, Subcategory, Transaction } from "@/firebase/models";
 import { Timestamp } from "firebase/firestore";
-import { getMockData } from "@/mock-data/mock-budget";
+import { getMockData } from "../../../../cypress/support/mock";
 
 export default {
 	title: "AccountsPage/AccountTransactions",
