@@ -108,41 +108,41 @@ export function AccountsPage(props: AccountsPagePropsType) {
 		accountItems.push(
 			<div
 				data-test-id={`account-item-${i}`}
-				key={`account_item_${i}`}
+				key={`account-item-${i}`}
 				className={styles.accountItem}
 				onClick={() => {
 					navigateToAccountTransactionsSubpage(account, filteredTransactions);
 				}}
 			>
-				<span key={`account_item_name_${i}`}>{account.name}</span>
-				<span key={`account_item_balance_${i}`}>{accountBalanceString}</span>
+				<span key={`account-item-name-${i}`}>{account.name}</span>
+				<span key={`account-item-balance-${i}`}>{accountBalanceString}</span>
 			</div>
 		);
 	}
 	// Adds "Budget" heading for list of accounts
 	const totalBalanceString = totalAccountBalance >= 0 ? "$" + (totalAccountBalance / 1000000).toFixed(2) : "-$" + (totalAccountBalance / -1000000).toFixed(2);
 	accountItems.unshift(
-		<div data-test-id={`total-item`} key={"total_item"} className={classNames(styles.accountItem, styles.totalItem)}>
-			<span key={"total_item_name"}>Budget</span>
-			<span key={"total_item_balance"}>{totalBalanceString}</span>
+		<div data-test-id="total-item" key={"total-item"} className={classNames(styles.accountItem, styles.totalItem)}>
+			<span key={"total-item-label"}>Budget</span>
+			<span key={"total-item-balance"}>{totalBalanceString}</span>
 		</div>
 	);
 
 	return (
 		<>
-			<header data-test-id="accounts_page_header" className={styles.header}>
+			<header data-test-id="accounts-page-header" className={styles.header}>
 				Accounts
 			</header>
-			<main data-test-id="accounts_page_main" key={accountsPageRenderKey} className={styles.main}>
+			<main data-test-id="accounts-page-main" key={accountsPageRenderKey} className={styles.main}>
 				<div className={styles.subpageButtonContainer}>
 					{unfinishedTransactions.length > 0 && (
-						<button data-test-id="unfinished_transactions_button" className={styles.subpageButton} onClick={navigateToUnfinishedTransactionsSubpage}>
+						<button data-test-id="unfinished-transactions-button" className={styles.subpageButton} onClick={navigateToUnfinishedTransactionsSubpage}>
 							New Transactions
 							<img src="/icons/arrow-right.svg" alt="Button to add accounts" />
 						</button>
 					)}
 					{transactions.length > 0 && (
-						<button data-test-id="all_accounts_button" className={styles.subpageButton} onClick={navigateToAllTransactionsSubpage}>
+						<button data-test-id="all-accounts-button" className={styles.subpageButton} onClick={navigateToAllTransactionsSubpage}>
 							All Accounts
 							<img src="/icons/arrow-right.svg" alt="Button to add accounts" />
 						</button>
@@ -150,13 +150,13 @@ export function AccountsPage(props: AccountsPagePropsType) {
 				</div>
 				{accountItems}
 				<div className={styles.subpageButtonContainer}>
-					<button data-test-id="add_accounts_button" className={styles.subpageButton} onClick={navigateToCreateAccountSubpage}>
+					<button data-test-id="add-accounts-button" className={styles.subpageButton} onClick={navigateToCreateAccountSubpage}>
 						Add Accounts
 						<img src="/icons/arrow-right.svg" alt="Button to add accounts" />
 					</button>
 				</div>
 			</main>
-			<section data-test-id="accounts_subpage" className={classNames(subpageClasses)}>
+			<section data-test-id="accounts-subpage" className={classNames(subpageClasses)}>
 				{subpage}
 			</section>
 		</>
