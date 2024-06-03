@@ -3,7 +3,7 @@ import { initializeApp } from "firebase/app";
 import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
 dotenv.config();
 
-export const isTesting = true;
+export const isTesting = false;
 
 const firebaseConfig = {
 	apiKey: process.env.NEXT_PUBLIC_API_KEY,
