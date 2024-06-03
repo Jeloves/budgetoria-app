@@ -1,6 +1,6 @@
 import { Account, Allocation, Budget, Category, Subcategory, Transaction } from "@/firebase/models";
 import { getAccountByID } from "@/utils/getByID";
-import { sortCategoriesAlphabetically, sortSubcategoriesAlphabetically, sortTransactionsByTimestamp } from "@/utils/sorting";
+import { sortAccountsAlphabetically, sortCategoriesAlphabetically, sortSubcategoriesAlphabetically, sortTransactionsByTimestamp } from "@/utils/sorting";
 import { Timestamp } from "firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
 import { NIL as NIL_UUID } from "uuid";
@@ -303,6 +303,7 @@ for (let account of accounts) {
 }
 
 export function getMockData() {
+	sortAccountsAlphabetically(accounts);
 	sortTransactionsByTimestamp(transactions);
 	sortCategoriesAlphabetically(categories);
 	sortSubcategoriesAlphabetically(subcategories);

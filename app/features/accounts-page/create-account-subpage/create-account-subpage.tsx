@@ -39,9 +39,16 @@ export function CreateAccountSubpage(props: CreateAccountSubpagePropsType) {
 			const indexOfDecimalPoint = newInitialBalance.indexOf(".");
 			const substringBeforeDecimal = newInitialBalance.substring(0, indexOfDecimalPoint);
 			const substringAfterDecimal = newInitialBalance.substring(indexOfDecimalPoint + 1, newInitialBalance.length + 1);
-			const substringAfterDecimalReplaced = substringAfterDecimal.replaceAll(".", "");
+			let substringAfterDecimalReplaced = substringAfterDecimal.replaceAll(".", "");
+			// Removes any number after the hundredths place
+			if (substringAfterDecimalReplaced.length > 2) {
+				substringAfterDecimalReplaced = substringAfterDecimalReplaced.substring(0, 2);
+			}
 			newInitialBalance = substringBeforeDecimal + "." + substringAfterDecimalReplaced;
 		}
+
+		// Removes any number after the hundredths place
+		const charsAfterDecimal = newInitialBalance.slice()
 
 		if (newInitialBalance === "") {
 			event.target.value = "";
@@ -66,7 +73,7 @@ export function CreateAccountSubpage(props: CreateAccountSubpagePropsType) {
 
 	return (
 		<>
-			<header data-test-id="create_account_subpage_header"  className={styles.header}>
+			<header className={styles.header}>
 				<IconButton button={{ onClick: handleBackClick }} src={"/icons/arrow-left-grey-100.svg"} altText={"Button to navigate back to Accounts Page"} />
 				<span>Create Account</span>
 				<button className={styles.finish} onClick={handleCreateAccountClick}>
@@ -79,11 +86,11 @@ export function CreateAccountSubpage(props: CreateAccountSubpagePropsType) {
 				<label>Enter the starting balance for the account</label>
 				<div className={styles.balance}>
 					<div className={styles.flowContainer}>
-						<div className={outflow ? styles.outflow : ""}>
+						<div data-test-id="outflow-button" className={outflow ? styles.outflow : ""}>
 							<IconButton button={{ onClick: handleSwitchToOutflow }} src={outflow ? "/icons/minus-gray-100.svg" : "/icons/minus-gray-500.svg"} altText={"Button to make a negative balance"} />
 						</div>
-						<hr className={styles.border}/>
-						<div className={outflow ? "" : styles.inflow}>
+
+						<div data-test-id="inflow-button" className={outflow ? "" : styles.inflow}>
 							<IconButton button={{ onClick: handleSwitchToInflow}} src={outflow ? "/icons/plus-gray-500.svg" : "/icons/plus-gray-100.svg"} altText={"Button to make a positive balance"} />
 						</div>
 					</div>
