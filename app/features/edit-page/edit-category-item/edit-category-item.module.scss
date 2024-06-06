@@ -14,6 +14,12 @@
 		font: inherit;
 		color: white;
 		flex: 1;
+		padding: space.$s1;
+	}
+
+	input:focus {
+		border: space.$s0-1 solid color.$gray-500;
+		border-radius: space.$s1;
 	}
 }
 

@@ -17,6 +17,9 @@ export function EditSubcategoryItem(props: EditSubcategoryItemPropsType) {
 			const newName = event.currentTarget.value;
 			if (newName) {
 				handleUpdateSubcategoryName(subcategory, newName);
+				(event.target as HTMLInputElement).blur();
+			} else {
+				alert("A subcategory name must be inputted");
 			}
 		}
 	}

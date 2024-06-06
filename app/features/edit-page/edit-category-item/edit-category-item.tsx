@@ -52,8 +52,9 @@ export function EditCategoryItem(props: EditCategoryItemPropsType) {
 			const newName = event.currentTarget.value;
 			if (newName) {
 				handleUpdateCategoryName(category, newName);
+				(event.target as HTMLInputElement).blur();
 			} else {
-				alert("A name must be inputted");
+				alert("A category name must be inputted");
 			}
 		}
 	};
